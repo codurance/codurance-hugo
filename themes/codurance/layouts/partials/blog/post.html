@@ -1,0 +1,135 @@
+<div class="bg-color-light">
+    <div class="container content-sm">
+        <div class="row blog-page blog-item">
+            <!-- Left Sidebar -->
+            <div class="col-md-9">
+                <!--Blog Post-->
+                <div class="news-v3 bg-color-white margin-bottom-30">
+                    <div class="news-v3-in shareThisButtons">
+                        <h1>{{ .Title }}</h1>
+                        <ul class="list-inline posted-info">
+                            <li>By <a class='author' href='/blog/author/{{ replace .Params.author " " "-" | lower }}'>{{ .Params.author }}</a></li>
+                            <li>Posted {{ .Date.Format "02 January 2006" }}</li>
+                            <li>
+                                {{ range .Params.tags }}
+                                <a href="/tags/{{ . | urlize  }}/"><i class="fa fa-tags"></i><span class="blog-tag-margin"> {{ . }}</span></a>
+                                {{ end }}
+                            </li>
+                        </ul>
+
+                        {{ .Content }}
+
+                        {{ if .Params.canonical }}
+                        <p class="cross-post"><a href="{{ .Params.canonical.href }}">This post was cross-posted to {{ .Params.canonical.name }}.</a></p>
+                        {{ end }}
+
+                        <div id="sharethisButtons">
+                            <span class='pull-right st_twitter_large' displayText='Tweet' st_url='{{ .Permalink }}'></span>
+                            <span class='pull-right st_linkedin_large' displayText='LinkedIn' st_url='{{ .Permalink }}'></span>
+                            <span class='pull-right st_email_large' displayText='Email' st_url='{{ .Permalink }}'></span>
+                            <span class='pull-right st_sharethis_large' displayText='ShareThis' st_url='{{ .Permalink }}'></span>
+                        </div>
+                    </div>
+                </div>
+                <!--End Blog Post-->
+                <!--About the author -->
+                {{ range $author := where (where .Site.Pages "Type" "ourteam" ) "Params.name" .Params.author }}
+                <div class = "blog-author bg-color-white margin-bottom-30">
+                    <div class="headline headline-md margin-bottom-30">
+                        <h2>About the author</h2>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3 pull-left">
+                            <img class="img-responsive"  id="author-img" src="{{ $author.Params.image }}">
+                        </div>
+                        <div class="col-sm-9">
+                            <div class="blog-author-desc">
+                                <div class="overflow-h">
+                                    <h4>{{ $.Params.author }}</h4>
+                                    {{ if $author.Params.twitter }}
+                                    <ul class="list-inline">
+                                        <li><a href="https://twitter.com/intent/tweet?text=.%20@{{ $author.Params.twitter }}%20Type%20your%20text%20here&url={{ $.Permalink }}&via=codurance"><i class="fa fa-twitter"></i></a></li>
+                                    </ul>
+                                    {{ end }}
+                                </div>
+                                {{ $author.Params.full_description | safeHTML }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{ end }}
+                <!--End About the author-->
+            </div>
+            <!-- End Left Sidebar -->
+
+            <!-- Right Sidebar -->
+            <div class="col-md-3">
+                <!--Related Blog Posts-->
+                <div class="posts margin-bottom-40">
+                    <div class="headline-v2">
+                        <h2>Related Blogs</h2>
+                    </div>
+
+                        {{ $.Scratch.Set "amountOfRelatedBlogs" 0 }}
+                        {{ $maxAmountOfRelatedBlogs := 7 }}
+                        {{ range where .Site.Pages.ByDate.Reverse "Type" "blog" }}
+                            {{ $has_common_tags := intersect $.Params.tags .Params.tags | len | lt 0 }}
+                            {{ if and (and $has_common_tags (ne $.Permalink .Permalink)) (lt ($.Scratch.Get "amountOfRelatedBlogs") $maxAmountOfRelatedBlogs) }}
+                                {{ $.Scratch.Add "amountOfRelatedBlogs" 1 }}
+                        <div class="blog-thumb blog-thumb-circle margin-bottom-15">
+                            <div class="blog-thumb-hover">
+                                <a href="{{ .RelPermalink }}">
+                                    <img class="rounded-x" src="{{ .Params.image.src }}" alt=""></img>
+                                </a>
+                                <a class="hover-grad" href="{{ .RelPermalink }}">
+                                    <i class="fa fa-hand-spock-o"></i>
+                                </a>
+                            </div>
+                            <div class="blog-thumb-desc">
+                                <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+                                <ul class="blog-thumb-info">
+                                    <li>
+                                        {{ .Params.author }}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                            {{ end }}
+                        {{ end }}
+                    </h1>
+                </div>
+                <!-- Recent blogs -->
+                <div class="posts margin-bottom-40">
+                    <div class="headline-v2"><h2>Recent Blogs</h2></div>
+                    {{ range first 7 (where .Site.Pages.ByDate.Reverse "Type" "blog") }}
+                    <div class="blog-thumb blog-thumb-circle margin-bottom-15">
+                        <div class="blog-thumb-hover">
+                            <a href="/">
+                                <img class="rounded-x" src="{{ .Params.image.src }}" alt=""></img>
+                            </a>
+                            <a class="hover-grad" href="{{ .RelPermalink }}">
+                                <i class="fa fa-hand-spock-o"></i>
+                            </a>
+                        </div>
+                        <div class="blog-thumb-desc">
+                            <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+                            <ul class="blog-thumb-info">
+                                <li>
+                                    {{ .Params.author }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    {{ end }}
+                    <!-- End Recent blogs -->
+                </div>
+                <!-- End Right Sidebar -->
+            </div>
+            <!--/row-->
+        </div>
+        <!--/container-->
+    </div>
+    <!-- background color -->
+</div>
+
+

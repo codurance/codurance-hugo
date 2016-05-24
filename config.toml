@@ -1,0 +1,9 @@
+title = "Software Craftsmanship and Agile Development"
+baseurl = "http://codurance.com/"
+theme = "codurance"
+googleAnalytics = "UA-46289079-1"
+rssuri = "atom.xml"
+ignoreFiles = [ "\\.___jb_tmp___$" ]
+
+languageCode = "en-gb"
+pluralizeListTitles = false

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Teams on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/teams/</link>
+    <description>Recent content in Teams on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Mon, 10 Nov 2014 04:20:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/teams/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Not all managers are stupid</title>
+      <link>http://codurance.com/blog/not-all-managers-are-stupid/</link>
+      <pubDate>Mon, 10 Nov 2014 04:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/not-all-managers-are-stupid/</guid>
+      <description>
+
+&lt;p&gt;&lt;em&gt;(The following story was a bit altered in order to keep it short(ish) and to protect the innocents)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;I still remember the day when our managers in a large organisation told us we should still go live after we reported a &lt;em&gt;major&lt;/em&gt; problem a couple of months before the deadline. We had been developing the system for almost one year with 7 teams in 2 different countries. We were building a system that would process different types of trades coming from many different front-office systems around the world. The system had to report all these trades to regulators according to quite complex criteria. Different types of trades had different rules and reporting workflows. We also had to integrate with other internal systems to get all the information needed to report the trades. The volume of trades was quite large—millions. There was a problem in a couple of unfinished flows, which would cause hundreds of thousands of trades to be misreported to the regulators. After we explained the situation, managers told us to &lt;em&gt;work harder&lt;/em&gt; go ahead with the release anyway.&lt;/p&gt;
+
+&lt;p&gt;How could they tell us to go live in a situation like that? They should all be fired. Arrested. How could they ask us to drop the quality and go live with a known problem of that size? “Your focus is to get the system ready to be deployed and integrated with other systems,” they said. “We are going live on the date specified.” Seriously? I could not believe in such irresponsibility. They were the same managers that once said they believed in Agile and Craftsmanship. The same ones that hired us because of our focus on quality. But still, they were making these “stupid” decisions. &lt;/p&gt;
+
+&lt;p&gt;More than once we made it clear that focusing our time on getting the system ready to production would not gives us any time to finish the automation for the problematic flows and thousands of trades would be misreported. But they did not listen. Or so we thought.&lt;/p&gt;
+
+&lt;h3 id=&#34;the-revelation&#34;&gt;The revelation&lt;/h3&gt;
+
+&lt;p&gt;After a few meetings with the business, we discovered a few things. They were not being irresponsible or stupid, as we developers thought. The deadline was set by the regulators and could not be moved. The cost of not reporting the trades was far higher than misreporting them. Not reporting the trades would not only be followed by heavy fines, but also by possible reputation damage. Companies would have extra time to correct any misreported trades before being fined. &lt;/p&gt;
+
+&lt;p&gt;For us, in the development team, it was the first time we realised that going live with a few known issues would be better than not going live at all. In order to meet the deadline, we took an informed (but hard) decision to drop the quality little bit—we got rid of higher-level tests (acceptance and component tests), but kept test-driving everything at unit level. We communicated the decision to the business and clearly told them the possible impacts of it. &lt;/p&gt;
+
+&lt;h3 id=&#34;focus-on-highest-value-features-first&#34;&gt;Focus on highest value features first&lt;/h3&gt;
+
+&lt;p&gt;With all the problems on the table (technical and business constraints), we could all focus on possible alternatives, business and developers working together as a real team. &lt;/p&gt;
+
+&lt;p&gt;There were two ways to report trades to the regulators. The first was to do it automatically, processing the trades via the system we were building, and sending them directly to the regulators. The second was to manually create spreadsheets for each type of trade and upload them via FTP. Due to the volume of trades and the amount of data we needed from other systems, the manual approach was not an option. At least not for all the trades.&lt;/p&gt;
+
+&lt;p&gt;As we knew we could not get all the flows done in time and also knowing of what was at stake, managers and developers worked as a team to find a solution. We prioritised and focused on automating the flows for the trades with the highest volume, making sure that we would correctly report the vast majority of trades. For the remaining trades, the ones with the lowest volume, we decided to hire a few people to upload the trades manually. Since the system would be ready to report the majority of the trades, the manual upload for the remaining ones could actually be done in time. A few developers and business analysts created a bunch of scripts to extract data from a few systems and save it on the file system, making the manual upload, although a bit painful, viable. &lt;/p&gt;
+
+&lt;h3 id=&#34;the-outcome&#34;&gt;The outcome&lt;/h3&gt;
+
+&lt;p&gt;With a hybrid solution, we managed to report all trades on time with very few minor bugs, which were fixed quite quickly after the deadline. The very few trades misreported were corrected and re-sent. We also automated the manual flows and got rid of the manual solution a few weeks later. There were no damage to the organisation and we were one of the very few organisations that met the regulators imposed deadline.&lt;/p&gt;
+
+&lt;h3 id=&#34;lessons-learned&#34;&gt;Lessons learned&lt;/h3&gt;
+
+&lt;p&gt;As craftsmen, we all learned very important lessons in this project:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Managers have a far broader view of the problem than we do. While we worry about problems with the software, they worry about problems that may affect the entire organisation. &lt;/li&gt;
+&lt;li&gt;Before judging managers, calling them stupid and irresponsible, we should understand why they are making certain decisions. Quite often we discover that we don’t have the same amount of information they have and that certain decisions are not as stupid as we think. &lt;/li&gt;
+&lt;li&gt;We are all humans and we all make mistakes. Managers are no different. They also make mistakes but that doesn’t make them stupid. Not always, at least. :)&lt;/li&gt;
+&lt;li&gt;We need to stop thinking that all managers are bad and that they don’t understand or care about software problems. In this very specific case, they understood it well, measured the pros and cons, and made the right call to go live.&lt;/li&gt;
+&lt;li&gt;When we are too involved with a problem, we end up thinking that our problem is the biggest and most important problem, calling stupid any other person that fails to recognise it.&lt;/li&gt;
+&lt;li&gt;As a craftsman we are paid to provide value. However, our notion of value needs to be aligned with what value means to our customers. Having well-crafted code is pointless if the business won’t benefit from it.&lt;/li&gt;
+&lt;li&gt;Even when there are many things at stake, developers should decide what can or cannot be compromised when it comes to software quality. When the whole project is under pressure, we should never let the business make technical decisions. Although we decided to drop certain tests, keeping TDD at unit level, refactoring, and pair programming, was the right decision for us and I’m happy we kept our practices. They helped us to deliver the value the business needed. We were able to confidently make all the changes we needed and also make sure that everything we delivered was working as expected. Giving the business the choice, they would have probably chosen to get rid of TDD, refactoring, CI, and pair programming altogether, risking not to deliver even the main flows correctly.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This project changed me. There are far more bad managers than good managers, but that is also true for developers. Understanding the main reasons behind each managerial decision can help us distinguish good and bad managers. It can also help us to stop with this unhealthy “us and them” attitude. Transparency, trust, and teamwork are essential for an effective organisation. &lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Too Many Cooks</title>
+      <link>http://codurance.com/blog/too-many-cooks/</link>
+      <pubDate>Sun, 09 Nov 2014 11:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/too-many-cooks/</guid>
+      <description>
+
+&lt;p&gt;Last week, &lt;a href=&#34;http://codurance.com/aboutus/ourteam/&#34;&gt;Sandro&lt;/a&gt; and I flew to Bucharest to meet &lt;a href=&#34;http://alexbolboaca.ro/&#34;&gt;Alex&lt;/a&gt; and &lt;a href=&#34;http://adrianbolboaca.ro/&#34;&gt;Adi Bolboaca&lt;/a&gt;, &lt;a href=&#34;http://about.me/aksalmi&#34;&gt;Aki Salmi&lt;/a&gt; and &lt;a href=&#34;http://code-cop.org/&#34;&gt;Peter Kofler&lt;/a&gt;. We didn&amp;rsquo;t know what to expect: the agenda was to try a &amp;ldquo;hardcore coderetreat&amp;rdquo;, in which the constraints would be incredibly difficult, but when you have six headstrong, opinionated people in a room, you really have no idea what&amp;rsquo;s going to happen.&lt;/p&gt;
+
+&lt;p&gt;So it was surprising, but not, when we decided as a group to try and &lt;a href=&#34;http://monospacedmonologues.com/post/91841399505/mob-programming-and-the-importance-of-fun-at-work&#34;&gt;mob&lt;/a&gt; on a real project. We started on a website for people to find pair programming partners (which we still plan to launch some time after the Global Day of Coderetreat), with one person driving and the rest &lt;del&gt;yelling at them&lt;/del&gt; &lt;ins&gt;navigating&lt;/ins&gt;.&lt;/p&gt;
+
+&lt;p&gt;We started off quite well, driving a simple set of static pages to get the flow hammered out, with lots of discussion about the product design, how it would work, what the first real feature would be and how we could launch a &lt;a href=&#34;http://en.wikipedia.org/wiki/Minimum_viable_product&#34;&gt;minimum viable product&lt;/a&gt;. Being an agile team, we had 45-minute iterations, ten minute retrospectives and five-minute breaks, just like a code retreat. Three iterations in, we had lunch, and people were feeling good.&lt;/p&gt;
+
+&lt;p&gt;That feeling didn&amp;rsquo;t last. By mid-afternoon, we were lagging, and people were drifting off. The experiment wasn&amp;rsquo;t working as well as we hoped. In our fifth retrospective, we decided to get to a point where it would be sensible to split into pairs and play with the code, so we quickly knocked out the rest of the flow and broke apart to do the things we cared about doing.&lt;/p&gt;
+
+&lt;p&gt;I, personally, was a bit dejected when we split apart. I thought that six skilled people should be able to do anything together. Pairing with Alex cheered me up very quickly, as we worked towards an acceptance test that focused us on what &lt;em&gt;we&lt;/em&gt; really cared about, while the others did different things. Aki and Peter worked on a new interface for the page handling, extending its capabilities while preserving the functionality at first. Sandro and Adi decided to show each other their styles of unit testing, as they&amp;rsquo;re very different.&lt;/p&gt;
+
+&lt;p&gt;A few hours later, we had lots of cool changes to the product that we&amp;rsquo;ll probably blend back together.&lt;/p&gt;
+
+&lt;p&gt;So what went wrong in the mobbing, and why did pairing work? As mob programming is really just pair programming taken to the next level, why didn&amp;rsquo;t things happen?&lt;/p&gt;
+
+&lt;h2 id=&#34;by-failing-to-prepare-you-are-preparing-to-fail&#34;&gt;By failing to prepare, you are preparing to fail.&lt;/h2&gt;
+
+&lt;p class=&#34;citation&#34;&gt;&lt;cite&gt;Benjamin Franklin&lt;/cite&gt;&lt;/p&gt;
+
+&lt;p&gt;This exercise gave me some more confirmation of a hypothesis I&amp;rsquo;ve been kicking around in my head for a while:&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;The number of people on a team should be a function of its stability.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;We had six people on the team, but it was very unstable. I&amp;rsquo;ll explain why.&lt;/p&gt;
+
+&lt;h3 id=&#34;we-had-never-worked-with-each-other-before&#34;&gt;We had never worked with each other before.&lt;/h3&gt;
+
+&lt;p&gt;We all knew each other, but only Sandro and I have worked with each other for more than a few hours. We have our own style, which is often quite loud and heated. We argue &lt;em&gt;a lot&lt;/em&gt;. It seems to work quite well for us, but it alienated the others, as they weren&amp;rsquo;t expecting it.&lt;/p&gt;
+
+&lt;h3 id=&#34;we-had-not-agreed-that-we-would-work-on-this-problem-at-all&#34;&gt;We had not agreed that we would work on this problem at all.&lt;/h3&gt;
+
+&lt;p&gt;The problem was a matter of consent, not consensus. Not everyone was committed to delivering a website; some wanted to just play around, and we didn&amp;rsquo;t so much decide to do one as assume that everyone was on the same page. While we did &lt;em&gt;state&lt;/em&gt; that we would build a website, simply stating something is not enough. People have to be emotionally committed, not just verbally committed.&lt;/p&gt;
+
+&lt;h3 id=&#34;we-didn-t-know-what-we-were-building&#34;&gt;We didn&amp;rsquo;t know what we were building.&lt;/h3&gt;
+
+&lt;p&gt;Alex had the idea for the website, which everyone &lt;em&gt;seemed to&lt;/em&gt; like, and for the first two iterations, he served as the product owner. However, he didn&amp;rsquo;t give us too much direction, which was probably a good move, as some people were there to build stuff, and some to experiment with code. Unfortunately, it meant that there was no clear focus on what we should be building.&lt;/p&gt;
+
+&lt;h3 id=&#34;we-didn-t-set-iteration-goals&#34;&gt;We didn&amp;rsquo;t set iteration goals.&lt;/h3&gt;
+
+&lt;p&gt;We had Scrum-style iterations, but no expectation of what we should be delivering. This, coupled with lots of new decisions during each retrospective, meant we didn&amp;rsquo;t go in a single direction; rather, we flew all over the place, often dropping snippets of code with little to no relevance to the actual project.&lt;/p&gt;
+
+&lt;h2 id=&#34;so-we-propose-a-new-experiment&#34;&gt;So, we propose a new experiment.&lt;/h2&gt;
+
+&lt;p&gt;This was a great experiment, and one I actually really enjoyed, despite my negative tone throughout this post. We didn&amp;rsquo;t get very far, but I derived a &lt;em&gt;lot&lt;/em&gt; of value from it, and that&amp;rsquo;s what I came for. It helped my refine my hypothesis, after all. It also helped me understand the value of planning meetings, product owners and defined backlogs in a way I hadn&amp;rsquo;t before. I honestly think that with those things, this would have been a success from the start.&lt;/p&gt;
+
+&lt;p&gt;As a result of this experiment, Adi and I would like to run a new one. Two teams, working separately on the same thing with the intention of shipping it. One would start with a mob. The other would start with a pair, and increase by one every &amp;ldquo;iteration&amp;rdquo;. We&amp;rsquo;d conduct retrospectives after each iteration, with the goal of finding out who made more progress &lt;em&gt;and&lt;/em&gt; who felt better connected as a team. Perhaps we&amp;rsquo;ll give it a shot at the next &lt;a href=&#34;http://www.socrates-conference.de/&#34;&gt;SoCraTes DE&lt;/a&gt; or &lt;a href=&#34;http://socratesuk.org/&#34;&gt;SoCraTes UK&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;I&amp;rsquo;d be really interested if anyone else has seen some studies on this or read about a similar concept elsewhere—drop me a line in the comments below or by email or Twitter.&lt;/em&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,1 @@
+{{ $plainifiedString := .string | plainify }}{{ $words := split $plainifiedString " " }}{{ range $index, $word := first $.limit $words }}{{ if ne $index 0}} {{ end  }}{{ $word | safeHTML }}{{ end }}{{if gt (len $words) $.limit}}...{{ end }}

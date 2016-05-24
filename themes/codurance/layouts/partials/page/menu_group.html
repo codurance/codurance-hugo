@@ -1,0 +1,8 @@
+<li class="dropdown">
+    <a class="dropdown-toggle" data-toggle="dropdown">{{ .item.name }} <i class="icon-angle-down">&nbsp;</i></a>
+    <ul class="dropdown-menu">
+        {{ range .item.links }}
+            {{ partial "page/menu_item.html" (dict "item" . "active_menu_item" $.active_menu_item )}}
+        {{ end }}
+    </ul>
+</li>

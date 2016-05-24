@@ -1,0 +1,44 @@
+<div class="row margin-bottom-20">
+    <div class="col-md-5 sm-margin-bottom-20">
+        <div class="blog-thumb">
+            <a href="{{ .RelPermalink }}"><img class="img-responsive" src="{{ .Params.image.src }}" alt="{{ .Title }}"></a>
+        </div>
+        {{ if or .Params.image.attribution.href .Params.image.attribution.text }}
+        <div>
+            <ul class="list-inline posted-info blog-img-attribution"><li>
+                {{ if .Params.image.attribution.href }}
+                <a href="{{ .Params.image.attribution.href }}" class="author">{{ .Params.image.attribution.text }}</a>
+                {{ else if .Params.image.attribution.text }}
+                {{ .Params.image.attribution.text }}
+                {{ end }}
+            </li></ul>
+        </div>
+        {{ end }}
+    </div>
+    <div class="col-md-7 news-v3">
+        <div class="news-v3-in-sm no-padding">
+            <a class="list-inline posted-info">
+                {{ $author := print "<a class=\"author\" href=\"/blog/author/" "felipe-fernández/" "\" >a</a>" }}
+                <li>By <a class='author' href="/blog/author/{{ .Params.author | urlize }}/">{{ .Params.author }} {{ $author | safeHTML }}</a></li>
+                <li>Posted {{ .Date.Format "02 January 2006" }}</li>
+            </ul>
+            <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+            <p>{{ partial "page/truncwords.html" (dict "string" .Content "limit" 45) }}</p>
+        </div>
+        {{ if .Params.tags }}
+        <div>
+            <ul class="list-unstyled list-inline blog-tags">
+                <li>
+                    <i class="fa fa-tags"></i>
+                    {{ range .Params.tags }}
+                    <a href="/tags/{{ . | urlize }}/">{{ . }} </a>
+                    {{ end }}
+                </li>
+            </ul>
+        </div>
+        {{ end }}
+    </div>
+</div>
+<div class="clearfix margin-bottom-20">
+    <hr/>
+</div>

@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Clojure on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/clojure/</link>
+    <description>Recent content in Clojure on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Sun, 15 May 2016 00:01:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/clojure/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Bowling Kata in Clojure, F# and Scala</title>
+      <link>http://codurance.com/blog/bowling-kata-in-clojure-fsharp-scala/</link>
+      <pubDate>Sun, 15 May 2016 00:01:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/bowling-kata-in-clojure-fsharp-scala/</guid>
+      <description>
+
+&lt;p&gt;In one of our evening apprenticeship meetings, a pair was doing the &lt;a href=&#34;http://codingdojo.org/cgi-bin/index.pl?KataBowling&#34;&gt;Bowling Kata&lt;/a&gt; in Java. After reviewing their code, I thought that it would be a good idea to do it myself.&lt;/p&gt;
+
+&lt;p&gt;Every craftsman at Codurance is a polyglot developer and, although we have very similar values, we all have our own preferences when it comes to programming languages and coding styles. As you can imagine, we cannot always avoid cracking a joke or two about all the languages we don’t like so much but other craftsmen in the company do. So, just for fun, quite a few of us decided to do the same kata using our language of choice. It was great to see the same problem solved with different languages. Although there are still a few craftsmen and apprentices working on solving the kata in different languages, here are 3 of my favourite solutions so far (in no particular order):&lt;/p&gt;
+
+&lt;h2 id=&#34;clojure-by-mashooq&#34;&gt;Clojure (by Mashooq)&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;(ns bowling.core-test
+  (:require [clojure.test :refer :all]
+            [bowling.core :refer :all]))
+
+(deftest bowling 
+  (testing &amp;quot;strikes for all rolls&amp;quot;
+    (is (= 300 (score &amp;quot;XXXXXXXXXXXX&amp;quot;))))
+
+  (testing &amp;quot;normal scores&amp;quot;
+    (is (= 99 (score &amp;quot;91919393929291219191&amp;quot;))))
+
+  (testing &amp;quot;normal scores or misses&amp;quot;
+    (is (= 90 (score &amp;quot;9-9-9-9-9-9-9-9-9-9-&amp;quot;)))
+    (is (= 93 (score &amp;quot;919-9-9-9-9-929-9-9-&amp;quot;))))
+  
+  (testing &amp;quot;mixture of stikes and normals&amp;quot;
+    (is (= 98 (score &amp;quot;9-X8-9-9-9-9-9-9-9-&amp;quot;)))
+    (is (= 104 (score &amp;quot;9-X8-9-9-9-9-9-9-X23&amp;quot;)))
+    (is (= 28 (score &amp;quot;--X81--------------&amp;quot;)))
+    (is (= 27 (score &amp;quot;--X8-1-------------&amp;quot;))))
+  
+  (testing &amp;quot;spares for all rolls&amp;quot;
+    (is (= 150 (score &amp;quot;5/5/5/5/5/5/5/5/5/5/5&amp;quot;))))
+
+  (testing &amp;quot;mixture of spares and normals&amp;quot;
+    (is (= 82 (score &amp;quot;9-8/--9-9-9-9-9-9-9-&amp;quot;)))
+    (is (= 84 (score &amp;quot;9-8/--9-9-9-9-9-9-9/1&amp;quot;)))
+    (is (= 12 (score &amp;quot;--8/1---------------&amp;quot;)))
+    (is (= 11 (score &amp;quot;--8/-1--------------&amp;quot;)))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;(ns bowling.core)
+
+(defn- spare?[s] (= \/ s))
+(defn- strike? [s] (= \X s))
+(defn- spare-or-strike? [s] (or (spare? s) (strike? s)))
+(defn- miss? [s] (or (= nil s) (= \- s)))
+
+(defn- score-for [s] 
+  (cond 
+     (spare-or-strike? s)  10
+     (miss? s)  0 
+     :else (read-string (str s))))
+
+(defn- score-roll [this-roll rem-rolls]
+  (cond 
+    (strike? this-roll) (+ 10 (score-for (first rem-rolls)) (score-for (first (rest rem-rolls))))
+    (spare? this-roll) (+ 10 (score-for (first rem-rolls)))
+    (spare? (first rem-rolls)) 0
+    :else (score-for this-roll)))
+
+(defn- score-rolls [acc rolls]
+  (if (seq rolls)  
+    (let [running-score (+ acc (score-roll (first rolls) (rest rolls)))]
+      (score-rolls running-score (rest rolls)))
+    acc))
+
+(defn- expand-strikes [rolls]
+  (seq (reduce str  (map #(if  (strike? %) &amp;quot;X-&amp;quot;  (str %)) (seq rolls)))))
+
+(defn- deduct-extra-rolls [score rolls]
+  (- score  (score-rolls 0 (drop 20 (expand-strikes rolls)))))
+
+(defn score [rolls] 
+  (deduct-extra-rolls (score-rolls 0 (seq rolls)) rolls))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;See on &lt;a href=&#34;https://github.com/mashooq/katas/tree/master/clojure/bowling&#34;&gt;Mash&amp;rsquo;s GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;f-by-pedro&#34;&gt;F# (by Pedro)&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fs&#34;&gt;namespace BowlingV2.FSharpKatas
+
+    module Bowling = 
+        open System
+
+        type private Rolls = Strike | Spare | Roll
+        type private Pins = Pins of int
+        type private Roll = Rolls * Pins
+        
+        let private maxRolls = 20
+        let private maxPins = 10
+        let private noPins = 0
+        
+        let private pinCountForRoll roll =
+            let (Pins pins) = snd roll
+            pins
+            
+        let private pinsFromRawRoll rawRoll =
+            Pins (Int32.Parse(rawRoll.ToString()))
+            
+        let private sparePinsFromRawRoll rawRoll = 
+            Pins (maxPins - Int32.Parse(rawRoll.ToString()))
+
+        let private parse roll index rolls =
+            let previousRoll = fun () -&amp;gt; Seq.item (index - 1) rolls
+            match roll with
+            | &#39;-&#39; -&amp;gt; Roll, Pins noPins
+            | &#39;/&#39; -&amp;gt; Spare, sparePinsFromRawRoll(previousRoll())
+            | &#39;X&#39; -&amp;gt; Strike, Pins maxPins
+            | r -&amp;gt; Roll, pinsFromRawRoll r
+
+        let private scoreRoll index rolls =
+            let bonusRoll = fun(lookAhead) -&amp;gt;  
+                if index + lookAhead &amp;lt; Seq.length rolls 
+                then pinCountForRoll (Seq.item (index + lookAhead) rolls) 
+                else noPins       
+
+            let exceedsMaxRolls = fun() -&amp;gt;
+                rolls 
+                |&amp;gt; Seq.take index
+                |&amp;gt; Seq.map (fun r -&amp;gt; match r with | (Strike, _) -&amp;gt; 2 | _ -&amp;gt; 1)
+                |&amp;gt; Seq.sum &amp;gt;= maxRolls
+
+            match Seq.item index rolls with
+                | (_, _) when exceedsMaxRolls() -&amp;gt; noPins
+                | (Spare, Pins pins) -&amp;gt; pins + bonusRoll 1
+                | (Strike, Pins pins) -&amp;gt; pins + bonusRoll 1 + bonusRoll 2
+                | (Roll, Pins pins) -&amp;gt; pins
+
+        let scoreGame rolls =
+            let parsedRolls = rolls |&amp;gt; Seq.mapi (fun index roll -&amp;gt; 
+                                                    parse roll index rolls)
+
+            parsedRolls
+            |&amp;gt; Seq.mapi (fun index _ -&amp;gt; scoreRoll index parsedRolls)
+            |&amp;gt; Seq.sum
+                     
+    module BowlingTests =
+        open NUnit.Framework
+        open Swensen.Unquote
+        open Bowling
+
+        [&amp;lt;Test&amp;gt;]
+        let ``calculate scores with no strikes or spares``() =
+            test &amp;lt;@ scoreGame &amp;quot;--&amp;quot; = 0 @&amp;gt; 
+            test &amp;lt;@ scoreGame &amp;quot;1&amp;quot; = 1 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;13&amp;quot; = 4 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;13521&amp;quot; = 12 @&amp;gt;
+            
+        [&amp;lt;Test&amp;gt;]
+        let ``calculate scores containing a miss``() =
+            test &amp;lt;@ scoreGame &amp;quot;1-5-&amp;quot; = 6 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;9-9-9-9-9-9-9-9-9-9-&amp;quot; = 90 @&amp;gt;
+            
+        [&amp;lt;Test&amp;gt;]
+        let ``calculate scores containing spares``() =
+            test &amp;lt;@ scoreGame &amp;quot;1/&amp;quot; = 10 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/--&amp;quot; = 10 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/-5&amp;quot; = 15 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/35-&amp;quot; = 21 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/3/23&amp;quot; = 30 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;5/5/5/5/5/5/5/5/5/5/5&amp;quot; = 150 @&amp;gt;
+        
+        [&amp;lt;Test&amp;gt;]
+        let ``calculate scores containing strikes``() =
+            test &amp;lt;@ scoreGame &amp;quot;X&amp;quot; = 10 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;X--&amp;quot; = 10 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;X--51&amp;quot; = 16 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;X51&amp;quot; = 22 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;XXXXXXXXXXXX&amp;quot; = 300 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;XXXXXXXXXX12&amp;quot; = 274 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/35XXX45&amp;quot; = 103 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/35XXX458/X35&amp;quot; = 149 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/35XXX458/X3/&amp;quot; = 153 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/35XXX458/X3/23&amp;quot; = 160 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/35XXX458/X3/X&amp;quot; = 173 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/35XXX458/X3/XX6&amp;quot; = 189 @&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;See on &lt;a href=&#34;https://github.com/pedromsantos/FSharpKatas/blob/master/BowlingV2.fs&#34;&gt;Pedro&amp;rsquo;s GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;scala-by-sandro&#34;&gt;Scala (by Sandro)&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;package com.codurance.bowlingkata.full_scoring
+
+import com.codurance.UnitSpec
+import com.codurance.bowlingkata.full_scoring.BowlingFullScoreCalculator.scoreFor
+
+class BowlingFullScoreCalculatorShould extends UnitSpec {
+
+	&amp;quot;calculate scores with no strikes or spares&amp;quot; in {
+		scoreFor(&amp;quot;11111111112222222222&amp;quot;) should be (30)
+	}
+
+	&amp;quot;calculate scores containing a miss&amp;quot; in {
+		scoreFor(&amp;quot;--------------------&amp;quot;) should be (0)
+		scoreFor(&amp;quot;1-1----------------1&amp;quot;) should be (3)
+		scoreFor(&amp;quot;9-9-9-9-9-9-9-9-9-9-&amp;quot;) should be (90)
+	}
+
+	&amp;quot;calculate scores containing spares&amp;quot; in {
+		scoreFor(&amp;quot;5/11------------3/11&amp;quot;) should be (26)
+		scoreFor(&amp;quot;5/5/5/5/5/5/5/5/5/5/5&amp;quot;) should be (150)
+	}
+
+	&amp;quot;calculate scores containing strikes&amp;quot; in {
+		scoreFor(&amp;quot;XXXXXXXXXXXX&amp;quot;) should be(300)
+		scoreFor(&amp;quot;XXXXXXXXXX12&amp;quot;) should be(274)
+		scoreFor(&amp;quot;1/35XXX458/X3/23&amp;quot;) should be(160)
+		scoreFor(&amp;quot;1/35XXX458/X3/XX6&amp;quot;) should be(189)
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;package com.codurance.bowlingkata.full_scoring
+
+object BowlingFullScoreCalculator {
+
+	def scoreFor(rolls: String): Int = totalScore(rolls.split(&amp;quot;&amp;quot;).toList)
+
+	private def totalScore(rolls: List[String], index: Int = 0, score: Int = 0): Int = {
+		lazy val MISS  = &amp;quot;-&amp;quot;
+		lazy val SPARE = (&amp;quot;/&amp;quot;, () =&amp;gt; 10 - rollScoreAt(index - 1) + if_(index &amp;lt; 19, rollScoreAt(index + 1)))
+		lazy val STRIKE = (&amp;quot;X&amp;quot;, () =&amp;gt; 10 + if_(index + numberOfPreviousStrikes() &amp;lt; 18,
+                                               rollScoreAt(index + 1) + rollScoreAt(index + 2)))
+
+		def numberOfPreviousStrikes() = rolls.mkString.take(index).count(_ == &#39;X&#39;)
+
+		def rollScoreAt(index: Int): Int =
+			rolls(index) match {
+				case STRIKE._1 =&amp;gt; 10
+				case SPARE._1  =&amp;gt; 10 - rolls(index - 1).toInt
+				case MISS      =&amp;gt; 0
+				case pins      =&amp;gt; pins.toInt
+			}
+
+		rolls.drop(index) match {
+			case STRIKE._1 :: _ =&amp;gt; totalScore(rolls, index + 1, score + STRIKE._2())
+			case SPARE._1 :: _  =&amp;gt; totalScore(rolls, index + 1, score + SPARE._2())
+			case MISS :: _      =&amp;gt; totalScore(rolls, index + 1, score)
+			case n :: _         =&amp;gt; totalScore(rolls, index + 1, score + n.toInt)
+			case List()         =&amp;gt; score
+		}
+	}
+
+	private def if_(condition: Boolean, ifTrue: =&amp;gt; Int): Int = if (condition) ifTrue else 0
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;See on &lt;a href=&#34;https://github.com/sandromancuso/bowling_kata_scala&#34;&gt;Sandro&amp;rsquo;s GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;fun-passion-and-respect&#34;&gt;Fun, passion, and respect&lt;/h2&gt;
+
+&lt;p&gt;Having fun at work, be surrounded by passionate and talented craftsmen, the respect we have for each other, and the willingness to learn and share, are some of the things I love the most about the Codurance’s culture. What started as apprentices practicing with a kata transformed into a great way to learn and share knowledge among craftsmen and apprentices. Some of our craftsmen and apprentices are also working on their solutions in Kotlin, Haskell, Java, and C#.&lt;/p&gt;
+
+&lt;p&gt;As among ourselves we will probably never agree which one we prefer, we will let you choose which one you like the most. :)&lt;/p&gt;
+
+&lt;p&gt;Thanks &lt;a href=&#34;https://twitter.com/mashooq&#34;&gt;Mash&lt;/a&gt; and &lt;a href=&#34;https://twitter.com/pedromsantos&#34;&gt;Pedro&lt;/a&gt; for the Clojure and F# implementations.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Clojure VIM Environment</title>
+      <link>http://codurance.com/blog/clojure-vim-environment/</link>
+      <pubDate>Sun, 10 Jan 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/clojure-vim-environment/</guid>
+      <description>&lt;p&gt;The &lt;a href=&#34;https://cursive-ide.com/&#34;&gt;Cursive&lt;/a&gt; plugin for Clojure is now out of its beta testing phase. I have been using it throughout its beta program and, I must say, it is pretty good. Sure, the refactoring capabilities are not quite on a par with those of IntelliJ for Java, but then Clojure is dynamic and asking for that kind of power is asking for the impossible.&lt;/p&gt;
+
+&lt;p&gt;I, on the other hand, have found myself going back to vim more often when I am working with Clojure. I have always found the vim shortcuts more powerful. I even use the vim plugin in IntelliJ IDEA / Cursive. Luckily there are couple of plugins available that make Clojure development in vim a joy. These are &lt;a href=&#34;https://github.com/vim-scripts/VimClojure&#34;&gt;Vim Clojure&lt;/a&gt; and &lt;a href=&#34;https://github.com/tpope/vim-fireplace&#34;&gt;Fireplace&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The basics I ask from a development environment are:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Syntax Highlighting&lt;/li&gt;
+&lt;li&gt;Fast keyboard based navigation through source code&lt;/li&gt;
+&lt;li&gt;Jump to source and docs for third-party libs&lt;/li&gt;
+&lt;li&gt;Fast test execution&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Vim with Fireplace satisfies the basic and goes beyond that. My favourite is the block editing feature that allows me to manipulate blocks of code (e.g. replace everything within function call, copy all declarations inside a let block etc.). The plugin also automatically connects to a running repl and allows me to execute any Clojure code directly through vim. I find these features much more useful then the rudimentary refactoring such as “change function name”, although I do miss it sometimes. Note that Cursive also has an integreated repl. There is a very good tutorial for Fireplace &lt;a href=&#34;http://clojure-doc.org/articles/tutorials/vim_fireplace.html&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Here’s what my vim Clojure dev environment looks like:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/vimenv.png&#34;  class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;I have found that some investment into learning better vim usage has allowed me to become more productive than I was with Cursive, although it will not suit everyones taste. The codebases I work on are relatively small and I may still prefer Cursive for larger codebases. Having said that, I like the argument that we should never have a single large codebase. At least for now vim is my new favourite editor for Clojure. Then again! I have not tried Emacs … yet!&lt;/p&gt;
+
+&lt;p&gt;EDIT: &lt;a href=&#34;https://twitter.com/tomphp&#34;&gt;Tom Oram&lt;/a&gt; pointed out a couple more plugins that I neglected to mention. These are &lt;a href=&#34;https://github.com/kien/rainbow_parentheses.vim&#34;&gt;Rainbow Parentheses&lt;/a&gt; and &lt;a href=&#34;https://github.com/vim-scripts/paredit.vim&#34;&gt;Paredit&lt;/a&gt;. The former is invaluable for keeping track of those parentheses, and adds a little colour to your life. The later allows structured editing of s-expressions -  it is not easy to get use to but once you do you cannot do without,&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Clojure (Prismatic) Schemas are Swagger</title>
+      <link>http://codurance.com/blog/clojure-schemas-are-swagger/</link>
+      <pubDate>Mon, 14 Sep 2015 13:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/clojure-schemas-are-swagger/</guid>
+      <description>&lt;p&gt;Recently, I decided to include Swagger documentation to our time sheet application. Although Swagger provides tools to help clients integrate with your REST API the most powerful feature, in my opinion, is that it acts as &amp;ldquo;living documentation&amp;rdquo; for the API. Adding Swagger to my the application had a couple of pleasant side-effects:&lt;/p&gt;
+
+&lt;p&gt;Idiomatic Clojure encourages the use of data structures such as maps. This work really well because JSON to/from Clojure Map translation, and persistence becomes straight forward whether you are using the &lt;a href=&#34;https://github.com/clojure/java.jdbc&#34;&gt;org.clojure/java.jdbc&lt;/a&gt; or persisting to a document database such as MongoDB. However, The problem with this approach is that understanding your entities becomes difficult. You often need to resort to the DDL for this purpose and in case of some databases you may not even have that. In cases where you are using migrations - your DDL may be scattered across many migrations over time. The Swagger support provided by &lt;a href=&#34;https://github.com/metosin/compojure-api&#34;&gt;metosin/compojure-api&lt;/a&gt; uses &lt;a href=&#34;https://github.com/Prismatic/schema&#34;&gt;prismatic/schema&lt;/a&gt; to define your API. Here is an example of what Activity and a list of Activities looks like in my time sheet application:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;(def Activity {
+  :id s/Num
+  :name s/Str
+  :description s/Str
+  :activitytype (s/enum &amp;quot;Daily&amp;quot; &amp;quot;Hourly&amp;quot;) })
+
+(def Activities [Activity])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Prismatic Schema provides other features such as attribute optionality, value optionality, custom schema types etc. See &lt;a href=&#34;https://github.com/Prismatic/schema&#34;&gt;README&lt;/a&gt; for more details.&lt;/p&gt;
+
+&lt;p&gt;Now that I have a single place where I can go to fully understand how my entities/value-objects looks like. The same entities/value-objects are used in my route definitions to define the REST API.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;(GET* &amp;quot;/activity&amp;quot; []
+  :return Activities
+  :summary &amp;quot;All activities in the system&amp;quot;
+  (ok (auth #(controller/get-activities))))
+
+(PUT* &amp;quot;/activity&amp;quot; []
+  :body [activity Activity]
+  :summary &amp;quot;Update an activity&amp;quot;
+  (ok (auth #(controller/update-activity activity))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here I am creating two routes for GET and PUT HTTP requests. In case of GET, I will return Activities and in case of PUT I expect an Activity in the body and return nothing. In both cases I return a HTTP OK code. The &amp;lsquo;auth&amp;rsquo; call allows me to authenticate the user before the call to the controller is made. The Compojure API can generate the full Swagger UI, allowing client developers to explore and invoke the API (if they have the right access of course!).&lt;/p&gt;
+
+&lt;p&gt;The generated Swagger UI looks like the following.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-09-14-swagger-clojure/swagger-doc.png&#34; alt=&#34;Generated Swagger Documentation&#34; title=&#34;Generated Swagger Documentation&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;The Compojure API validates every request/response against the model so that any violation of the API will result in a failure. This brings me to the second side-effect; you can validate the model against your tests! In my case I validate the model against my controllers:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;(defn ^:always-validate get-activities :- Activities []
+  (model/get-activities))
+
+(defn ^:always-validate update-activity [activity :- Activity]
+  (model/update-activity activity))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Using the &lt;code&gt;^:always-validate&lt;/code&gt; meta data will validate my tests against the model. In this case my functional tests are testing the system from controllers to the database allowing me to enforce the schema at build time.&lt;/p&gt;
+
+&lt;p&gt;Clojure is a dynamic language. One of its main criticisms is a lack of types. Although there is some good work in progress by the &lt;a href=&#34;http://typedclojure.org/&#34;&gt;Typed Clojure&lt;/a&gt; project, I think the Prismatic Schema library provides a very good compromise and the fact that it plays nicely with Swagger is an icing on the cake.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

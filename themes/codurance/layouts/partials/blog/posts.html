@@ -1,0 +1,51 @@
+<div class="container content-md">
+    <div class="row">
+        <!-- Left Sidebar -->
+        <div class="col-md-9">
+            {{ $paginator := .Paginate (where .Data.Pages.ByDate.Reverse "Type" "blog") 10 }}
+            {{ range $paginator.Pages }}
+            {{ partial "blog/post_on_list.html" . }}
+            {{ end }}
+
+            <!--Pagination-->
+            {{ if gt $paginator.TotalPages 1 }}
+            <div class="text-center">
+                <ul class="pagination">
+
+                    {{ if $paginator.HasPrev }}
+                    <li>
+                        <a href="{{ $paginator.Prev.URL }}">«</a>
+                    </li>
+                    {{ end }}
+
+
+                    {{ range $paginator.Pagers }}
+                    <li{{ if eq $paginator.PageNumber .PageNumber }} class="active" {{ end }}>
+                    <a href="{{ .URL }}">{{ .PageNumber }}</a>
+                    </li>
+                    {{ end }}
+
+                    {{ if $paginator.HasNext }}
+                    <li>
+                        <a href="{{ $paginator.Next.URL }}">»</a>
+                    </li>
+                    {{ end }}
+                </ul>
+            </div>
+            {{ end }}
+            <!--End Pagination-->
+
+        </div>
+        <!-- Right sidebar -->
+        <div class="col-md-3">
+            <div class="posts margin-bottom-40">
+                <div class="headline-v2 bg-color-light">
+                    <h2>Latest Tweets</h2>
+                </div>
+                <a class="twitter-timeline" href="https://twitter.com/codurance" data-widget-id="675332417700409344">Tweets by @codurance</a>
+                <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+            </div>
+            <!-- End right sidebar -->
+        </div>
+    </div>
+</div>

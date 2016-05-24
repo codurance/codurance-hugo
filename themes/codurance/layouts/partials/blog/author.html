@@ -1,0 +1,34 @@
+<div class="container content-sm">
+    <div class="blog-author bg-color-white margin-bottom-30">
+        <!--About the author-->
+        {{ range $author := where (where .Site.Pages "Type" "ourteam" ) "Params.name" .Title }}
+        <div class="row">
+            <div class="col-sm-3 pull-left">
+                <img class="img-responsive" id="author-img" src="{{ .Params.image }}">
+            </div>
+            <div class="col-sm-9">
+                <div class="blog-author-desc">
+                    <div class="overflow-h">
+                        <h4>{{ .Params.name }}</h4>
+                        {{ if .Params.twitter }}
+                        <ul class="list-inline">
+                            <li><a href="https://twitter.com/intent/tweet?text=.%20@{{ .Params.twitter }}%20Type%20your%20text%20here&url={{ $.Permalink }}&via=codurance"><i class="fa fa-twitter"></i></a></li>
+                        </ul>
+                        {{ end }}
+                    </div>
+                    <p>{{ .Params.full_description | safeHTML }}</p>
+                </div>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+    <hr/>
+    <div class="row">
+        <div class="col-md-9">
+            <h2 class="margin-bottom-20">Blogs</h2>
+            {{ range where (where .Site.Pages.ByDate.Reverse "Type" "blog") "Params.author" .Title }}
+            {{ partial "blog/post_on_list.html" . }}
+            {{ end }}
+        </div>
+    </div>
+</div>

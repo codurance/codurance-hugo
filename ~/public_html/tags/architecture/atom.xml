@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Architecture on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/architecture/</link>
+    <description>Recent content in Architecture on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Thu, 28 Apr 2016 00:20:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/architecture/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Async systems with sync clients</title>
+      <link>http://codurance.com/blog/Async-systems-with-sync-clients/</link>
+      <pubDate>Thu, 28 Apr 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/Async-systems-with-sync-clients/</guid>
+      <description>
+
+&lt;p&gt;As the &lt;a href=&#34;http://www.reactivemanifesto.org/&#34;&gt;Reactive Manifesto&lt;/a&gt; says Reactive systems are:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Responsive&lt;/li&gt;
+&lt;li&gt;Resilient&lt;/li&gt;
+&lt;li&gt;Elastic&lt;/li&gt;
+&lt;li&gt;Message Driven&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The last principle often goes together with non-blocking async protocols. This style of communication &amp;ldquo;allows recipients to only consume resources while staying active, leading to less system overhead&amp;rdquo;. This fits perfectly with new demands of efficiency derived from the elastic model of cloud providers. However not every system is async and integrating an async system with a sync client could be tricky.&lt;/p&gt;
+
+&lt;h2 id=&#34;integration-strategies&#34;&gt;Integration Strategies&lt;/h2&gt;
+
+&lt;p&gt;We can fix the mismatch of communication styles through a couple of strategies.&lt;/p&gt;
+
+&lt;h3 id=&#34;polling&#34;&gt;Polling&lt;/h3&gt;
+
+&lt;p&gt;This involves work for both parties. First round trip of this protocol involves client sending some request to the server with an outcome of ACK/NACK. This is called fire and forget. Assuming HTTP, the server will return status code 202 (Accepted). The async process will eventually succeed or fail and that result will be exposed by the server via a different endpoint. The client will have to periodically poll that endpoint to figure out the status of the operation.&lt;/p&gt;
+
+&lt;p&gt;Polling is by nature inefficient but could be a good solution when the technological stack doesn&amp;rsquo;t allow bidirectional protocols like &lt;a href=&#34;https://www.wikiwand.com/en/WebSocket&#34;&gt;Web Sockets&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;hiding-asynchronicity&#34;&gt;Hiding asynchronicity&lt;/h3&gt;
+
+&lt;p&gt;If we don&amp;rsquo;t have control over those clients, we&amp;rsquo;ll probably have to hide our async nature under some sync layer. That layer will implement a polling or pub/sub mechanism bounded by a timeout.&lt;/p&gt;
+
+&lt;h2 id=&#34;learning-by-example&#34;&gt;Learning by example&lt;/h2&gt;
+
+&lt;p&gt;In this series of posts we&amp;rsquo;ll implement last strategy with a pub/sub mechanism. We&amp;rsquo;ll add some essential complexities to our domain to make the exercise more juicy.&lt;/p&gt;
+
+&lt;p&gt;We&amp;rsquo;ll be working on something similar to &lt;a href=&#34;https://craigslist.org&#34;&gt;Craiglist&lt;/a&gt;, a website with classified advertisements. However our platform will have a social focus (as everything nowadays). That means that a user can post an item into some group and/or to her followers. People can report dubious items and we will take seriously those reports as they&amp;rsquo;re threats to our reputation. So much so that the authorities have direct access to an API that can take down an item immediately.&lt;/p&gt;
+
+&lt;p&gt;Our system is formed by several microservices based on &lt;a href=&#34;http://akka.io/&#34;&gt;Akka&lt;/a&gt;, using &lt;a href=&#34;http://kafka.apache.org/&#34;&gt;Kafka&lt;/a&gt; for inter-process communication. The police platform has only sync clients and they don&amp;rsquo;t seem keen to implement a polling mechanism to verify that an item has been actually removed. We need to communicate with them synchronously and that&amp;rsquo;s not negotiable. In the next posts we&amp;rsquo;ll see the details of our solution, but as an advancement, let&amp;rsquo;s see the high level architecture. Don&amp;rsquo;t worry if you don&amp;rsquo;t understand everything yet.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/law_enforcement.png&#34; alt=&#34;Law enforcement architecture&#34; title=&#34;Law enforcement architecture&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;&lt;a href=&#34;http://codurance.com/2016/04/28/async-systems-with-sync-clients/&#34;&gt;Part 1&lt;/a&gt; | &lt;a href=&#34;http://codurance.com/2016/04/30/akka-basics/&#34;&gt;Part 2&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Premature Microservices</title>
+      <link>http://codurance.com/blog/premature-microservices/</link>
+      <pubDate>Fri, 15 Jan 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/premature-microservices/</guid>
+      <description>
+
+&lt;p&gt;Building your app from the very start as microservices is not a great idea! Their deployment is complex - regardless of how good your microservices infra is. They create boundaries in your application that resist change. Software applications are complex systems and complex systems are grown not designed. In order to grow an efficient system - we must allow it to grow in directions that it needs to. Boundaries designed at the start will stunt that growth at certain axis when direction of growth is at its most unpredictable.&lt;/p&gt;
+
+&lt;p&gt;Also testing the system as a whole is very cumbersome. One can argue that the services should be decoupled enough that testing the application where all the services need to run is kept to a minimum. Sure, but in my experience even that minimal testing is a pain. Pain that should be lessened or altogether avoided for as long as possible.&lt;/p&gt;
+
+&lt;p&gt;So why do we do it? Why are microservices such a compelling idea? The premise of isolating change is extremely attractive. We have all been stung with “the monolith”. We look at the system and see the change hotspots and wonder, “if only I had those hotspots isolated so that I didn’t have to redeploy the whole thing when they change” or “if only I could re-engineer this part without having to worry about the rest” etc. Yes microservices based architecture may help you achieve that (Remember! I said they are a bad idea at the start of a project, not a bad idea altogether.) but by this time you understand the hotspots in the application and your understanding of the domain has matured. My problem is with creating strong boundaries between different aspects of our application. These resist change if the understanding changes and some of the boundaries are no longer valid. It discourages people to question the already drawn boundaries because they are not easy to change.&lt;/p&gt;
+
+&lt;h3 id=&#34;an-idea&#34;&gt;An Idea&lt;/h3&gt;
+
+&lt;p&gt;So can we do microservices without having to draw strong boundaries, at least at the start? Like anything in life it is not so simple. From weak-to-strong -  we can use classes/modules, interfaces/protocols, package/namespaces, sub-projects, libraries and processes to draw these boundaries. The problem with the conventional microservices is that we go straight to the processes level to draw the boundary which is the strongest level at which you can separate the system. However, the weaker the boundary the bigger the chance that you’ll have to do extra work to strengthen that boundary because dependencies will have leaked through. But at the same time weaker boundaries are easier to redefine.&lt;/p&gt;
+
+&lt;p&gt;What if we keep the boundaries in process but make them explicit? For example we segregate the system into components that are only allowed to speak to each other over a well defined interface just like our microservices but they’re all running in the same process. This could be serialised into something specific like JSON or a more abstract interchange format. Code could be divided into top level packages ensuring that there is no direct binary dependency between modules. So that modules are truly passing messages to each other - like good old fashioned Object Oriented Programming. We must ensure that there is no direct dependency between modules e.g. shared code, shared memory or shared database tables. Code can be reused using versioned libraries. This will allow us to keep explicit boundaries between the modules in our codebase that are strong enough that individual modules can be extracted into their own microservices when required but also weak enough that they can be easily changed when needed. Even this level of division my not be ideal at the start and we may start with a single component to the point where a division into at least two parts becomes apparent.&lt;/p&gt;
+
+&lt;h3 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;So the advice, if you haven’t guessed, is that we should start our system with minimal assumptions and restrictions and then sense the system to see where it needs to go. Microservices could be the vision of the destination but we shouldn’t try to second guess the destination or even preplan our journey. We should sense and adapt. Premature abstractions and boundaries will drown out this sense in certain areas resulting in a system that is not as fully evolved as it could’ve been.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Increasing complexity one entity at a time</title>
+      <link>http://codurance.com/blog/increasing-complexity-one-entity-at-a-time/</link>
+      <pubDate>Mon, 17 Aug 2015 09:35:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/increasing-complexity-one-entity-at-a-time/</guid>
+      <description>
+
+&lt;p&gt;While working on one of our internal tools, I decided to make a small comprise and not follow my own advice. We are building a mini CRM tool and the initial requirements were:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Maintain information about the companies we are dealing with;&lt;/li&gt;
+&lt;li&gt;Maintain a list of contacts per company;&lt;/li&gt;
+&lt;li&gt;Maintain a list of engagements (projects, training, consultancy) per company.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;em&gt;NOTE: I’ll omit details of the code, attributes, etc in order to keep this post simple.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Starting small, while building the CRUD for Company, I ended up with a Company entity that looked like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;class Company {
+     + id: CompanyId
+     + name: String
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That was all well and good. Then I needed to write code in order to maintain a list of contacts for each company. I ended up with the following:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;class Contact {
+     + id: ContactId;
+     + companyId: CompanyId;
+     + name: String
+     + email: String;
+}
+ 
+class Company {
+     + id: CompanyId;
+     + name: String;
+     + contacts: List[Contact];
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That was the beginning of the problems. For the “View Company” page, I needed to display data related to the Company and all its contacts. For the pages that were only dealing with Company data (a page that listed all companies, page for edit/delete company), I didn’t need the contacts information. Should I load the contacts every time I loaded a company? Should I not load them? The problem of not loading the contacts in certain occasions is that, as the code evolves, I would not know if the list of contacts inside Company was empty because the company doesn’t have contacts or because they were not loaded. That’s confusing. Since performance is not a concern in this application, I decided to load the list of contacts every time I needed a company. Problem solved.&lt;/p&gt;
+
+&lt;p&gt;In the next feature I had to maintain engagements (CRUD) for a company. Following the same approach I used for contacts, I ended up with the following entities:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;class Engagement {
+     + id: EngagementId;
+     + companyId: CompanyId;
+     + name: String
+     + startDate: Date;
+     + endDate: Date;
+     + description: String;
+}
+
+class Company {
+     + id: CompanyId;
+     + name: String;
+     + contacts: List[Contact];
+     + engagements: List[Engagement];
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;At this point, things got very confusing. I had pages that needed Company and its contacts and engagements. Pages that only needed Company and Engagements, pages that only needed Company and Contacts. But the problems were not only related to what to load and where. I had loads of code that was relying on the Company structure.&lt;/p&gt;
+
+&lt;p&gt;The application is a web app using AngularJS in the front with JSON going to the browser and back into the application. For that, I had JSON converters that would convert JSON to and from objects. I also had quite a lot of tests for my API and inner layers which would use builders to assemble data. In summary, there was quite a lot of code that, in order to satisfy all the features, would rely on the structure of the Company entity. This code “had to know” when contacts and engagements were loaded or not. And of course, that was constantly changing while we were deciding how much information we needed on each page.&lt;/p&gt;
+
+&lt;p&gt;As features stabilised and I made a few more changes in the code, everything was working.&lt;/p&gt;
+
+&lt;h3 id=&#34;the-ripple-effect&#34;&gt;The ripple effect&lt;/h3&gt;
+
+&lt;p&gt;As we thought we were ready to start building other features (dashboard, financial information, forecasts, notes, reminders, follow up actions, etc), we realised we missed something important.&lt;/p&gt;
+
+&lt;p&gt;Some of our projects come through partners (other companies). That means that an engagement may have more than one company involved. This could make the relationship between Company and Engagements a bit different. Maybe the relationship between Company and Engagements wouldn’t be a &lt;em&gt;one to many&lt;/em&gt; anymore. It would probably be a &lt;em&gt;many to many&lt;/em&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;class Engagement {
+     + id: EngagementId;
+     + companies: List[Company];
+     + name: String
+     + startDate: Date;
+     + endDate: Date;
+     + description: String;
+}
+
+class Company {
+     + id: CompanyId;
+     + name: String;
+     + contacts: List[Contact];
+     + engagements: List[Engagement];
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I thought that it would be an easy change but I was surprised to see the massive ripple effect that it had in my code. Loads of test data, builders, JSON parsers, and API structure would be impacted and that was not a good feeling. I was really disappointed with myself and quite pissed off to be honest.&lt;/p&gt;
+
+&lt;h3 id=&#34;following-my-own-advice&#34;&gt;Following my own advice&lt;/h3&gt;
+
+&lt;p&gt;A few years ago I came across &lt;a href=&#34;https://en.wikipedia.org/wiki/Command%E2%80%93query_separation&#34;&gt;CQS&lt;/a&gt; and later on &lt;a href=&#34;http://www.cqrsinfo.com/&#34;&gt;CQRS&lt;/a&gt;. At the beginning I didn’t give CQS much attention and it was only with CQRS that I actually understood a different way to design software. Since then, I’ve been a strong advocate of separating the data structures (and yes, I treat entities as data structures) I use to write from the ones I use to read. I’m not talking about independently deployable read/write models, different databases, events, messages, etc. I’m only talking about using different objects to write and read data.&lt;/p&gt;
+
+&lt;h3 id=&#34;fixing-the-problem-1st-solution&#34;&gt;Fixing the problem (1st solution)&lt;/h3&gt;
+
+&lt;p&gt;After another discussion, we decided that an Engagement would always be for a Company but it may have come to us through a partner. That changed things again. So, I decided to do the following: remove all the dependencies (attributes containing other entities or list of entities) from all the entities. Then ended up like that:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;class Company {
+     + id: CompanyId
+     + name: String
+}
+
+class Contact {
+     + id: ContactId;
+     + companyId: CompanyId;
+     + name: String
+     + email: String;
+}
+
+class Engagement {
+     + id: EngagementId;
+     + companyId: CompanyId;
+     + partnerId: Optional[CompanyId];
+     + name: String
+     + startDate: Date;
+     + endDate: Date;
+     + description: String;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With this approach, the entities would contain just the data they needed to be persisted.&lt;/p&gt;
+
+&lt;p&gt;But I still had the queries to fix, where many of them would need a combination of these entities. For that, I created “read” objects that would contain exactly the data needed for each query. Some of them looked like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;class CompanyWithContacts {
+     + company: Company;
+     + contacts: List[Contacts]
+}
+
+class CompanyWithContactsAndEngagements {
+     + company: Company;
+     + contacts: List[Contacts];
+     + engagements: List[Engagements];
+}
+
+class EngagementWithCompanies {
+     + engagement: Engagement;
+     + client: Company;
+     + partner: Optional[Company];
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With this approach, each query would return the combination of data that was requested by the delivery mechanism (pages on the website). Changes in how my entities relate to each other didn’t cause a ripple effect of changes any more since just specific queries would break. There were no problems with lazy-load / eager fetch anymore. There were no doubts about empty attributes since there were no attributes anymore. The optional ones could easily be marked as optional (thanks Java 8).&lt;/p&gt;
+
+&lt;h3 id=&#34;fixing-the-problem-2nd-solution&#34;&gt;Fixing the problem (2nd solution)&lt;/h3&gt;
+
+&lt;p&gt;After the fix above, I was reasonably happy since I was able to localise changes when entity relationships changed. But there was a bit more to it. On the positive side, they allowed me to make a single call from a page that needed a combination of data. On the negative side, performance was not a real concern for me and I didn’t want these extra objects with weird names hanging around. I still had to write code to populate them and convert them to JSON.&lt;/p&gt;
+
+&lt;p&gt;I then decided to make multiple calls from my pages. If a page needed a company, a list of contacts and a list of engagements related to that company, I would make three calls from the page. This decision made all the  “read” objects go away and still kept my code very simple.&lt;/p&gt;
+
+&lt;h3 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;Keep your entities detached from each other and focus on implementing simple queries from the client. Just move to a single query if performance really proves to be an issue.&lt;/p&gt;
+
+&lt;p&gt;Don’t use ORMs. ORMs would have made my changes even worse as I would have to keep my entities and database synchronised. It’s great to have the freedom to get a record set from the database using whatever query you want and populate your objects the way you want.&lt;/p&gt;
+
+&lt;p&gt;The way we query data changes far more often than the way we persist the data and these changes can slice and dice the data in many different ways. Binding your entities together will only make it harder to satisfy all the queries and will put an unnecessary strain on the code that is only supposed run business logic and store data.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>CQRS and Event Sourcing for dummies</title>
+      <link>http://codurance.com/blog/cqrs-and-event-sourcing-for-dummies/</link>
+      <pubDate>Sat, 18 Jul 2015 17:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/cqrs-and-event-sourcing-for-dummies/</guid>
+      <description>
+
+&lt;p&gt;CQRS (Command and Query Responsibility Segregation) and Event Sourcing are concepts that are not new at all. Alongside NoSql, Functional Programming and Microservices, these revival concepts are getting traction because of their ability to deal with modern software challenges. Assuming that you&amp;rsquo;re building a product that has a complex domain with a significant amount of users I can predict that if you follow more traditional architectural styles you will face the following problems how to scale and how to deal with complexity.&lt;/p&gt;
+
+&lt;h2 id=&#34;basic-concepts-of-cqrs&#34;&gt;Basic concepts of CQRS&lt;/h2&gt;
+
+&lt;p&gt;CQRS and Event Sourcing address those concerns with an architectural style that, not only works, but makes sense without too much cognitive effort required. Over the past few weeks some colleagues and I have taken part in a study group on &lt;a href=&#34;http://www.viddler.com/v/dc528842&#34;&gt;Greg Young online tutorial&lt;/a&gt; on CQRS and Event Sourcing. The video is really long, so I&amp;rsquo;m going to highlight some of the key concepts that fell out of the tutorial, but I&amp;rsquo;d recommend investing the time to watch it yourself.&lt;/p&gt;
+
+&lt;p&gt;CQRS is based in Bertrand Meyer&amp;rsquo;s CQS (Command-Query Separation) concept. CQS states that every method should either be a command that performs an action or a query that retrieves a result. The concerns shouldn&amp;rsquo;t be mixed. From a functional point of view that means that query methods shouldn&amp;rsquo;t have any side effects that is, they&amp;rsquo;re referentially transparent so we can use them in any part of our system without any contextual knowledge. This approach assists in creating software that is modular and easy to reason about it.&lt;/p&gt;
+
+&lt;p&gt;CQRS brings that concept to an architectural level. We shouldn&amp;rsquo;t be creating services with command and query concerns mixed. This architectual approach is not exclusive with DDD or Microservices, we might create different services around bounded contexts. Additionally, any &amp;lsquo;microservices&amp;rsquo; should be split in write and read components too. I&amp;rsquo;m going to provide an example to make it easy to understand.&lt;/p&gt;
+
+&lt;h2 id=&#34;challenges-of-non-cqrs-architectures&#34;&gt;Challenges of non-CQRS architectures&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s imagine that we&amp;rsquo;re modeling a really small slice of Twitter. A user can tweet, favourite a tweet and read a timeline. In a non-CQRS design we could model the systems around nouns and CRUD (Create, Read, Update &amp;amp; Delete) verbs. Those verbs/actions could be represented as REST (Representational State Transfer) interfaces and normalised tables in a relational database. This kind of structural model offers some problems:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Write and read concerns are mixed, so the code is harder to reason about. The same applies to POJOs that uses ORMs like &lt;a href=&#34;http://hibernate.org/&#34;&gt;Hibernate&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Managing change is difficult. It&amp;rsquo;s arrogant or naive to think that we created our model right the first time, so we need an architecture that is easy to change.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;It&amp;rsquo;s not possible to optimise write and read queries if you share your data model and technology. Certain queries to that system could require joining different tables which may prove problematic at a larger scale. Normalised models are suitable for optimising writing scenarios; you just need to write in a single table without having to worry about propagating changes between different denormalised views. They also save storage space for obvious reasons. Nowadays memory is cheap and to be honest, most of the apps that I&amp;rsquo;ve worked in the past read more than write.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;benefits-of-getting-into-an-event-world&#34;&gt;Benefits of getting into an event world&lt;/h2&gt;
+
+&lt;p&gt;CQRS enables you to go for another architectural style called Event Sourcing. In that approach your event store becomes the single source of truth. Alberto Brandolini created a technique called Event Storming that allows you to model your system around events. This approach tries to model your system as humans would, or as the business would see it: a flow of commands and events. A command in our example would be &lt;em&gt;Create a Tweet&lt;/em&gt; and the event, always in past tense, would be &lt;em&gt;Created Tweet&lt;/em&gt;. A command can generate different events and per event we can have different consumers of it. That means that we have flexibility to change our read side, like &lt;em&gt;Read a Timeline&lt;/em&gt;, in the future.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/cqrs.jpg&#34;  class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;This is one proposal that separates write and read concerns and uses event sourcing. It&amp;rsquo;s important to note that depending on the constraints and challenges of our domain we might design this architecture slightly differently. We could decide to place the event queue at the beginning of our system or we could move some time-consuming tasks into the dummy reader as &lt;a href=&#34;http://www.infoq.com/presentations/Twitter-Timeline-Scalability&#34;&gt;real Twitter is doing for some special cases&lt;/a&gt;. Regardless, some key benefits can be obtained:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;We can scale out easily. Nowadays event queues are beasts. &lt;a href=&#34;http://kafka.apache.org/&#34;&gt;Kafka&lt;/a&gt; is used as an event store in massive places like Linkedin.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;We&amp;rsquo;ll face eventual consistency. This architecture follows the fire and forget command style. When we send a command to the system, we don&amp;rsquo;t wait synchronously for a response. The queue is inherently asyncronous, so the user will have to wait some time until the denormalised view gets updated. Greg Young argues that every system is basically eventual consistent, and is just a matter of magnitudes. The suggested solutions are educating users and, why not, programmers. Programmers often think that their systems are more critical than what reality says.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;We can use different technologies for write and read storage. I&amp;rsquo;ve already suggested Kafka as an event store (backed for instance by HDFS when you need to archive the events) and you can use Cassandra or Redis for storing the views. Remember that with this architecture you don&amp;rsquo;t need to calculate the views on read time, so you don&amp;rsquo;t need to join tables, which is otherwise a common bottleneck.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;We never have to delete or update events (and no longer require the &amp;lsquo;UD&amp;rsquo; in &amp;lsquo;CRUD&amp;rsquo;).  We don&amp;rsquo;t need to synchronise resources as our event store is immutable. If we want to unfavourite a tweet, we send a command that will publish a &lt;em&gt;Unfavourited Tweet&lt;/em&gt; in our event store. This will trigger a recalculation of our timeline view removing that favourite action in the tweet.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;But what happens when you reach millions of events? Do you need to replay every single event every time you get a new event in the system? The answer is snapshots. Periodically we&amp;rsquo;ll store snapshots of our views and persist them. Along with that snapshot we&amp;rsquo;ll record the pointer (offset in Kafka) of our topic so we know that that when the snapshot was taken. Whenever we need to replay the events to reconstitute our views we can do it from a chosen snapshot and not from the beginning of the time.&lt;/p&gt;
+
+&lt;p&gt;Why would we want to replay events? One important reason is to help us create otherwise irreproducible bugs. Often bugs are hidden in specific combinations of system state and can become difficult to emulate when the system is complex. If the user can send a report that includes the command and hence the event that caused the bug, we can replay the system to that specific point in time in an effort to ascertain the cause of that damn bug.&lt;/p&gt;
+
+&lt;h2 id=&#34;in-conclusion&#34;&gt;In conclusion&lt;/h2&gt;
+
+&lt;p&gt;I really believe that this architectural style removes accidental complexity from systems that are unable to scale as the modern world requires. The world changes and software has to keep up. So, despite of the hype, event driven architectures, microservices, NoSql and functional programming are here to stay. They provide new ways to tackle difficult challenges in software operations and testing resulting in what is potentially, an exciting time for programmers everywhere.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Inflection Point</title>
+      <link>http://codurance.com/blog/inflection-point/</link>
+      <pubDate>Wed, 17 Jun 2015 02:34:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/inflection-point/</guid>
+      <description>
+
+&lt;p&gt;We all say that software design is all about trade-offs but how do we actually reason about it? How do we decide how much code we are going to write for a given task? Is the easiest thing that could possibly work the right approach? The simplest? How do we know the &lt;a href=&#34;http://www.infoq.com/presentations/Simple-Made-Easy&#34;&gt;difference between simple and easy&lt;/a&gt;? Is this even the right question?&lt;/p&gt;
+
+&lt;p&gt;One way or another, subconsciously or not, we always make a decision to start implementing a new behaviour from somewhere. Some of us write just enough code to satisfy the new behaviour. Others write way more code, trying to avoid future rework in case things change or evolve. Many others are somewhere in between.&lt;/p&gt;
+
+&lt;p&gt;Let’s assume the following:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-06-17-inflection-point.jpg&#34; alt=&#34;Inflection Point&#34; title=&#34;Inflection Point&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;On the left hand side, we have the most straightforward solution for a given desired behaviour. On the right hand side, we have infinite possibilities for writing future proof code. The problem with the right side is that we could never write future proof code according to infinite future possibilities. But we can, however, pick a software capability and try to write some future proof code for that. E.g:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;We may need to scale this application&lt;/li&gt;
+&lt;li&gt;We may have multiple users with different access levels.&lt;/li&gt;
+&lt;li&gt;We will need to make it very secure&lt;/li&gt;
+&lt;li&gt;We may add more clients (mobile, web, other systems)&lt;/li&gt;
+&lt;li&gt;We may have different types of payments (or biddings, or travels, or accommodations, etc)&lt;/li&gt;
+&lt;li&gt;We may want to print this to console, generate a PDF, or call a reporting system.&lt;/li&gt;
+&lt;li&gt;We may want provide an API so we are prepared for future integrations with other systems.&lt;/li&gt;
+&lt;li&gt;etc…&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Although we could try, writing code that can remain flexible for the entire lifespan of a project is practically impossible. You will get it wrong, no matter what you do. Besides that, you will be adding complexity all over the place since there is no way we can know for sure which areas of our code base will evolve.&lt;/p&gt;
+
+&lt;p&gt;I don’t think there is a clear solution or guideline for this problem but at least there is a better way to reason about that. I call it inflection point.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;Inflection point defines the maximum amount of investment we are comfortable to make in a desired type of flexibility at a given moment in time. Beyond this point, the investment is not worth anymore.&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;There are two ways to reason about the inflection point:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Right-to-left:&lt;/strong&gt; We pick a software capability that we judge to be very important in the near future. We then think about what would be our ideal solution for that software capability. From that point, which may be quite far on the right hand side, we start thinking how we could make our solution more straightforward (probably also cheaper and faster to implement) right now without loosing site of the flexibility we would like to have in the future. We keep discussing how we can simplify the solution until we find a point where making it simpler will mean loose so much flexibility that it will be too expensive to move towards our ideal solution in the future. That is the inflection point, coming from right to left.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Left-to-right:&lt;/strong&gt; We start from the most straightforward solution for a given problem. We then think about what we currently know about the project, features that are definitely going to be implemented next, and the important software capabilities that will need to be provided in the near future. With that knowledge, we can decide how flexible we could make our code right now, moving from a straightforward solution towards a more engineered solution up to a point that the cost of the flexibility we are providing right now is just not worth the effort or it is just to speculative and risky. That’s the inflection point coming from left to right.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;inflection-point-as-a-general-guideline&#34;&gt;Inflection point as a general guideline&lt;/h2&gt;
+
+&lt;p&gt;Let’s look at some common scenarios. Take them with a pinch of salt since there are many other factors that could make them invalid or sway the inflection point to a different side. Also, the team’s experience in certain technologies and approaches will also impact on what is considered straightforward and the cost of added flexibility.&lt;/p&gt;
+
+&lt;h3 id=&#34;example-1-separating-page-structure-and-data-on-a-web-application&#34;&gt;Example 1: Separating page structure and data on a web application&lt;/h3&gt;
+
+&lt;p&gt;Should we split a web page structure (HTML) from its data or should we have our backend generate the whole page via a template engine and return the whole page in one go?&lt;/p&gt;
+
+&lt;p&gt;What are we pre-optimising for? What type of flexibility do we want to provide now and what impact would it have in our code?&lt;/p&gt;
+
+&lt;p&gt;Splitting the page structure from data can bring future benefits like a stable RESTful API for other clients (mobile, other systems). It could also make it easier to write automated tests for our application when it comes to the data it returns. Besides that, we can provide a better user experience since the page will load faster or not even reload at all, depending on the implementation (single/multi page). In order to achieve that, we need to use JavaScript in the front end and provide multiple controller methods in the back end. We may need to convert objects to JSON and comply to the REST guidelines. There will be more code in the front and back end, and a few data translation layers. We will probably need to use different programming languages in the front and back end.&lt;/p&gt;
+
+&lt;p&gt;A different approach would be to use a template engine and render the whole pages on the server. That could be “easier” since template engine libraries are quite mature in most major languages and we keep the whole application writing in a single programming language. For back end developers, that can be more straightforward. But what do we loose? Do we have a worse user experience? Well, maybe. Internet connection today is much faster than it was 10-15 years ago, when using AJAX was a must (and also pretty hard—browser wars anyone?). What about the flexibility to add new clients (mobile / other systems)? Can we really foresee what type of API they will need? What about the API granularity? Would it be the same one used for the web?&lt;/p&gt;
+
+&lt;p&gt;Then we have things like team skills set. How familiar are we with all the technologies involved? How concrete are the plans to have a mobile presence? Would it be a native app or a responsive web page would do just fine?&lt;/p&gt;
+
+&lt;p&gt;Do we have a separate web design / UX team? Which approach would be easier to make them part of the team and work on the same code base?&lt;/p&gt;
+
+&lt;p&gt;Where is the inflection point? How much complexity should we add right now? Is some extra code really a big deal for the amount of flexibly we get, even if a bit speculative? Are there any other alternatives to provide a similar flexibility without so much extra code? How much would we pay if we delay the decision to provide the flexibility right now?&lt;/p&gt;
+
+&lt;h3 id=&#34;example-2-knowing-upcoming-features&#34;&gt;Example 2: Knowing upcoming features&lt;/h3&gt;
+
+&lt;p&gt;When our work is most exploratory, I would strongly recommend looking for the most straightforward solution. However, when working in an environment where we have a Product Owner with a clear vision, a product backlog that is carefully maintained, and with big enough budget to guarantee that the project will run for many months, if not years, should we always aim for the most straightforward solution?&lt;/p&gt;
+
+&lt;p&gt;Imagine that we are working on Feature A and that we know that Feature B and C are the next features to be implemented. Also, imagine that they are closely related, that means, Feature B and C will be built on top of the implementation of Feature A.&lt;/p&gt;
+
+&lt;p&gt;In this scenario, should we aim for the most straightforward solution for Feature A and then refactor everything in order to add Feature B and C? How far do we go with the implementation of Feature A when we are 99% sure that Feature B and C are going to implemented immediately after we finish Feature A? But what if we were only 50% sure? Or 20%? Where would the inflection point be?&lt;/p&gt;
+
+&lt;h3 id=&#34;example-3-layers&#34;&gt;Example 3: Layers&lt;/h3&gt;
+
+&lt;p&gt;Many developers use some sort of layered architecture. A common layer would be the data layer that is normally defined by &lt;em&gt;repository&lt;/em&gt; classes.&lt;/p&gt;
+
+&lt;p&gt;In almost 20 years of career, I had only one application that we actually changed our persistency mechanism and the repository layer was extremely useful. Moving from one database to another had almost zero impact in the rest of the code.&lt;/p&gt;
+
+&lt;p&gt;I recently had a few discussions about the data (repository) layer. Some of my colleagues said that this added complexity not always pays off since we are probably not going to change the persistency mechanism. That is a fair comment and normally the repository layer can be seen as future proof code and not the most straightforward solution.&lt;/p&gt;
+
+&lt;p&gt;But what is the alternative? Active Record? Have persistency logic mixed with application logic? Violation of SRP? No separation of concerns? A different type of separation that will be very similar to the repositories but less explicit? Use of a framework? How does it affect transactional boundaries? Should they be in the repository layer or should they be at the entry points of your domain model?&lt;/p&gt;
+
+&lt;p&gt;This is an example where discussing what would be the straightforward solution versus what type of future proof code we want to have may differ a lot from team to team. Some would find a layer of repositories a very cheap price to pay while others would find it too expensive.&lt;/p&gt;
+
+&lt;p&gt;So, instead of discussing the repository layer, we should discuss what type of flexibility we would like to have when it comes to persistency and how much are we wiling to pay for that right now. What would the inflection point be?&lt;/p&gt;
+
+&lt;h3 id=&#34;example-4-architecture-and-high-level-design&#34;&gt;Example 4: Architecture and high-level design&lt;/h3&gt;
+
+&lt;p&gt;Should we start an application with a monolith or with a bunch of micro-services? Or somewhere in between? Normal services? Application modules? Well-defined package/namespace structure? This is not a simple question and the inflection point will change significantly according to the context. Are we working for a small startup with two developers? Are we working with a large company with budget for a multi-year project, which will start with 50 developers from day one? How much do we know about the domain? Are we exploring an idea? Or is it a well-defined domain?&lt;/p&gt;
+
+&lt;p&gt;What are we optimising for? How much does it cost? How complex is the solution? What are the trade offs? Should we pre-optimise for scalability or should we focus on the most straightforward? What do we loose or gain with a given solution? Can we defer this decision to a later stage? Would it be too chaotic to have all the developers working on the same code base? Which software capabilities do we want to have in the first release? What would be the cost to make some architectural decisions in the future?&lt;/p&gt;
+
+&lt;p&gt;I worked in projects where it made sense to start small and grow the application bit-by-bit, focusing on the most straightforward solutions at the beginning. But I also worked in much larger applications where it was too risky or close to impossible to defer certain architectural decisions. The inflection point was completely different in those two contexts.&lt;/p&gt;
+
+&lt;h3 id=&#34;example-5-micro-design&#34;&gt;Example 5: Micro design&lt;/h3&gt;
+
+&lt;p&gt;Many agree that the use of primitives to represent domain concepts is bad. So, should we create types for everything? What is the cost and how much more code do we need to write? Is the amount of code the only concern? Are we trying to reduce the number of bugs in the future? What about languages without types?&lt;/p&gt;
+
+&lt;p&gt;What price do we pay when we create types for everything? Does it really improve readability? What gains do we have in the future? Should we limit type creation to our domain model? When is it OK to use primitives? What is the impact in maintainability and testing? Would we need to write more or less tests when choosing primitives over types? How easy is to create types in our chosen programming language?&lt;/p&gt;
+
+&lt;p&gt;Those are many of the considerations that may define where the inflection point will be.&lt;/p&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Over-engineering has a big cost and may cause a lot of damage. However, a long sequence of straightforward solutions may also cause of lot of pain and re-work as the system grows. Every change becomes a huge refactoring task.&lt;/p&gt;
+
+&lt;p&gt;As a general guideline, I prefer to first look at what would be the most straightforward solution and then start exploring a few possibilities to provide more flexibility for future changes given an important software capability (left to right). Also, most straightforward doesn’t mean quick and dirty.&lt;/p&gt;
+
+&lt;p&gt;However, there are times when we know that certain things are very important and considering them in the early stages of a project, or while building a new feature, may be quite beneficial. Maybe the price we pay now for some extra code may be considered a bargain when compared to the amount of flexibility we gain in the future, which will move the inflection point more towards the right.&lt;/p&gt;
+
+&lt;p&gt;Whenever you have a design discussion with your pair or team, focus the discussion on finding the inflection point. This will make the discussion more objective. Instead of “my idea versus yours” or “this approach versus that approach”, we should discuss what type of flexibility we would like to have and how we can achieve that without paying premium for it. How much are we willing to pay? Should we pay for it now, or in the future? Distant or near future? Can we pay in instalments?&lt;/p&gt;
+
+&lt;p&gt;Trying to answer the questions above will help us to reason about our decisions and find a good starting point (inflection point) for new projects or features.&lt;/p&gt;
+
+&lt;p&gt;_Thanks to &lt;a href=&#34;http://twitter.com/SamirTalwar&#34;&gt;Samir Talwar&lt;/a&gt;, &lt;a href=&#34;http://twitter.com/mashooq&#34;&gt;Mashooq Badar&lt;/a&gt;, &lt;a href=&#34;http://twitter.com/tom_b025&#34;&gt;Tom Brand&lt;/a&gt;, and &lt;a href=&#34;http://twitter.com/johan_alps&#34;&gt;Johan Martinsson&lt;/a&gt; for the conversations during &lt;a href=&#34;http://socratesuk.org&#34;&gt;Socrates UK&lt;/a&gt; that led to the clarification of the terminology and ideas described in this post._&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

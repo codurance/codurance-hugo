@@ -1,0 +1,95 @@
+
+<!--=== Content Part ===-->
+
+<div class="container services content">
+    <div class="client-descriptions">
+        <div class="title-v1 introduction">
+            <h2 class="service-header">Training</h2>
+        </div>
+
+
+
+        <!-- Course summary -->
+        <div class="row text-center margin-bottom-60">
+            <div class="col-md-6 col-md-offset-3">
+                <h1>Crafted Design</h1>
+                <h4 class="margin-bottom-20">Created by Sando Mancuso</h4>
+                <p class="margin-bottom-40 training-description"><strong>For experienced developers that want to get better at designing well-crafted solutions.</strong> It focuses on designing software that is responsive to changing requirements and new
+                    functionality, avoiding the pitfalls that lead to legacy code.</p>
+                <a href="/services/training" class="training-link-btn btn-u btn-brd btn-u-orange btn-u-lg margin-right-20"
+                   type="button">More courses</a>
+                <a href="#contact" class="training-link-btn btn-u btn-brd btn-u-orange btn-u-lg" type="button">Contact</a>
+            </div>
+        </div>
+        <!-- End course summary -->
+
+        <!-- Course description -->
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                {{ .Content }}
+            </div>
+        </div>
+
+
+        <div class="margin-bottom-60"></div>
+        <!--<hr/>-->
+        <div class="row margin-bottom-40 margin-top-20">
+            <div class="col-md-8 col-md-offset-2">
+                <div class="headline headline-md margin-bottom-30">
+                    <h2>Talk to us about your training needs</h2>
+                </div>
+
+                <form id="contact" class="sky-form" action="http://formspree.io/hello@codurance.com" method="POST">
+                    <input type="hidden" name="_next" value="/aboutus/thanks"/>
+                    <input type="hidden" name="_subject" value="Codurance Training"/>
+                    <input type="hidden" id="TrainingUrl" name="TrainingUrl" value=""/>
+
+                    <div class="row margin-bottom-20">
+                        <div class="col-md-6">
+                            <label>Name / Organisation</label>
+                            <input class="form-control" type="text" name="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Your email</label>
+                            <input class="form-control" type="email" name="_replyto" required>
+                        </div>
+                    </div>
+                    <div class="row margin-bottom-20">
+                        <div class="col-md-6">
+                            <label>Desired start date</label>
+                            <input class="form-control" type="text" name="start_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label>Number of participants</label>
+                            <input class="form-control" type="text" name="participants">
+                        </div>
+                    </div>
+                    <div class="row margin-bottom-20">
+                        <div class="col-md-12">
+                            <label>Message</label>
+                            <textarea class="form-control" rows="10" name="body" required></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button id="Send" value="Send" class="pull-right btn-u btn-u-lg" type="submit">Submit
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    document.getElementById('TrainingUrl').value = window.location.href;
+</script>
+
+
+
+
+
+
+
+
+

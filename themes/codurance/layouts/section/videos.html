@@ -1,0 +1,7 @@
+{{ partial "html/head.html" . }}
+<div class="wrapper">
+    {{ partial "page/menu.html" (dict "menus" .Site.Data.menu "active_menu_item" "Software Creation")  }}
+    {{ partial "videos/videos.html" . }}
+    {{ partial "page/footer.html" . }}
+</div>
+{{ partial "html/footer.html" . }}

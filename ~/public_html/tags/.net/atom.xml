@@ -1,0 +1,875 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>.Net on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/index.net/</link>
+    <description>Recent content in .Net on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Mon, 11 May 2015 18:00:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/.net/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Applying Transformation Priority Premise to Roman Numerals Kata</title>
+      <link>http://codurance.com/blog/applying-transformation-priority-premise-to-roman-numerals-kata/</link>
+      <pubDate>Mon, 11 May 2015 18:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/applying-transformation-priority-premise-to-roman-numerals-kata/</guid>
+      <description>
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;As tests get more specific code gets more generic.&amp;rdquo; - Uncle Bob&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;tdd&#34;&gt;TDD&lt;/h2&gt;
+
+&lt;p&gt;Often one of the doubts we have when developing software driven by tests is how to evolve code in small and steady paces guided by tests (baby steps). TDD looks deceptively easy and only when we get more experience do we recognize this. The three laws of TDD state:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;You are not allowed to write any production code unless it is to make a failing unit test pass.&lt;/li&gt;
+&lt;li&gt;You are not allowed to write any more of a unit test than is sufficient to fail; and compilation failures are failures.&lt;/li&gt;
+&lt;li&gt;You are not allowed to write any more production code than is sufficient to pass the one failing unit test.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;On this post I would like to concentrate on the third law.
+On May 2013 Robert C. Martin AKA Uncle Bob wrote a seminal post titled &lt;a href=&#34;http://blog.8thlight.com/uncle-bob/2013/05/27/TheTransformationPriorityPremise.html&#34;&gt;&amp;ldquo;Transformation Priority Premise&amp;rdquo;&lt;/a&gt;. Go read it, I will wait here. Alternatively &lt;a href=&#34;https://vimeo.com/97516288&#34;&gt;watch&lt;/a&gt; him talk about it.&lt;/p&gt;
+
+&lt;h2 id=&#34;what-is-this-post-about&#34;&gt;What is this post about?&lt;/h2&gt;
+
+&lt;p&gt;I had to prepare a presentation on Transformation Priority Premise. I tried to document how I could use this technique to implement an algorithm. My objective was to implement it trying not to skip any of the transformations and moving through them in the order they are defined.&lt;/p&gt;
+
+&lt;h2 id=&#34;transformation-priority-premise&#34;&gt;Transformation Priority Premise&lt;/h2&gt;
+
+&lt;p&gt;The transformations list gives guidance on how to apply small transformations to the code under test in order to evolve it to a more generic implementation. We should try to avoid taking big leaps forward when a small transformation will do. Remember the third law of TDD: &amp;ldquo;You are not allowed to write any more production code than is sufficient to pass the one failing unit test.&amp;rdquo; &amp;ldquo;Transformations on the top of the list should be preferred to those that are lower. It is better (or simpler) to change a constant into a variable than it is to add an if statement. So when making a test pass, you try to do so with transformations that are simpler (higher on the list) than those that are more complex.&amp;rdquo;
+On the table below you can find the transformations list.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;({} -&amp;gt; nil) no code at all-&amp;gt;code that employs nil&lt;/li&gt;
+&lt;li&gt;(nil -&amp;gt; constant)&lt;/li&gt;
+&lt;li&gt;(constant -&amp;gt; constant+) a simple constant to a more complex constant&lt;/li&gt;
+&lt;li&gt;(constant -&amp;gt; scalar) replacing a constant with a variable or an argument&lt;/li&gt;
+&lt;li&gt;(statement -&amp;gt; statements) adding more unconditional statements.&lt;/li&gt;
+&lt;li&gt;(unconditional -&amp;gt; if) splitting the execution path&lt;/li&gt;
+&lt;li&gt;(scalar -&amp;gt; array)&lt;/li&gt;
+&lt;li&gt;(array -&amp;gt; container)&lt;/li&gt;
+&lt;li&gt;(statement -&amp;gt; recursion)&lt;/li&gt;
+&lt;li&gt;(if -&amp;gt; while)&lt;/li&gt;
+&lt;li&gt;(expression -&amp;gt; function) replacing an expression with a function or algorithm&lt;/li&gt;
+&lt;li&gt;(variable -&amp;gt; assignment) replacing the value of a variable.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;roman-numbers&#34;&gt;Roman Numbers&lt;/h2&gt;
+
+&lt;p&gt;If you are familiar with this kata please move to the next section implementation.&lt;/p&gt;
+
+&lt;h3 id=&#34;definition&#34;&gt;Definition&lt;/h3&gt;
+
+&lt;p&gt;Given a positive integer number (eg. 42) determine its Roman numeral representation as a String (eg &amp;ldquo;XLII&amp;rdquo;). You cannot write numerals like IM for 999.&lt;/p&gt;
+
+&lt;h3 id=&#34;examples&#34;&gt;Examples&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Arabic number&lt;/th&gt;
+&lt;th&gt;Roman numeral&lt;/th&gt;
+&lt;th&gt;Arabic number&lt;/th&gt;
+&lt;th&gt;Roman numeral&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;I&lt;/td&gt;
+&lt;td&gt;60&lt;/td&gt;
+&lt;td&gt;LX&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;II&lt;/td&gt;
+&lt;td&gt;70&lt;/td&gt;
+&lt;td&gt;LXXX&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;III&lt;/td&gt;
+&lt;td&gt;80&lt;/td&gt;
+&lt;td&gt;LXXX&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;IV&lt;/td&gt;
+&lt;td&gt;90&lt;/td&gt;
+&lt;td&gt;XC&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;V&lt;/td&gt;
+&lt;td&gt;100&lt;/td&gt;
+&lt;td&gt;C&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;6&lt;/td&gt;
+&lt;td&gt;VI&lt;/td&gt;
+&lt;td&gt;200&lt;/td&gt;
+&lt;td&gt;CC&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;7&lt;/td&gt;
+&lt;td&gt;VII&lt;/td&gt;
+&lt;td&gt;300&lt;/td&gt;
+&lt;td&gt;CCC&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;8&lt;/td&gt;
+&lt;td&gt;VIII&lt;/td&gt;
+&lt;td&gt;400&lt;/td&gt;
+&lt;td&gt;CD&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;9&lt;/td&gt;
+&lt;td&gt;IX&lt;/td&gt;
+&lt;td&gt;500&lt;/td&gt;
+&lt;td&gt;D&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;10&lt;/td&gt;
+&lt;td&gt;X&lt;/td&gt;
+&lt;td&gt;600&lt;/td&gt;
+&lt;td&gt;DC&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;20&lt;/td&gt;
+&lt;td&gt;XX&lt;/td&gt;
+&lt;td&gt;700&lt;/td&gt;
+&lt;td&gt;DCC&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;30&lt;/td&gt;
+&lt;td&gt;XXX&lt;/td&gt;
+&lt;td&gt;800&lt;/td&gt;
+&lt;td&gt;DCCC&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;40&lt;/td&gt;
+&lt;td&gt;XL&lt;/td&gt;
+&lt;td&gt;900&lt;/td&gt;
+&lt;td&gt;CM&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;50&lt;/td&gt;
+&lt;td&gt;L&lt;/td&gt;
+&lt;td&gt;1000&lt;/td&gt;
+&lt;td&gt;M&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Arabic number&lt;/th&gt;
+&lt;th&gt;Roman numeral&lt;/th&gt;
+&lt;th&gt;Thousands&lt;/th&gt;
+&lt;th&gt;Cents&lt;/th&gt;
+&lt;th&gt;Tenths&lt;/th&gt;
+&lt;th&gt;Units&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;846&lt;/td&gt;
+&lt;td&gt;DCCCXLVI&lt;/td&gt;
+&lt;td&gt;-&lt;/td&gt;
+&lt;td&gt;DCC&lt;/td&gt;
+&lt;td&gt;XL&lt;/td&gt;
+&lt;td&gt;VI&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;1999&lt;/td&gt;
+&lt;td&gt;MCMXCIX&lt;/td&gt;
+&lt;td&gt;M&lt;/td&gt;
+&lt;td&gt;CM&lt;/td&gt;
+&lt;td&gt;XC&lt;/td&gt;
+&lt;td&gt;IX&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;2008&lt;/td&gt;
+&lt;td&gt;MMVIII&lt;/td&gt;
+&lt;td&gt;MM&lt;/td&gt;
+&lt;td&gt;-&lt;/td&gt;
+&lt;td&gt;-&lt;/td&gt;
+&lt;td&gt;VIII&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&#34;implementation&#34;&gt;Implementation&lt;/h2&gt;
+
+&lt;p&gt;We start by writing the simplest unit test we can think of.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;[TestFixture]
+public class RomanConverterShould
+{
+    [TestCase(1, &amp;quot;I&amp;quot;)]
+    public void ConvertNumberToRoman(int number, string expected)
+    {
+        var romanNumeral = new RomanConverter().Convert(number);
+        Assert.That(romanNumeral, Is.EqualTo(expected));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We start the implementation using the first transformation &lt;em&gt;no code to nil&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;// 1 nil
+public class RomanConverter
+{
+    public string Convert(int number)
+    {
+        return null;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The first transformation is not enough to make the test pass so we apply the second transformation &lt;em&gt;nil to constant&lt;/em&gt;. This is enough to make the test pass so we stop evolving the code until we have a failing test.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;// 2 nil -&amp;gt; constant
+public class RomanConverter
+{
+    public string Convert(int number)
+    {
+        return &amp;quot;I&amp;quot;;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We add a new failing test.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;[TestFixture]
+public class RomanConverterShould
+{
+    [TestCase(1, &amp;quot;I&amp;quot;)]
+    [TestCase(2, &amp;quot;II&amp;quot;)]
+    public void ConvertNumberToRoman(int number, string expected)
+    {
+        var romanNumeral = new RomanConverter().Convert(number);
+        Assert.That(romanNumeral, Is.EqualTo(expected));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The next transformation &lt;em&gt;constant to variable&lt;/em&gt; is not sufficient to make the test pass.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;// 4 Constant -&amp;gt; variable
+public class RomanConverter
+{
+    public string Convert(int number)
+    {
+        var result = &amp;quot;I&amp;quot;;
+        return result;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The next transformation &lt;em&gt;statement to statements&lt;/em&gt; is also not sufficient to make the test pass.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;// 5 statement -&amp;gt; statements
+public class RomanConverter
+{
+    public string Convert(int number)
+    {
+        var result = &amp;quot;I&amp;quot;;
+        result += &amp;quot;I&amp;quot;;
+
+        return result;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Applying the next transformation &lt;em&gt;unconditional to conditional&lt;/em&gt; is sufficient to make the test pass.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;// 6 unconditional -&amp;gt; conditional
+public class RomanConverter
+{
+    public string Convert(int number)
+    {
+        var result = &amp;quot;I&amp;quot;;
+
+        if (number &amp;gt;= 1)
+        {
+            result += &amp;quot;I&amp;quot;;
+        }
+
+        return result;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We add a new failing test.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;[TestFixture]
+public class RomanConverterShould
+{
+    [TestCase(1, &amp;quot;I&amp;quot;)]
+    [TestCase(2, &amp;quot;II&amp;quot;)]
+    [TestCase(3, &amp;quot;III&amp;quot;)]
+    public void ConvertNumberToRoman(int number, string expected)
+    {
+        var romanNumeral = new RomanConverter().Convert(number);
+        Assert.That(romanNumeral, Is.EqualTo(expected));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Adding another conditional will make the test pass, but we have duplication.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;public class RomanConverter
+{
+    public string Convert(int number)
+    {
+        var result = &amp;quot;I&amp;quot;;
+        if (number &amp;gt; 1)
+        {
+            result += &amp;quot;I&amp;quot;;
+        }
+
+        if (number &amp;gt; 2)
+        {
+            result += &amp;quot;I&amp;quot;;
+        }
+
+        return result;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Applying the next transformation &lt;em&gt;variable to array&lt;/em&gt; removes the duplication.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;// 7 variable -&amp;gt; array
+public class RomanConverter
+{
+    public static readonly string[] Results = { &amp;quot;I&amp;quot;, &amp;quot;II&amp;quot;, &amp;quot;III&amp;quot; };
+
+    public string Convert(int number)
+    {
+        return Results[number - 1];
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We add a new failing test.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;[TestFixture]
+public class RomanConverterShould
+{
+    [TestCase(1, &amp;quot;I&amp;quot;)]
+    [TestCase(2, &amp;quot;II&amp;quot;)]
+    [TestCase(3, &amp;quot;III&amp;quot;)]
+    [TestCase(4, &amp;quot;IV&amp;quot;)]
+    public void ConvertNumberToRoman(int number, string expected)
+    {
+        var romanNumeral = new RomanConverter().Convert(number);
+        Assert.That(romanNumeral, Is.EqualTo(expected));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To make the test pass we don&amp;rsquo;t need to apply the next transformation, we can make the test pass by adding a new element to the array.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;// no transformation
+public class RomanConverter
+{
+    public static readonly string[] Results = { &amp;quot;I&amp;quot;, &amp;quot;II&amp;quot;, &amp;quot;III&amp;quot;, &amp;quot;IV&amp;quot; };
+
+    public string Convert(int number)
+    {
+        return Results[number - 1];
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;While adding a new element to the array was enough to make the test pass, we now spot some duplication on character &amp;ldquo;I&amp;rdquo;. By applying the next transformation &lt;em&gt;statement to tail&lt;/em&gt; recursion we can get rid of this duplication. Since we are trying to follow the transformation table we applied the &lt;em&gt;array to collection&lt;/em&gt; transformation before the tail recursion.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;// 8 array -&amp;gt; collection
+public class RomanConverter
+{
+    public static readonly IDictionary&amp;lt;int, string&amp;gt; Results =
+        new Dictionary&amp;lt;int, string&amp;gt;
+        {
+            {1, &amp;quot;I&amp;quot;},
+            {2, &amp;quot;II&amp;quot;},
+            {3, &amp;quot;III&amp;quot;},
+            {4, &amp;quot;IV&amp;quot;},
+        };
+
+    public string Convert(int number)
+    {
+        return Results[number];
+    }
+}
+
+// 9 statement -&amp;gt; tail recursion
+public class RomanConverter
+{
+    public static readonly IDictionary&amp;lt;int, string&amp;gt; Results = new Dictionary&amp;lt;int, string&amp;gt;
+    {
+        {1, &amp;quot;I&amp;quot;},
+        {4, &amp;quot;IV&amp;quot;},
+    };
+
+    public string Convert(int number)
+    {
+        if (Results.ContainsKey(number))
+        {
+            return Results[number];
+        }
+
+        return Results[1] + Convert(number - 1);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We add a few more failing tests but since the last transformation was still allowing us to make tests pass we waited until we had duplication to refactor.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;[TestFixture]
+public class RomanConverterShould
+{
+    [TestCase(1, &amp;quot;I&amp;quot;)]
+    [TestCase(2, &amp;quot;II&amp;quot;)]
+    [TestCase(3, &amp;quot;III&amp;quot;)]
+    [TestCase(4, &amp;quot;IV&amp;quot;)]
+    [TestCase(5, &amp;quot;V&amp;quot;)]
+    [TestCase(6, &amp;quot;VI&amp;quot;)]
+    [TestCase(7, &amp;quot;VII&amp;quot;)]
+    [TestCase(8, &amp;quot;VIII&amp;quot;)]
+    public void ConvertNumberToRoman(int number, string expected)
+    {
+        var romanNumeral = new RomanConverter().Convert(number);
+        Assert.That(romanNumeral, Is.EqualTo(expected));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;No other transformations required, simply adding new values to the dictionary allowed us to make the tests pass but we can now spot duplication, again around character &amp;ldquo;I&amp;rdquo;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;public class RomanConverter
+{
+    public static readonly IDictionary&amp;lt;int, string&amp;gt; Results =
+    new Dictionary&amp;lt;int, string&amp;gt;
+    {
+        {1, &amp;quot;I&amp;quot;},
+        {4, &amp;quot;IV&amp;quot;},
+        {5, &amp;quot;V&amp;quot;},
+        {6, &amp;quot;VI&amp;quot;},
+        {7, &amp;quot;VII&amp;quot;},
+        {8, &amp;quot;VIII&amp;quot;},
+    };
+
+    public string Convert(int number)
+    {
+        if (Results.ContainsKey(number))
+        {
+            return Results[number];
+        }
+
+        return Results[1] + Convert(number - 1);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To fix the duplication we apply again the transformation, &lt;em&gt;statement to tail recursion&lt;/em&gt;, to fix this. We don&amp;rsquo;t yet need to move to the next transformation.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;// 9 statement -&amp;gt; tail recursion
+public class RomanConverter
+{
+    public static readonly IDictionary&amp;lt;int, string&amp;gt; Results =
+    new Dictionary&amp;lt;int, string&amp;gt;
+    {
+        {1, &amp;quot;I&amp;quot;},
+        {4, &amp;quot;IV&amp;quot;},
+        {5, &amp;quot;V&amp;quot;},
+    };
+
+    public string Convert(int number)
+    {
+        if (Results.ContainsKey(number))
+        {
+            return Results[number];
+        }
+
+        if (number &amp;gt; 5)
+        {
+            const string result = &amp;quot;V&amp;quot;;
+            return result + Convert(number - 5);
+        }
+
+        return Results[1] + Convert(number - 1);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Again we add more failing tests, and again, the last transformation is still making tests pass.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;[TestFixture]
+public class RomanConverterShould
+{
+    [TestCase(1, &amp;quot;I&amp;quot;)]
+    [TestCase(2, &amp;quot;II&amp;quot;)]
+    [TestCase(3, &amp;quot;III&amp;quot;)]
+    [TestCase(4, &amp;quot;IV&amp;quot;)]
+    [TestCase(5, &amp;quot;V&amp;quot;)]
+    [TestCase(6, &amp;quot;VI&amp;quot;)]
+    [TestCase(7, &amp;quot;VII&amp;quot;)]
+    [TestCase(8, &amp;quot;VIII&amp;quot;)]
+    [TestCase(9, &amp;quot;IX&amp;quot;)]
+    [TestCase(10, &amp;quot;X&amp;quot;)]
+    [TestCase(40, &amp;quot;XL&amp;quot;)]
+    [TestCase(44, &amp;quot;XLIV&amp;quot;)]
+    public void ConvertNumberToRoman(int number, string expected)
+    {
+        var romanNumeral = new RomanConverter().Convert(number);
+        Assert.That(romanNumeral, Is.EqualTo(expected));
+    }
+}
+
+// Wait for patterns to emerge
+public class RomanConverter
+{
+    public static readonly IDictionary&amp;lt;int, string&amp;gt; Results =
+        new Dictionary&amp;lt;int, string&amp;gt;
+        {
+            {1, &amp;quot;I&amp;quot;},
+            {4, &amp;quot;IV&amp;quot;},
+            {5, &amp;quot;V&amp;quot;},
+            {9, &amp;quot;IX&amp;quot;},
+            {10, &amp;quot;X&amp;quot;},
+            {40, &amp;quot;XL&amp;quot;},
+        };
+
+    public string Convert(int number)
+    {
+        if (Results.ContainsKey(number))
+        {
+            return Results[number];
+        }
+
+        if (number &amp;gt; 40)
+        {
+            const string result = &amp;quot;XL&amp;quot;;
+            return result + Convert(number - 40);
+        }
+
+        if (number &amp;gt; 10)
+        {
+            const string result = &amp;quot;X&amp;quot;;
+            return result + Convert(number - 10);
+        }
+
+        if (number &amp;gt; 5)
+        {
+            const string result = &amp;quot;V&amp;quot;;
+            return result + Convert(number - 5);
+        }
+
+        return Results[1] + Convert(number - 1);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We spot duplication around if statements, so we refactor the code to the next transformation &lt;em&gt;if to while&lt;/em&gt;. This gets rid of if statement duplication, but we now have while statement duplication.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;// 10 if -&amp;gt; while
+public class RomanConverter
+{
+    public static readonly IDictionary&amp;lt;int, string&amp;gt; Results =
+        new Dictionary&amp;lt;int, string&amp;gt;
+        {
+            {1, &amp;quot;I&amp;quot;},
+            {4, &amp;quot;IV&amp;quot;},
+            {5, &amp;quot;V&amp;quot;},
+            {9, &amp;quot;IX&amp;quot;},
+            {10, &amp;quot;X&amp;quot;},
+            {40, &amp;quot;XL&amp;quot;},
+        };
+
+    public string Convert(int number)
+    {
+        if (Results.ContainsKey(number))
+        {
+            return Results[number];
+        }
+
+        string result = string.Empty;
+
+        while (number &amp;gt;= 40)
+        {
+            result += &amp;quot;XL&amp;quot;;
+            number -= 40;
+        }
+
+        while (number &amp;gt;= 10)
+        {
+            result += &amp;quot;X&amp;quot;;
+            number -= 10;
+        }
+
+        while (number &amp;gt;= 5)
+        {
+            result += &amp;quot;V&amp;quot;;
+            number -= 5;
+        }
+
+        while (number &amp;gt;= 4)
+        {
+            result += &amp;quot;IV&amp;quot;;
+            number -= 4;
+        }
+
+        while (number &amp;gt;= 1)
+        {
+            result += &amp;quot;I&amp;quot;;
+            number -= 1;
+        }
+
+        return result;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We apply the same &lt;em&gt;if to while&lt;/em&gt; transformation to the remaining if statement and this allows us to get rid of the duplicated while statements. In order for this to work it&amp;rsquo;s more convenient to have the dictionary reversed so we also do this.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;// 10 if -&amp;gt; while
+public class RomanConverter
+{
+    public static readonly IDictionary&amp;lt;int, string&amp;gt; mappings =
+        new Dictionary&amp;lt;int, string&amp;gt;
+        {
+            {40, &amp;quot;XL&amp;quot;},
+            {10, &amp;quot;X&amp;quot;},
+            {9, &amp;quot;IX&amp;quot;},
+            {5, &amp;quot;V&amp;quot;},
+            {4, &amp;quot;IV&amp;quot;},
+            {1, &amp;quot;I&amp;quot;},
+        };
+
+    public string Convert(int number)
+    {
+        string result = string.Empty;
+        var mappingsEnumerator = mappings.GetEnumerator();
+
+        while (mappingsEnumerator.MoveNext())
+        {
+            var mapping = mappingsEnumerator.Current;
+
+            while (number &amp;gt;= mapping.Key)
+            {
+                result += mapping.Value;
+                number -= mapping.Key;
+            }
+        }
+
+        return result;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We add more failing tests but the last transformation is sufficient to make all new tests pass and we cannot think of anymore failing tests, this implies we are done. We refactor the code to make it more readable and we are done. We decided not to refactor the outer while loop to a foreach loop. Although this could simplify the code, a foreach loop is not in the transformation premise list so we decided against it for the purposes of this post.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csharp&#34;&gt;// final solution
+[TestFixture]
+public class RomanConverterShould
+{
+    [TestCase(1, &amp;quot;I&amp;quot;)]
+    [TestCase(2, &amp;quot;II&amp;quot;)]
+    [TestCase(3, &amp;quot;III&amp;quot;)]
+    [TestCase(4, &amp;quot;IV&amp;quot;)]
+    [TestCase(5, &amp;quot;V&amp;quot;)]
+    [TestCase(6, &amp;quot;VI&amp;quot;)]
+    [TestCase(7, &amp;quot;VII&amp;quot;)]
+    [TestCase(8, &amp;quot;VIII&amp;quot;)]
+    [TestCase(9, &amp;quot;IX&amp;quot;)]
+    [TestCase(10, &amp;quot;X&amp;quot;)]
+    [TestCase(40, &amp;quot;XL&amp;quot;)]
+    [TestCase(50, &amp;quot;L&amp;quot;)]
+    [TestCase(90, &amp;quot;XC&amp;quot;)]
+    [TestCase(100, &amp;quot;C&amp;quot;)]
+    [TestCase(400, &amp;quot;CD&amp;quot;)]
+    [TestCase(500, &amp;quot;D&amp;quot;)]
+    [TestCase(900, &amp;quot;CM&amp;quot;)]
+    [TestCase(1000, &amp;quot;M&amp;quot;)]
+    [TestCase(846, &amp;quot;DCCCXLVI&amp;quot;)]
+    [TestCase(1999, &amp;quot;MCMXCIX&amp;quot;)]
+    [TestCase(2008, &amp;quot;MMVIII&amp;quot;)]
+    public void ConvertNumberToRoman(int number, string expected)
+    {
+        var romanNumeral = new RomanConverter().Convert(number);
+        Assert.That(romanNumeral, Is.EqualTo(expected));
+    }
+}
+
+public class RomanConverter
+{
+    public static readonly IDictionary&amp;lt;int, string&amp;gt; arabicsToRomans =
+            new Dictionary&amp;lt;int, string&amp;gt;
+            {
+                {1000, &amp;quot;M&amp;quot;},
+                {900, &amp;quot;CM&amp;quot;},
+                {500, &amp;quot;D&amp;quot;},
+                {400, &amp;quot;CD&amp;quot;},
+                {100, &amp;quot;C&amp;quot;},
+                {90, &amp;quot;XC&amp;quot;},
+                {50, &amp;quot;L&amp;quot;},
+                {40, &amp;quot;XL&amp;quot;},
+                {10, &amp;quot;X&amp;quot;},
+                {9, &amp;quot;IX&amp;quot;},
+                {5, &amp;quot;V&amp;quot;},
+                {4, &amp;quot;IV&amp;quot;},
+                {1, &amp;quot;I&amp;quot;},
+            };
+
+        public string Convert(int number)
+        {
+            var romanNumeral = string.Empty;
+            var arabicsToRomansEnumerator = arabicsToRomans.GetEnumerator();
+
+            while (arabicsToRomansEnumerator.MoveNext())
+            {
+                var arabicToRoman = arabicsToRomansEnumerator.Current;
+                var arabicNumeral = arabicToRoman.Key;
+                var romanNumeral = arabicToRoman.Value;
+
+                while (number &amp;gt;= arabicNumeral)
+                {
+                    result += romanNumeral;
+                    number -= arabicNumeral;
+                }
+            }
+
+            return romanNumeral;
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;conclusions&#34;&gt;Conclusions&lt;/h2&gt;
+
+&lt;p&gt;For the purpose of this post I think the code as is, illustrates the process described by Robert Martin, AKA Uncle Bob, to refactor code from specific to generic guided by tests. Deliberately following the Transformation Priority Premise while coding was a very interesting exercise, it provided guidance while avoiding big leap refactors. I found out that when I was stuck, most of the time, the solution was just applying the next transformation on the table.&lt;/p&gt;
+
+&lt;h2 id=&#34;links&#34;&gt;Links&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://blog.8thlight.com/uncle-bob/2013/05/27/TheTransformationPriorityPremise.html&#34;&gt;http://blog.8thlight.com/uncle-bob/2013/05/27/TheTransformationPriorityPremise.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://vimeo.com/97516288&#34;&gt;https://vimeo.com/97516288&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://en.wikipedia.org/wiki/Transformation_Priority_Premise&#34;&gt;http://en.wikipedia.org/wiki/Transformation_Priority_Premise&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Creating a local NuGet repository for offline development</title>
+      <link>http://codurance.com/blog/creating-a-local-nuget-repository/</link>
+      <pubDate>Fri, 01 May 2015 10:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/creating-a-local-nuget-repository/</guid>
+      <description>&lt;p&gt;I spend several hours each week on long-distance train journeys and often use the time to code, whether on a pet project or practising a kata or two. Large parts of this journey have patchy-at-best mobile data coverage, so tools with a reliance on a stable internet connection can cause problems. One of these tools is the NuGet Package Manager in Visual Studio.&lt;/p&gt;
+
+&lt;p&gt;In the most simple cases, where a solution just needs a reference to a single DLL, local copies are an adequate solution. However, that is not always sufficient as some of the libraries I want to use are vastly more complex with extended dependency chains. I was really beginning to miss NuGet while working offline, so I decided to set up my own offline local NuGet repository. It is a surprisingly simple operation, yet I had to do quite a bit of hunting around to find all the steps I needed to perform and failed to find a them all listed in a single article. So here goes…&lt;/p&gt;
+
+&lt;p&gt;Firstly, you’ll need to create a local folder to house all your local NuGet packages. I created a folder called &lt;em&gt;‘LocalNugetRepository’&lt;/em&gt; within the &lt;em&gt;Documents\Visual Studio 2013&lt;/em&gt; folder, but you can call it whatever you like and place it anywhere you have sufficient privileges:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-05-01-creating-a-local-nuget-repository/local-folder.png&#34; alt=&#34;Local repository folder&#34; title=&#34;Local repository folder&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;The next step is to download the NuGet packages you wish to be able to use offline into this folder. Packages can be downloaded from &lt;a href=&#34;http://www.nuget.org&#34;&gt;nuget.org&lt;/a&gt;. Importantly, you must be logged in to this site to be able to download packages, so go ahead and log in, or register for a new account if you don’t already have one.&lt;/p&gt;
+
+&lt;p&gt;Once you are logged in, search for the packages you require and click the &lt;em&gt;‘Download’&lt;/em&gt; link in the left hand menu of each (highlighted below). &lt;strong&gt;This link will not be present in the menu if you are not logged in:&lt;/strong&gt;&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-05-01-creating-a-local-nuget-repository/nuget-download.png&#34; alt=&#34;Downloading packages from nuget.org&#34; title=&#34;Downloading packages from nuget.org&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;Once you have successfully downloaded the &lt;em&gt;.nupkg&lt;/em&gt; files you require into your local repository folder, head into Visual Studio and open the NuGet Settings dialog via &lt;em&gt;Tools &amp;gt; NuGet Package Manager &amp;gt; Package Manager Settings&lt;/em&gt;. Click the Package Sources tab within the settings dialog, followed by the ‘plus’ icon in the top left to add a new package source:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-05-01-creating-a-local-nuget-repository/nuget-settings.png&#34; alt=&#34;Adding a local package source&#34; title=&#34;Adding a local package source&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;Enter the Name and Source of your local repository. The name can be any string and will be the name displayed in the NuGet Package Manager within Visual Studio.&lt;/p&gt;
+
+&lt;p&gt;Now that you have added the local package source, you will be able to use your offline local repository from within Visual Studio in the usual way, either via the Console or via the Package Dialog, by selecting it from the &lt;em&gt;Package Source&lt;/em&gt; menu, without the need for an active internet connection:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-05-01-creating-a-local-nuget-repository/package-manager.png&#34; alt=&#34;Using the new local package source&#34; title=&#34;Using the new local package source&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;It is worth noting here that if you downloaded any pre-release packages from &lt;a href=&#34;http://www.nuget.org&#34;&gt;nuget.org&lt;/a&gt; into your local repository they will not be displayed by default within either the Package Manager Console or GUI dialog. This is by design, however it can be overridden in the Package Manager Console through the use of the &lt;code&gt;-IncludePrerelease&lt;/code&gt; flag. For more information, see the &lt;a href=&#34;https://docs.nuget.org/create/versioning#installing-prerelease-packages&#34;&gt;official documentation&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Multiple projects in Visual Studio solutions considered harmful</title>
+      <link>http://codurance.com/blog/visual-studio-projects/</link>
+      <pubDate>Mon, 23 Mar 2015 22:49:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/visual-studio-projects/</guid>
+      <description>
+
+&lt;h1 id=&#34;multiple-projects-in-visual-studio-solutions-considered-harmful&#34;&gt;Multiple projects in Visual Studio solutions considered harmful&lt;/h1&gt;
+
+&lt;p&gt;I agree with &lt;a href=&#34;https://lostechies.com/chadmyers/author/chadmyers/&#34;&gt;Chad Myers&lt;/a&gt; when he defines a common project anti-pattern &lt;a href=&#34;https://lostechies.com/chadmyers/2008/07/16/project-anti-pattern-many-projects-in-a-visual-studio-solution-file/&#34;&gt;“Many projects in a Visual Studio Solution”&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;fast-feedback-loop&#34;&gt;Fast feedback loop&lt;/h2&gt;
+
+&lt;p&gt;Too many projects increase both the load and build time of your solution. Also a solution will take longer to start executing in debug due the overhead of loading/resolving multiple assemblies with associated PDB’s and symbols. This has an impact on the fast feedback loop we should strive to achieve. When I write code I want feedback as fast as possible. This includes compiling, and executing tests. Solutions with multiple projects affect the fast feedback loop.&lt;/p&gt;
+
+&lt;h2 id=&#34;logical-boundary-physical-boundary&#34;&gt;Logical boundary != Physical boundary&lt;/h2&gt;
+
+&lt;p&gt;An assembly is a unit of deployment in .Net. A Visual Studio project has a 1 on 1 relation with an assembly. We should have boundaries in our solutions, but we should not confuse logical boundaries with physical boundaries. A project in Visual Studio creates a physical boundary; this is often needed, but also open to abuse. Physical boundaries are all about deployment and versioning. If you are not deploying and versioning a part of your code independently, there is no reason to create a physical boundary. Multiple layers != multiple assemblies.&lt;/p&gt;
+
+&lt;h2 id=&#34;dependency-management&#34;&gt;Dependency management&lt;/h2&gt;
+
+&lt;p&gt;I don&amp;rsquo;t want to reference System.Web across all code, so I create a separate assembly where I &amp;ldquo;isolate&amp;rdquo; the code that depends on that assembly. When I hear this argument, most of the time it equates to distrust among team members. Or, I don&amp;rsquo;t trust other developers, so to avoid them referencing System.Web on business classes, I segregate them in another project that does not reference System.Web. Can you hear yourself? There may be a compelling reason to isolate a dependency in a separate assembly, but the reason should not be: to avoid other developers making a mess.&lt;/p&gt;
+
+&lt;h2 id=&#34;how-do-i-do-it&#34;&gt;How do I do it?&lt;/h2&gt;
+
+&lt;p&gt;My solutions start with two projects one for production code and one for tests. The question to ask before creating a project is: Do I need to deploy and version this part of the code independently? Only if the answer is yes do I create a new project.&lt;/p&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;This subject has been discussed in the community for a long time but I still don’t see any change. I’m continuously faced with solutions with dozens even hundreds of projects. In fact I would say this is the norm, unfortunately. I still see shocked faces, when I propose rearranging a solution using folders and namespaces instead of projects. So I’m adding my voice to other voices.&lt;/p&gt;
+
+&lt;p&gt;Some authors propose a number between 15-20 maximum projects in a Visual Studio Solution to be a good compromise. I disagree; my proposal is one for production code and a separate project for tests. Adding any other project to a solution should be considered very carefully.&lt;/p&gt;
+
+&lt;p&gt;Thanks to Tom Male and Eric Li Koo for reading drafts of this.&lt;/p&gt;
+
+&lt;h4 id=&#34;references&#34;&gt;References&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://ayende.com/blog/3158/the-two-project-solution&#34;&gt;http://ayende.com/blog/3158/the-two-project-solution&lt;/a&gt;
+&lt;a href=&#34;http://geekswithblogs.net/FrostRed/archive/2008/10/03/125628.aspx&#34;&gt;http://geekswithblogs.net/FrostRed/archive/2008/10/03/125628.aspx&lt;/a&gt;
+&lt;a href=&#34;http://codebetter.com/jeremymiller/2008/09/30/separate-assemblies-loose-coupling/&#34;&gt;http://codebetter.com/jeremymiller/2008/09/30/separate-assemblies-loose-coupling/&lt;/a&gt;
+&lt;a href=&#34;http://www.hanselman.com/blog/AssemblyFiefdomsWhatsTheRightNumberOfAssembliesLibraries.aspx&#34;&gt;http://www.hanselman.com/blog/AssemblyFiefdomsWhatsTheRightNumberOfAssembliesLibraries.aspx &lt;/a&gt;
+&lt;a href=&#34;https://lostechies.com/chadmyers/2008/07/16/project-anti-pattern-many-projects-in-a-visual-studio-solution-file/&#34;&gt;https://lostechies.com/chadmyers/2008/07/16/project-anti-pattern-many-projects-in-a-visual-studio-solution-file/&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

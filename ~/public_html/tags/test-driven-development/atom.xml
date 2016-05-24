@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Test Driven Development on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/test-driven-development/</link>
+    <description>Recent content in Test Driven Development on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Sun, 14 Dec 2014 00:27:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/test-driven-development/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Code quality cannot be measured</title>
+      <link>http://codurance.com/blog/quality-cannot-be-measured/</link>
+      <pubDate>Sun, 14 Dec 2014 00:27:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/quality-cannot-be-measured/</guid>
+      <description>
+
+&lt;p&gt;We cannot effectively measure what we can&amp;rsquo;t precisely define. And this is definitely true when it comes to software quality. What is software quality? What does quality mean? Quality for whom? Compared to what? In which context? Are we talking about quality from a developer&amp;rsquo;s perspective, from a manager&amp;rsquo;s perspective, or from a user&amp;rsquo;s perspective?&lt;/p&gt;
+
+&lt;p&gt;From a developer&amp;rsquo;s perspective, I don&amp;rsquo;t think it is possible to measure quality to a satisfactory degree. Static analyses tools, code coverage, and a few other code metrics are a good thing when used by developers; they help us to identify areas of our code that could potentially be improved. However, although I think metrics help us to identify bad code, they fail to identify good code. Code with high-test coverage is not the same as well-tested code. Small methods with zero or few parameters are not the same as clean code. Highly cohesive code (low &lt;a href=&#34;http://www.aivosto.com/project/help/pm-oo-cohesion.html#LCOM4&#34;&gt;LCOM4&lt;/a&gt;) is not the same as code that express the business domain. Loose-coupled code is not the same as code that can be easily maintained. Numbers can be gamed, and believe me, I&amp;rsquo;ve been there.&lt;/p&gt;
+
+&lt;p&gt;Software quality metrics used by managers or anyone else that doesn&amp;rsquo;t have the skills to create well-crafted code should be extremely discouraged. When used by managers, metrics can cause more harm than good. Instead of being used as an aid to make our code better, metrics end up being used as bonus targets and finger pointing.&lt;/p&gt;
+
+&lt;p&gt;Software design is all about trade-offs and no software quality tool will ever be able to understand the rationale behind each design decision. For example: decoupling classes and creating indirections are good practices; they allow us to easily test and expand our code. However, the excessive use of indirections, and decoupling every single class from each other, may lead to a totally over-engineered code base.&lt;/p&gt;
+
+&lt;h3 id=&#34;what-is-quality&#34;&gt;What is quality?&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;quality&lt;/em&gt;: the standard of something as measured against other things of a similar kind; the degree of excellence of something.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;What is this standard that we are talking about here? What are the other things of similar kind we are comparing our code base to?&lt;/p&gt;
+
+&lt;p&gt;I don&amp;rsquo;t think there is a simple way to define quality. Quality is contextual and subject to comparisons. There is also a human and time factor to quality. Quality for whom? At what point in time?&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;Quality is something that is valuable to someone at some point in time&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;This is by far the best (and vaguest) definition of quality I&amp;rsquo;ve seen. It came from a combination of ideas captured in an old &lt;a href=&#34;http://www.shino.de/2010/07/22/quality-is-value-to-some-person-at-some-time/&#34;&gt;blog post&lt;/a&gt; by &lt;a href=&#34;https://twitter.com/mgaertne&#34;&gt;Markus Gartner&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;why-do-we-want-to-measure-software-quality&#34;&gt;Why do we want to measure software quality?&lt;/h3&gt;
+
+&lt;p&gt;There are many reasons to why we want to measure quality. Some developers like to use metrics to identify areas of the code that could be improved. Others use metric as a quality gate; if the code doesn&amp;rsquo;t satisfy a certain &amp;ldquo;quality&amp;rdquo; criteria, the build fails.&lt;/p&gt;
+
+&lt;p&gt;Managers may have different reasons to why they want to measure quality. Although they may say otherwise, the most common reasons to why they want software quality to be measured are:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Lack of trust.&lt;/li&gt;
+&lt;li&gt;Fear of being responsible for things they don&amp;rsquo;t understand.&lt;/li&gt;
+&lt;li&gt;Find other people to blame in case something goes wrong.&lt;/li&gt;
+&lt;li&gt;Try to find a justification for the general dissatisfaction among the people building or using the software.&lt;/li&gt;
+&lt;li&gt;Show they are in control.&lt;/li&gt;
+&lt;li&gt;Cover their backside, showing that they are doing something to control quality (ticking a box).&lt;/li&gt;
+&lt;li&gt;Annual targets and bonuses (normally associated to the percentage of test coverage).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;With the exception of a few developers and academics, the people that are keener to find a way to measure software quality are the ones that don&amp;rsquo;t write software on a daily basis. Many of them don&amp;rsquo;t even understand how some of the metrics are calculated, but they want a way to control what they don&amp;rsquo;t understand. How many times have we heard stories about managers who &lt;em&gt;force&lt;/em&gt; their teams to keep test coverage above a certain percentage? Do they really know what it means? Would they be able to help the teams to achieve that? Can they distinguish good tests from bad tests?&lt;/p&gt;
+
+&lt;h3 id=&#34;when-do-we-want-to-measure-quality&#34;&gt;When do we want to measure quality?&lt;/h3&gt;
+
+&lt;p&gt;The desire to measure quality is intensified when things are not going well: people are unhappy; some team members are not suitable for the job; too many bugs; there&amp;rsquo;s always problems with new releases; few releases per year; things are taking too long to be done; lack of trust; people are often wondering what others are doing and who is responsible for what. But when asked, almost no one can explain exactly where the software lacks quality or how it could be fixed.&lt;/p&gt;
+
+&lt;p&gt;On the other hand, we very rarely see people talking about measuring software quality when the project is going well: team is composed by good professionals; people are working well with each other; people respect and trust the opinion of their teammates; software is released often and with zero or few cosmetic bugs; good communication and team spirit;&lt;/p&gt;
+
+&lt;h3 id=&#34;code-metrics&#34;&gt;Code metrics&lt;/h3&gt;
+
+&lt;p&gt;Code analysis tools are great when used by developers as an aid to find areas of the system that could be improved. They are great to highlight things that are not always easily seen with a naked eye. They may also be very helpful when working with legacy code. However, the problem with code metrics is that making sure that the code complies to specific metrics is very different from saying that the code has quality. Having high test coverage is not the same as having good tests. Having loose coupled and high cohesive code doesn&amp;rsquo;t mean code that express the business domain or that is very easy to understand. Code with low cyclomatic complexity doesn&amp;rsquo;t mean code that behaves according business specifications and is bug free.&lt;/p&gt;
+
+&lt;h3 id=&#34;non-code-related-metrics&#34;&gt;Non-code related metrics&lt;/h3&gt;
+
+&lt;p&gt;How long does it take to build a new feature? How hard is to deploy the application? How many bugs are found in production every time we go live? How often do we go live? How fast can we safely and confidently change the software to accommodate the ever changing business requirements? Those are all things that we could associate with code quality, but can they be really associated to it? Are all these things only related to the quality of the code? Let&amp;rsquo;s take two common non-code related metrics as examples.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Number of bugs:&lt;/strong&gt; What type of bugs have been raised? Are they related to the bad state of the code base, the lack of skills of the developer that implemented the code, bad requirements, or a complete lack of communication between business, developers, and testers?&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Time to deliever a feature:&lt;/strong&gt; Why are we unhappy about the time it took us to deliver a feature? Is is because of bad estimations? Is it because we were doing something that we haven&amp;rsquo;t done before and we had to explore different alternatives? Were we blocked by other teams or internal bureaucracy? How does this feature compare to previous features implemented in the system? Are they similar? Completely different?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;As you can see, there are just too many variables involved, which makes it impossible to have a precise way to measure quality.&lt;/p&gt;
+
+&lt;p&gt;Can we really judge the quality of our code according to the amount of time we take to build a new feature or number of bugs? I don&amp;rsquo;t think so. Does the state of the code base impact on our speed of delivery and number of bugs? Yes, definitely. Is the state of the code base the sole responsible for delays and bugs? No. But, as a developer, can we feel that the state of the code is dragging us down and helping us to make mistakes? Absolutely. Can we define a set of metrics that would define quality according to how we feel? I really doubt.&lt;/p&gt;
+
+&lt;h3 id=&#34;same-role-different-perceptions&#34;&gt;Same role, different perceptions&lt;/h3&gt;
+
+&lt;p&gt;On top of the difficulty to map any type of metrics to quality, there is an additional complexity. We are assuming that a single developer could express his or her notion of quality and then derive some code metrics from it. But do all developers in the team share the same notion of quality? Do developers outside that team and company share the same notion of quality?&lt;/p&gt;
+
+&lt;p&gt;Do Ruby and Java developers share the same notion of code quality? Do game developers share the same notion of quality with developers in the financial industry? Or social network industry?&lt;/p&gt;
+
+&lt;p&gt;With so many different opinions about what code quality means, how can we measure quality? How can we precisely say which degree of quality a code base has?&lt;/p&gt;
+
+&lt;h3 id=&#34;feeling-quality&#34;&gt;Feeling quality&lt;/h3&gt;
+
+&lt;p&gt;What I want from a code base is to be able to quickly and confidently make the changes, and most importantly, be satisfied with the solution. I don&amp;rsquo;t want be scared every time I touch certain areas of the code. I want to easily navigate through the code and always finding what I&amp;rsquo;m looking for. I don&amp;rsquo;t want to be unplesantly surprised, wasting time looking for things that don&amp;rsquo;t exist or are not in the right place. I don&amp;rsquo;t want to constantly get stuck, but if that ever happens, I want to have that piece of mind that anyone around me can quickly unstuck me. I don&amp;rsquo;t want to waste time fixing bugs, but if I need to fix a bug, I don&amp;rsquo;t want to spend more than a few minutes. When I look at the system from above, I want to clearly understand what that system is about and what it does. I want to deploy the application to production as often as possible. I want to be able to change the code almost as fast as the business change their minds, making sure that whatever I&amp;rsquo;m delivering is exactly what they expect. As a developer, this is what quality looks like for me.&lt;/p&gt;
+
+&lt;h3 id=&#34;a-few-thoughts&#34;&gt;A few thoughts&lt;/h3&gt;
+
+&lt;p&gt;No code analysis tool will ever guarantee quality. They can probably highlight the lack of quality but never inform that the code is of high quality. Although I believe that code quality cannot be measured, I believe that it can be felt. This general feeling of quality software is only achieved when we have great professionals working well together, trusting and respecting each other. Conversations between team members flow easily, information is as precise as they can be, division of labor happens naturally, and in the few occasions when things don&amp;rsquo;t go according to plan, the whole team gets together to solve the problem. When we work in an environment like that, we didn&amp;rsquo;t need metrics to tell us we are producing quality software. Every one simply feels it.&lt;/p&gt;
+
+&lt;p&gt;By no means I&amp;rsquo;m against using code metrics. I just don&amp;rsquo;t feel they are enough to measure quality. I think metrics are great when used as a &lt;em&gt;bare-minimum&lt;/em&gt; quality gate and also an aid for developers to identify areas of improvement. However I also believe that the need to measure &lt;em&gt;quality&lt;/em&gt; normally comes from a general dissatisfaction caused by bad professionals and organisational disfunction.&lt;/p&gt;
+
+&lt;p&gt;There are too many variables in a software project and many of them cannot be easily be measured, if at all. But if you ask the people involved in a project to rank the quality of their software in a scale of 1 to 10, they would give you a number, which in fact is more based on gut feel than any scientific measure. When you ask them to pinpoint the reasons why they ranked the quality in that way, you will see that none of them will say that the reason is because the code base scores 3.2 in the LCOM metric or that the test coverage is only 32% when it should have been 70%.&lt;/p&gt;
+
+&lt;h3 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;I believe that the only sensible thing we can do is to try to be the best we can be and always strive to do our best.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Naming Test Classes and Methods</title>
+      <link>http://codurance.com/blog/naming-test-classes-and-methods/</link>
+      <pubDate>Sat, 13 Dec 2014 00:27:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/naming-test-classes-and-methods/</guid>
+      <description>
+
+&lt;p&gt;What should my first test be? What should I test next? These are common questions that I&amp;rsquo;m asked over and over again. I quite often ask these questions myself. Deciding on what to test is hard. Deciding on the order that things should be tested is even harder.&lt;sup class=&#34;footnote-ref&#34; id=&#34;fnref:1&#34;&gt;&lt;a rel=&#34;footnote&#34; href=&#34;#fn:1&#34;&gt;1&lt;/a&gt;&lt;/sup&gt; But writing tests first is not the only problem. How often did we get frustrated while dealing with existing tests which we had no idea what they are testing?&lt;/p&gt;
+
+&lt;p&gt;Over the years I met and paired with a lot of experienced TDD practicioners and each one of them have a slightly different way to decide which tests to write and in which order. They also have different approaches to actually write their tests. Some write the name of the test method first. Others don&amp;rsquo;t bother with the name of the test method; they only appropriately name it after they write the test code. Some prefer a more exploratory approach, making a mess at the beginning, and only refactor when they have a better understanding of the problem and enough code in front of them. Others prefer a more structured approach, doing a little bit more thinking and &amp;ldquo;just-in-time design&amp;rdquo; before they write their tests. Some start typing straight away and wait to see what the code will look like before making any naming and design assumptions. Some use a more &lt;em&gt;classicist&lt;/em&gt; approach by default. Others prefer a more &lt;em&gt;mockist outside-in&lt;/em&gt; approach. And to make things more confusing, experienced TDD practicioners mix-and-match styles and approaches according to what they are trying to test.&lt;/p&gt;
+
+&lt;p&gt;In this post I&amp;rsquo;ll try to describe how I generally think about my tests. Due to the nature of the projects I&amp;rsquo;m noramlly involved with&lt;sup class=&#34;footnote-ref&#34; id=&#34;fnref:2&#34;&gt;&lt;a rel=&#34;footnote&#34; href=&#34;#fn:2&#34;&gt;2&lt;/a&gt;&lt;/sup&gt; I tend to think and design (in my head) a little bit more before I start typing. Outside-In TDD is normally my default mode when writing tests. My main focus when writing tests is to clearly express the behaviour I want the application (or class) to have.&lt;/p&gt;
+
+&lt;p&gt;This is the template I normally use to help me decide what to test and how to name my test methods according to the expected behaviour:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2014_12_12/class_and_method_name_template.jpg&#34;  class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;This approach forces me to think about the behaviour I want my class to have, making it easier to write my first and subsequent tests. Even at a unit test level, I try my best to name my test methods in a way that a business person could understand, rarely using any technical language. Here are a few examples:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2014_12_12/class_methods_example.jpg&#34;  class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;Trying to form a sentence combining the name of the test class and the name of the test method forces me to really focus on the behaviour I want to test. Once I figure that out, it becomes quite easy to write my assertion since I just need to translate English to the programming language I&amp;rsquo;m using.&lt;/p&gt;
+
+&lt;p&gt;One thing to notice is that I normally split the body of my tests into 3 blocks (given, when, then). However, in some tests I call the method under test from the assertion and some tests don&amp;rsquo;t need any setup. Many tests are quite simple and have only one line.&lt;/p&gt;
+
+&lt;p&gt;And here are the 5 steps I normally follow when creating a new test class:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2014_12_12/test_in_5_steps.jpg&#34;  class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;For subsequent test methods I iterate through steps 2 to 5. The skeleton of the production code is generated from the test class.&lt;/p&gt;
+
+&lt;h4 id=&#34;why-do-i-use-should&#34;&gt;Why do I use &amp;ldquo;should&amp;rdquo;?&lt;/h4&gt;
+
+&lt;p&gt;Many developers don&amp;rsquo;t like the use of the word &amp;ldquo;should&amp;rdquo;. Some say that it is redundant and should not be used. Others say that it is not strong enough. &amp;ldquo;Must&amp;rdquo; is too strong. What about &amp;ldquo;have to&amp;rdquo;? I&amp;rsquo;m still not sure about it. For now, I&amp;rsquo;ll stick with &amp;ldquo;should&amp;rdquo; but I may give &amp;ldquo;have to&amp;rdquo; a try. Since I only use it on the class name, I don&amp;rsquo;t really think it is a big deal and it helps me to construct a phrase when combining with the name of the test methods.&lt;/p&gt;
+
+&lt;h3 id=&#34;bad-names&#34;&gt;Bad names&lt;/h3&gt;
+
+&lt;p&gt;Here are some common names I&amp;rsquo;ve seen given to the variable that points to the class under test:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;BankAccount testee = new BankAccount();
+BankAccount sut = new BankAccount();
+BankAccount ba = new BankAccount();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;** If it is a bank account, name the variable bankAccount.**&lt;/p&gt;
+
+&lt;p&gt;And for methods, here are some&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;test_deposit_works() {…}             // what does &#39;works&#39; mean?
+test_deposit_works_correctly() {…}   // should it ever work incorrectly?
+test_deposit() {…}                   // what exactly is it testing?
+check_balance_after_deposit() {…}    // what is it checking? 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;A test name should clearly indicate why a test should pass or fail, that means, I should not need to look at the assertion(s) to figure out what the test is actually testing.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;[BankAccountShould] have_balance_increased_after_a_deposit()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If the test above fails I&amp;rsquo;ll have a fairly good idea why it failed.&lt;/p&gt;
+
+&lt;h3 id=&#34;considerations&#34;&gt;Considerations&lt;/h3&gt;
+
+&lt;p&gt;I don&amp;rsquo;t really follow rules and quite often I do things in a different way. It all depends on what I&amp;rsquo;m doing and the context I&amp;rsquo;m in. Some projects already have a standard way of writing unit tests and if I&amp;rsquo;m a new joiner, I&amp;rsquo;ll comply to it. Having a standard is a good thing. It avoids confusion and (bad) surprises, regardless if the &amp;ldquo;standard&amp;rdquo; is good or not. What I described above is how I normally name and think about my tests, and it is the standard I often put in place when I start a new project. This is also how I&amp;rsquo;m teaching our apprentices at Codurance.&lt;/p&gt;
+&lt;div class=&#34;footnotes&#34;&gt;
+
+&lt;hr /&gt;
+
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34;&gt;Ideally we would choose a sequence of small steps (tests) that could help us to gradually add functionality to our system and evolve our design.
+ &lt;a class=&#34;footnote-return&#34; href=&#34;#fnref:1&#34;&gt;&lt;sup&gt;[return]&lt;/sup&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li id=&#34;fn:2&#34;&gt;Most of my work is done on bespoke business applications with a complex domain. I also normally work in projects where we constantly interact with product owners and business experts. All projects that I get involved are run using Agile methodologies. The approach I described works well for me because I normally write code according to well-defined user stories and acceptance criteria, which gives me a fairly good idea of what needs to be done before I start coding. It may not work so well if you do more exploratory work. I normally flip to a more &lt;em&gt;classicist&lt;/em&gt; approach when I&amp;rsquo;m exploring.
+ &lt;a class=&#34;footnote-return&#34; href=&#34;#fnref:2&#34;&gt;&lt;sup&gt;[return]&lt;/sup&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

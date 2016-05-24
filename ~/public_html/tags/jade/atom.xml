@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Jade on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/jade/</link>
+    <description>Recent content in Jade on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Thu, 10 Jul 2014 15:35:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/jade/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Google&#43; Sign-In with Scalatra</title>
+      <link>http://codurance.com/blog/google-plus-sign-in-with-scalatra/</link>
+      <pubDate>Thu, 10 Jul 2014 15:35:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/google-plus-sign-in-with-scalatra/</guid>
+      <description>
+
+&lt;h3 id=&#34;the-requirements&#34;&gt;The requirements&lt;/h3&gt;
+
+&lt;p&gt;For one of our internal pet-projects at Codurance, we decided to have authentication and authorisation using &lt;a href=&#34;https://developers.google.com/+/&#34;&gt;Google+ Sign-in&lt;/a&gt;. Google+ Sign-In is able to authenticate anyone with a Google email account (gmail or business) using OAuth 2.0. However, we wanted to restrict the application to Codurance craftsmen only, that means, people with a Codurance email address.&lt;/p&gt;
+
+&lt;p&gt;The application had also to redirect us to the desired URL, in case we tried to access a deep URL without being authenticated.&lt;/p&gt;
+
+&lt;h3 id=&#34;technology-stack&#34;&gt;Technology stack&lt;/h3&gt;
+
+&lt;p&gt;In this project we are using:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.scala-lang.org/&#34;&gt;Scala&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.scalatra.org/&#34;&gt;Scalatra&lt;/a&gt; as a web micro-framework&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://jade-lang.com/&#34;&gt;Jade&lt;/a&gt; as template engine&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.scala-sbt.org/&#34;&gt;sbt&lt;/a&gt; as our build tool.&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/json4s/json4s&#34;&gt;json4s&lt;/a&gt; for JSON manipulation&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/stackmob/newman&#34;&gt;Newman&lt;/a&gt; as HTTP client library&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;implementation&#34;&gt;Implementation&lt;/h3&gt;
+
+&lt;h4 id=&#34;authentication-filter&#34;&gt;Authentication Filter&lt;/h4&gt;
+
+&lt;p&gt;First we need to add an AuthenticationFilter to our Scalatra application.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;import javax.servlet.ServletContext
+
+import com.codurance.cerebro.controllers.MainController
+import com.codurance.cerebro.security.AuthenticationFilter
+import org.scalatra._
+
+class ScalatraBootstrap extends LifeCycle {
+    override def init(context: ServletContext) {
+        context.mount(new AuthenticationFilter, &amp;quot;/*&amp;quot;)
+        context.mount(new MainController, &amp;quot;/*&amp;quot;)
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then, in the AuthenticationFilter, we need to redirect to the sign-in page when we don&amp;rsquo;t have a user in the session. We also need to exclude the pages and URLs that don&amp;rsquo;t need a user to be logged in.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;package com.codurance.cerebro.security
+
+import org.scalatra.ScalatraFilter
+
+class AuthenticationFilter extends ScalatraFilter {
+    before() {
+        if (isProtectedUrl &amp;amp;&amp;amp; userIsNotAuthenticated) {
+            redirect(&amp;quot;/signin?originalUri=&amp;quot; + originalURL)
+        }
+    }
+
+    def originalURL(): String = {
+        val url = Option(request.getRequestURI).getOrElse(&amp;quot;/main&amp;quot;)
+        if (url.startsWith(&amp;quot;/signin&amp;quot;)) &amp;quot;/main&amp;quot; else url
+    }
+
+    def userIsNotAuthenticated: Boolean = {
+        request.getSession.getAttribute(&amp;quot;user&amp;quot;) == null
+    }
+
+    def isProtectedUrl(): Boolean = {
+        val url = request.getRequestURI();
+        !(url.equals(&amp;quot;/signin&amp;quot;) || url.equals(&amp;quot;/authorise&amp;quot;) || url.equals(&amp;quot;/not-authorised&amp;quot;))
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For more information about filters, check the &lt;a href=&#34;http://www.scalatra.org/&#34;&gt;Scalatra&lt;/a&gt; documentation.&lt;/p&gt;
+
+&lt;h4 id=&#34;signin-jade&#34;&gt;signin.jade&lt;/h4&gt;
+
+&lt;p&gt;Then we need a sign-in page, that is displayed when the user is not authenticated.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-jade&#34;&gt;- attributes(&amp;quot;title&amp;quot;) = &amp;quot;Cerebro&amp;quot;
+- attributes(&amp;quot;layout&amp;quot;) = &amp;quot;/WEB-INF/templates/layouts/no-header.jade&amp;quot;
+
+-@ val originalUri: String
+
+h1 Welcome to Cerebro!
+
+p= &amp;quot;Please sigin in using google id!&amp;quot;
+p URI: #{originalUri}
+
+:!javascript
+    function onSignInCallback(authResult) {
+        if (authResult[&#39;access_token&#39;]) {
+            $.ajax({
+                type: &#39;POST&#39;,
+                url: &#39;/authorise&#39;,
+                contentType: &#39;application/x-www-form-urlencoded; charset=utf-8&#39;,
+                data: {authCode: authResult.code },
+                success: function(result) {
+                    window.location.replace(&#39;#{originalUri}&#39;);
+                },
+                error: function(result) {
+                    window.location.replace(&#39;/not-authorised&#39;);
+                }
+            });
+        }
+    }
+
+#gConnect
+    button(class=&#39;g-signin&#39;
+    data-scope=&#39;https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/userinfo.email&#39;
+    data-requestvisibleactions=&#39;http://schemas.google.com/AddActivity&#39;
+    data-clientId=&#39;&amp;lt;&amp;lt;YOUR_CLIENT_ID&amp;gt;&amp;gt;&#39;
+    data-accesstype=&#39;offline&#39; data-callback=&#39;onSignInCallback&#39;
+    data-theme=&#39;dark&#39;
+    data-cookiepolicy=&#39;single_host_origin&#39;)
+
+script(src=&#39;https://plus.google.com/js/client:plusone.js&#39;)
+script(src=&#39;//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If you are not using Jade or want more details, check the &lt;a href=&#34;https://developers.google.com/+/web/signin/add-button&#34;&gt;official documentation&lt;/a&gt; about how to &lt;a href=&#34;https://developers.google.com/+/web/signin/add-button&#34;&gt;add the sign-in button&lt;/a&gt; to your page.&lt;/p&gt;
+
+&lt;p&gt;This should be enough to trigger the Google authentication form when clicking on the Sign-In button. Once the authentication is done, the callback function will send us a POST with the &amp;ldquo;authCode&amp;rdquo;.&lt;/p&gt;
+
+&lt;h4 id=&#34;main-controller&#34;&gt;Main Controller&lt;/h4&gt;
+
+&lt;p&gt;We then need a controller that will respond to all these requests, displays the respective pages, and do the authorisation.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;package com.codurance.cerebro.controllers
+
+import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
+
+class BaseController extends CerebroStack {
+
+    def display(page: String, attributes: (String, Any)*)(implicit request: HttpServletRequest, response: HttpServletResponse): String = {
+        contentType = &amp;quot;text/html&amp;quot;
+        val all_attributes = attributes :+ (&amp;quot;user&amp;quot;, session.getAttribute(&amp;quot;user&amp;quot;))
+        jade(page, all_attributes: _*)
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;package com.codurance.cerebro.controllers
+
+import com.codurance.cerebro.security.CoduranceAuthorisation.authorise
+
+import scala.Predef._
+
+class MainController extends BaseController {
+
+    get(&amp;quot;/&amp;quot;) {
+        display(&amp;quot;main&amp;quot;)
+    }
+
+    get(&amp;quot;/main&amp;quot;) {
+        display(&amp;quot;main&amp;quot;)
+    }
+
+    get(&amp;quot;/signin&amp;quot;) {
+        display(&amp;quot;signin&amp;quot;, &amp;quot;originalUri&amp;quot; -&amp;gt; request.getParameter(&amp;quot;originalUri&amp;quot;))
+    }
+
+    get(&amp;quot;/not-authorised&amp;quot;) {
+        display(&amp;quot;not-authorised&amp;quot;)
+    }
+
+    post(&amp;quot;/authorise&amp;quot;) {
+        val authCode: String = params.getOrElse(&amp;quot;authCode&amp;quot;, halt(400))
+        authorise(authCode)
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The MainController responds to &amp;ldquo;/authorise&amp;rdquo;, which invokes the authorisation function defined inside CoduranceAuthorisation. Note that we receive the &amp;ldquo;authCode&amp;rdquo; from the Google+ authentication. Once the user was authenticated, we had to make the application available just for users using a Codurance email. For that, we had to invoke the &lt;a href=&#34;https://developers.google.com/+/api/latest/people&#34;&gt;Google+ People API&lt;/a&gt; to get more information (email address, domain, etc).&lt;/p&gt;
+
+&lt;p&gt;The authorise function would then check if the user belongs to the Codurance domain and add her to the session.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;package com.codurance.cerebro.security
+
+import java.net.URL
+import javax.servlet.http.{HttpSession, HttpServletResponse, HttpServletRequest}
+import javax.servlet.http.HttpServletResponse._
+
+import com.google.api.client.googleapis.auth.oauth2.{GoogleAuthorizationCodeTokenRequest, GoogleTokenResponse}
+import com.google.api.client.http.javanet.NetHttpTransport
+import com.google.api.client.json.jackson.JacksonFactory
+import com.stackmob.newman._
+import com.stackmob.newman.dsl._
+
+import scala.concurrent.Await
+import scala.concurrent.duration._
+
+object CoduranceAuthorisation {
+
+    implicit val httpClient = new ApacheHttpClient
+
+    val GOOGLE_PLUS_PEOPLE_URL = &amp;quot;https://www.googleapis.com/plus/v1/people/me?fields=aboutMe%2Ccover%2FcoverPhoto%2CdisplayName%2Cdomain%2Cemails%2Clanguage%2Cname&amp;amp;access_token=&amp;quot;
+    val CLIENT_ID: String = &amp;quot;&amp;lt;&amp;lt;YOUR_CLIENT_ID&amp;gt;&amp;gt;&amp;quot;
+    val CLIENT_SECRET = &amp;quot;&amp;lt;&amp;lt;YOUR_CLIENT_SECRET&amp;gt;&amp;gt;&amp;quot;
+    val API_KEY = &amp;quot;&amp;lt;&amp;lt;YOUR_API_KEY&amp;gt;&amp;gt;&amp;quot;
+    val APPLICATION_NAME = &amp;quot;&amp;lt;&amp;lt;YOUR_APP_NAME&amp;gt;&amp;gt;&amp;quot;
+    val JSON_FACTORY = new JacksonFactory()
+    val TRANSPORT = new NetHttpTransport()
+
+    def authorise(authCode: String)(implicit session: HttpSession, response: HttpServletResponse): Unit = {
+        val user = userFor(authCode)
+        user.domain match {
+            case Some(Domain(&amp;quot;codurance.com&amp;quot;)) =&amp;gt; {
+                session.setAttribute(&amp;quot;user&amp;quot;, user)
+                response.setStatus(SC_OK)
+            }
+            case _ =&amp;gt; response.setStatus(SC_UNAUTHORIZED)
+        }
+    }
+
+    def userFor(authCode: String): User = {
+        val tokenResponse: GoogleTokenResponse =
+            new GoogleAuthorizationCodeTokenRequest(
+                TRANSPORT, JSON_FACTORY, CLIENT_ID, CLIENT_SECRET, authCode, &amp;quot;postmessage&amp;quot;
+            ).execute
+        val url = new URL(GOOGLE_PLUS_PEOPLE_URL + tokenResponse.getAccessToken)
+        val userInfo = Await.result(GET(url).apply, 10.seconds)
+        GooglePlusJSONResponseParser.toUser(userInfo.bodyString, tokenResponse.toString)
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt; that in the GOOGLE_PLUS_PEOPLE_URL we specify all the fields we are interested in, including the &lt;em&gt;domain&lt;/em&gt; and &lt;em&gt;emails&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;GooglePlusJSONResponseParser&lt;/strong&gt; is a class that we created to parse the JSON response and convert into a User object. We are not showing it in order to keep this post short and focused. You can create your own JSON parser. :)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;IMPORTANT:&lt;/strong&gt; Don&amp;rsquo;t forget to import add the Google+ APIs to your sbt build file.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;    &amp;quot;com.google.apis&amp;quot; % &amp;quot;google-api-services-oauth2&amp;quot; % &amp;quot;v2-rev59-1.17.0-rc&amp;quot;,
+    &amp;quot;com.google.apis&amp;quot; % &amp;quot;google-api-services-plus&amp;quot; % &amp;quot;v1-rev115-1.17.0-rc&amp;quot;,
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That&amp;rsquo;s about it. You now can display the name of the user on all your pages, using a default layout.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-jade&#34;&gt;-@ val title: String
+-@ val headline: String = title
+-@ val body: String
+-@ val user: com.codurance.cerebro.security.User
+
+!!!
+html
+    head
+        title= title
+    body
+        header
+            div
+                span Hello #{user.name.displayName}
+        div
+            h1= headline
+            != body
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

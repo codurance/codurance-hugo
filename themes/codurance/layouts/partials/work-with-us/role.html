@@ -1,0 +1,22 @@
+<!--=== Content Part ===-->
+<div class="careers page container content">
+    <div class="row">
+        <!--Begin Sidebar Menu-->
+        <div class="col-md-3">
+            <ul class="list-group sidebar-nav-v1">
+                <li class="list-group-item{{ if eq .Params.role "Craftsman" }} active{{ end }}">
+                    <a href="/work-with-us/craftsman">Craftsman</a>
+                </li>
+                <li class="list-group-item{{ if eq .Params.role "Apprentice" }} active{{ end }}">
+                    <a href="/work-with-us/apprentice">Apprentice</a>
+                </li>
+            </ul>
+        </div>
+        <!--End Sidebar Menu-->
+
+        <!--Begin Content-->
+        <div class="col-md-9 careers">
+            {{ .Content }}
+        </div>
+    </div>
+</div>

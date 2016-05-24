@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ios on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/ios/</link>
+    <description>Recent content in Ios on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Tue, 18 Aug 2015 09:35:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/ios/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>How katas can help you learn</title>
+      <link>http://codurance.com/blog/How-katas-can-help-you-learn/</link>
+      <pubDate>Tue, 18 Aug 2015 09:35:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/How-katas-can-help-you-learn/</guid>
+      <description>&lt;p&gt;In the last couple of weeks I have spent my time doing katas to improve my Objective-C. As you may remember, I had an issue, &lt;a href=&#34;http://wp.me/p4i8Xl-7h&#34;&gt;that you can revisit here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;ve learned a lot from other katas too: for instance the RomanNumerals kata&amp;hellip; You&amp;rsquo;d may think it&amp;rsquo;s a simple task, that you wan&amp;rsquo;t learn much from. It&amp;rsquo;s a simple algorithm, a good exercise for your red -&amp;gt; green -&amp;gt; refactoring cycle. So nothing new will come from here&amp;hellip;  Wasn&amp;rsquo;t I wrong!!!!!&lt;/p&gt;
+
+&lt;p&gt;First I created some tests. Next I implemented the kata and refactored. Whilst I was refactoring, I decided to use NSDictionary to map from a decimal to a roman number. Here is an example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;NSDictionary *mapper = @{@10: @&amp;quot;X&amp;quot;, @5:@&amp;quot;V&amp;quot;, @1: @&amp;quot;I&amp;quot;};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That&amp;rsquo;s when I discovered that the NSDictionary does not guarantee insertion order. What???? So my keys were all mixed up&amp;hellip; And I needed them to maintain their order!!!! That&amp;rsquo;s ok! I decided to create a class to map between decimals and romans. That&amp;rsquo;s cool! Done! In the converter I just added a private property of type NSMutableArray. In it&amp;rsquo;s constructor I added the class to the array for all elements I needed. But now I have to do:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;[[DecimalToRomanMapper alloc] initWithDecimal: andRoman];
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;for every entry in the mapper. God!!!! So much work! Maybe that&amp;rsquo;s why developers solve problems. They definitely don&amp;rsquo;t like to do things by hand so they automate everything.
+So I decided that I could create a factory method. I really didn&amp;rsquo;t know how to create this factory method, so I just looked in Apple docs. Here is another thing i learned. Even thought I knew that it existed, I never used it because I never needed to. But as I was in learning mode, I think I was more interested in finding a different way to do it. When you are at a client, you don&amp;rsquo;t always have the opportunity to experiment with new things. Having this time to learn new ways of doing things is really rewarding. So here is my class:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;@interface DecimalToRomanMapper : NSObject
+
+@property (nonatomic, assign, readonly) NSInteger decimal;
+@property (nonatomic, copy, readonly) NSString* roman;
+
++ (instancetype)mappDecimal:(NSInteger)decimal toRoman:(NSString*)roman;
+
+@end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It&amp;rsquo;s even more readable then the initialiser. And here is how I initialised it in my converter:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;   self.mapper = @[
+                      [DecimalToRomanMapper mappDecimal:1000 toRoman:@&amp;quot;M&amp;quot;]
+                  ];
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So my class was looking pretty but then I look at my test class&amp;hellip;it wasn&amp;rsquo;t good:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;...
+
+- (void)testShouldConvertFourToIV {
+    NSString *result = [converter convert:4];
+   XCTAssertTrue([result isEqualToString:@&amp;quot;IV&amp;quot;]);
+}
+
+...
+
+- (void)testShouldConvert1000ToM {
+   NSString *result = [converter convert:1000];
+    XCTAssertTrue([result isEqualToString:@&amp;quot;M&amp;quot;]);
+}
+
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So many tests. They remind me of the DRY principle. I really don&amp;rsquo;t like to repeat myself. It&amp;rsquo;s like a broken CD that doesn&amp;rsquo;t move from the same music track&amp;hellip; I&amp;rsquo;ve done the same kata in C# and my test class was all parameterised and I really liked it. After all this is a simple kata, right? ;).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;(C# code)
+[TestCase(1, &amp;quot;I&amp;quot;)]
+[TestCase(2, &amp;quot;II&amp;quot;)]
+[TestCase(3, &amp;quot;III&amp;quot;)]
+[TestCase(4, &amp;quot;IV&amp;quot;)]
+[TestCase(5, &amp;quot;V&amp;quot;)]
+[TestCase(9, &amp;quot;IX&amp;quot;)]
+[TestCase(10, &amp;quot;X&amp;quot;)]
+[TestCase(40, &amp;quot;XL&amp;quot;)]
+[TestCase(50, &amp;quot;L&amp;quot;)]
+[TestCase(90, &amp;quot;XC&amp;quot;)]
+[TestCase(100, &amp;quot;C&amp;quot;)]
+[TestCase(400, &amp;quot;CD&amp;quot;)]
+[TestCase(900, &amp;quot;CM&amp;quot;)]
+[TestCase(1000, &amp;quot;M&amp;quot;)]
+[TestCase(2499, &amp;quot;MMCDXCIX&amp;quot;)]
+[TestCase(3949, &amp;quot;MMMCMXLIX&amp;quot;)]
+public void convertDecimalToRoman(int decimalNumber, string expectedRomanNumber)
+{
+     var converter = new DecimalToRomanConverter();
+
+      string result = converter.Convert(decimalNumber);
+
+    Assert.AreEqual(expectedRomanNumber, result);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Well wouldn&amp;rsquo;t it be nice if I could have that in Objective-C? Well, after some help from &lt;a href=&#34;https://twitter.com/singsalad&#34;&gt;Franzi&lt;/a&gt; I found a little &lt;a href=&#34;https://github.com/michalkonturek/XCParameterizedTestCase&#34;&gt;library&lt;/a&gt; that does it. You install the pod, you inherit from it and you create an array of inputs and expected values like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;+ (NSArray *)testCaseData {
+    return @[
+             [XCTestCaseData createWithInputValue:@1 withExpectedValue:@&amp;quot;I&amp;quot;]
+            ];
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And then you just have to use the properties input and expected. So my test class looks like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;@interface DecimalToRomanConverterTests : XCParameterizedTestCase
+
+@end
+
+@implementation DecimalToRomanConverterTests
+
++(NSArray *)testCaseData {
+    return @[
+             [XCTestCaseData createWithInputValue:@1 withExpectedValue:@&amp;quot;I&amp;quot;],
+             [XCTestCaseData createWithInputValue:@2 withExpectedValue:@&amp;quot;II&amp;quot;],
+             [XCTestCaseData createWithInputValue:@3 withExpectedValue:@&amp;quot;III&amp;quot;],
+             [XCTestCaseData createWithInputValue:@5 withExpectedValue:@&amp;quot;V&amp;quot;],
+             [XCTestCaseData createWithInputValue:@8 withExpectedValue:@&amp;quot;VIII&amp;quot;],
+             [XCTestCaseData createWithInputValue:@10 withExpectedValue:@&amp;quot;X&amp;quot;],
+             [XCTestCaseData createWithInputValue:@18 withExpectedValue:@&amp;quot;XVIII&amp;quot;],
+             [XCTestCaseData createWithInputValue:@4 withExpectedValue:@&amp;quot;IV&amp;quot;],
+             [XCTestCaseData createWithInputValue:@9 withExpectedValue:@&amp;quot;IX&amp;quot;],
+             [XCTestCaseData createWithInputValue:@50 withExpectedValue:@&amp;quot;L&amp;quot;],
+             [XCTestCaseData createWithInputValue:@100 withExpectedValue:@&amp;quot;C&amp;quot;],
+             [XCTestCaseData createWithInputValue:@500 withExpectedValue:@&amp;quot;D&amp;quot;],
+             [XCTestCaseData createWithInputValue:@2499 withExpectedValue:@&amp;quot;MMCDXCIX&amp;quot;],
+             [XCTestCaseData createWithInputValue:@3949 withExpectedValue:@&amp;quot;MMMCMXLIX&amp;quot;]
+             ];
+}
+
+-(void)testShouldConvertADecimalIntoARoman {
+
+    DecimalToRomanConverter *converter = [[DecimalToRomanConverter alloc]init];
+    NSString* result = [converter convert:[self.input integerValue]];
+
+    XCTAssertEqualObjects(self.expected, result);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here is my final solution: &lt;a href=&#34;https://github.com/ananogal/RomanNumeralsKata&#34;&gt;RomanNumerals&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;So please don&amp;rsquo;t underestimate what you can learn from a kata. They are a good opportunity to stretch your knowledge and add some more to it!&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>How to start doing TDD in iOS</title>
+      <link>http://codurance.com/blog/how-to-start-doing-tdd-in-iOS/</link>
+      <pubDate>Mon, 13 Jul 2015 12:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/how-to-start-doing-tdd-in-iOS/</guid>
+      <description>&lt;p&gt;I like to do apps. As a newbie TDD developer, I&amp;rsquo;ve made my apps with tests but not driven by tests. I want to change that. I&amp;rsquo;m learning to be a Craftsman, so TDD is an essential technique to know. It&amp;rsquo;s your main tool. At Codurance it&amp;rsquo;s unthinkable that you could code without doing TDD. That&amp;rsquo;s one of the things that you learn in our apprenticeship program: to be able to do TDD without thinking about it and feel as if it&amp;rsquo;s natural: as you breath to survive you do TDD to code.&lt;/p&gt;
+
+&lt;p&gt;So today I feel pretty much confident that I&amp;rsquo;m able to do TDD (at least in C#), and so I&amp;rsquo;ve come back to my apps and I&amp;rsquo;ve decided to change them to apply all the good practices that I&amp;rsquo;ve learned in my first month at Codurance.&lt;/p&gt;
+
+&lt;p&gt;Oh God! What have I done! It&amp;rsquo;s amazing how you go back now, look at your code and think: What that hell was I doing? How could I write such code? I really just wanted to delete everything and start again&amp;hellip; Well, we all know that that is not really possible when you have an app published and selling and you have users that send you requests for new features&amp;hellip;&lt;/p&gt;
+
+&lt;p&gt;So what could I do? I thought it would be a good idea to refactor all my code, and at least make it a little bit cleaner, with unit tests everywhere rather than just in the main features (Oh God! I know!!!! It&amp;rsquo;s horrible&amp;hellip;) All the horrible things that they say to you that you will find in the real world when you finish the apprenticeship have come true when looking to at own code, so frustating!!!! So to be proficient in doing refactoring in iOS, I must be able to do TDD correctly, this means not even thinking about it when I code in Objective-C. That was not the stage that I was at&amp;hellip; So, what can I do?&lt;/p&gt;
+
+&lt;p&gt;I decided to start were I started at Codurance: to do katas, one after another, get the logic of the language, solve small problems first, and then go to bigger katas where you can apply your OOP knowledge. I&amp;rsquo;ve googled for katas in Objective-C and I&amp;rsquo;ve got a lot of links: I was thrilled! iOS developers are sharing their katas. Then I followed the links&amp;hellip; Most of then send me to a &amp;ldquo;This webpage is not available&amp;rdquo; page. Even the Objective-C version of String calculator by &lt;a href=&#34;http://osherove.com/tdd-kata-1/&#34;&gt;Roy Osherove&lt;/a&gt; is going to the same page&amp;hellip; And then I found a &lt;a href=&#34;http://www.screencast.com/t/CfaYvoCMHE&#34;&gt;screencast&lt;/a&gt; that is using iOS 5.5? We are already in beta for 9!!!&lt;/p&gt;
+
+&lt;p&gt;Well I can just conclude that iOS developers don&amp;rsquo;t share their code! So let&amp;rsquo;s change that. Since we talked about the String Calculator, let&amp;rsquo;s start with this kata and see what we can do with it. I&amp;rsquo;ll do the beginner version. Here&amp;rsquo;s my attempt, found at &lt;a href=&#34;https://github.com/ananogal/StringCalculator&#34;&gt;Github&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

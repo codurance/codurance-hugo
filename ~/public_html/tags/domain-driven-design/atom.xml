@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Domain Driven Design on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/domain-driven-design/</link>
+    <description>Recent content in Domain Driven Design on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Sun, 22 Nov 2015 23:54:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/domain-driven-design/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Changing Scalatra and sbt default directories</title>
+      <link>http://codurance.com/blog/changing-scalatra-and-sbt-default-directories/</link>
+      <pubDate>Sun, 22 Nov 2015 23:54:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/changing-scalatra-and-sbt-default-directories/</guid>
+      <description>&lt;p&gt;Conventions are not always good. I recently started a new internal web project
+at Codurance and I decided to use Scala. As I&amp;rsquo;m not a fan of big
+frameworks, I chose &lt;a href=&#34;http://www.scalatra.org/&#34;&gt;Scalatra&lt;/a&gt; as a micro web framework.&lt;/p&gt;
+
+&lt;p&gt;The first challenge was that I wanted to organise my application with a
+different directory structure. By default, &lt;a href=&#34;http://www.scala-sbt.org/&#34;&gt;sbt&lt;/a&gt; and Scalatra use the same convention used by &lt;a href=&#34;https://maven.apache.org/&#34;&gt;maven&lt;/a&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; /src/main/scala       // source code
+&amp;gt; /src/main/resources   // production resources
+&amp;gt; /scr/test/scala       // tests
+&amp;gt; /scr/test/resouces    // test resources
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For the past few years I&amp;rsquo;ve been experimenting with different directory structure for my projects. I want my directories to be more meaningful when it comes to explain the business domain. The new directory structure is part of what I call &lt;em&gt;Interaction Driven Design (IDD)&lt;/em&gt; and a full talk on it can be found in our &lt;a href=&#34;http://codurance.com/videos/&#34;&gt;videos area&lt;/a&gt;. I give a lot of details about the rational behind the new directory structure on that talk.&lt;/p&gt;
+
+&lt;p&gt;The directory structure I would like to use for this new project is:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; /src/core/scala          // source code for my core domain
+&amp;gt; /src/core-test/scala     // tests for my core domain
+
+&amp;gt; /src/data/resources      // resources for data migration and test data
+&amp;gt; /src/data/scala          // code for data migration and test data
+
+&amp;gt; /src/web/resources       // delivery mechanism resources
+&amp;gt; /src/web/scala           // delivery mechanism code (controllers, API, etc)
+&amp;gt; /src/web/webapp          // web files (WEB-INF folder, css, javascript, Jade templates, etc)
+&amp;gt; /src/web-test/scala      // tests for my delivery mechanism
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Once again, the directory structure above will make more sense if you watch the &lt;a href=&#34;http://codurance.com/videos/&#34;&gt;Interaction Driven Design (IDD) talk&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The biggest challenge was to rename the default directory &lt;em&gt;main&lt;/em&gt; to &lt;em&gt;web&lt;/em&gt;. That broke the whole world. Here are the changes I had to make to fix it all:&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;build.sbt&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;unmanagedSourceDirectories in Compile := Seq((baseDirectory.value / &amp;quot;src/core/scala&amp;quot;),
+                                     (baseDirectory.value / &amp;quot;src/data/scala&amp;quot;),
+                                     (baseDirectory.value / &amp;quot;src/web/scala&amp;quot;))
+
+unmanagedResourceDirectories in Compile += baseDirectory.value / &amp;quot;src/data/resources&amp;quot;
+
+unmanagedSourceDirectories in Test := Seq((baseDirectory.value / &amp;quot;src/core-test/scala&amp;quot;),
+                                      (baseDirectory.value / &amp;quot;src/web-test/scala&amp;quot;))
+
+webappSrc in webapp &amp;lt;&amp;lt;= (baseDirectory in Compile) map { _ / &amp;quot;src/web/webapp&amp;quot; }
+
+webappDest in webapp &amp;lt;&amp;lt;= (baseDirectory in Compile) map { _ / &amp;quot;src/web/webapp&amp;quot; }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The last two lines &lt;em&gt;webappSrc&lt;/em&gt; and &lt;em&gt;webappDest&lt;/em&gt; were needed because I also use a class that starts &lt;a href=&#34;http://www.eclipse.org/jetty/&#34;&gt;Jetty&lt;/a&gt; by hand where I hook the Scalatra listener.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;JettyLauncher.scala&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;import org.eclipse.jetty.server.Server
+import org.eclipse.jetty.servlet.DefaultServlet
+import org.eclipse.jetty.webapp.WebAppContext
+import org.scalatra.servlet.ScalatraListener
+
+object JettyLauncher {
+
+    def main(args: Array[String]) {
+        val port = if(System.getenv(&amp;quot;PORT&amp;quot;) != null) System.getenv(&amp;quot;PORT&amp;quot;).toInt else 8089
+    
+        val server = new Server(port)
+        val context = new WebAppContext()
+        context.setClassLoader(JettyLauncher.getClass.getClassLoader)
+        context setContextPath &amp;quot;/&amp;quot;
+        context.setResourceBase(&amp;quot;src/web/webapp&amp;quot;)
+        context.addEventListener(new ScalatraListener)
+        context.addServlet(classOf[DefaultServlet], &amp;quot;/&amp;quot;)
+    
+        server.setHandler(context)
+    
+        server.start
+        server.join
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;When executing this class, the &lt;em&gt;ScalatraBootstrap&lt;/em&gt; could not be found and that&amp;rsquo;s why I had to add the following line to my &lt;em&gt;JettyLauncher&lt;/em&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;&amp;gt; context.setClassLoader(JettyLauncher.getClass.getClassLoader)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Scalatra relies on the default directory &lt;em&gt;main&lt;/em&gt; to find &lt;em&gt;ScalatraBootstrap&lt;/em&gt; and this is how I managed to make sure the &lt;em&gt;ScalatraBootstrap&lt;/em&gt; could be found.&lt;/p&gt;
+
+&lt;p&gt;Note that I also had to change the resource base, pointing to the &lt;em&gt;web&lt;/em&gt; folder instead of &lt;em&gt;main&lt;/em&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;&amp;gt; context.setResourceBase(&amp;quot;src/web/webapp&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As I use &lt;a href=&#34;http://scalate.github.io/scalate/documentation/jade.html&#34;&gt;Jade&lt;/a&gt; templates via &lt;a href=&#34;http://scalate.github.io/scalate/&#34;&gt;Scalate&lt;/a&gt;, I had to change the Scalate template configuration on &lt;strong&gt;build.scala&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;build.scala&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;object MonitorBuild extends Build {
+    val Organization = &amp;quot;com.codurance&amp;quot;
+    val Name = &amp;quot;monitor&amp;quot;
+    val Version = &amp;quot;0.1.0-SNAPSHOT&amp;quot;
+    val ScalaVersion = &amp;quot;2.11.6&amp;quot;
+    val ScalatraVersion = &amp;quot;2.4.0.RC1&amp;quot;
+    
+    lazy val project = Project(
+        &amp;quot;monitor&amp;quot;,
+        file(&amp;quot;.&amp;quot;),
+        settings = ScalatraPlugin.scalatraSettings ++ scalateSettings ++ Seq(
+    
+            // dependencies and some other stuff here
+    
+            scalateTemplateConfig in Compile &amp;lt;&amp;lt;= (sourceDirectory in Compile) { base =&amp;gt;
+                Seq(
+                    TemplateConfig(
+                        new RichFile(new File(&amp;quot;src&amp;quot;)) / &amp;quot;web&amp;quot; / &amp;quot;webapp&amp;quot; / &amp;quot;WEB-INF&amp;quot; / &amp;quot;templates&amp;quot;,
+                        Seq.empty, 
+                        Seq(
+                            Binding(&amp;quot;context&amp;quot;, &amp;quot;_root_.org.scalatra.scalate.ScalatraRenderContext&amp;quot;, importMembers = true, isImplicit = true)
+                        ), 
+                        Some(&amp;quot;templates&amp;quot;)
+                    )
+                )
+            }
+        )
+    )
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The important line above is:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;&amp;gt; new RichFile(new File(&amp;quot;src&amp;quot;)) / &amp;quot;web&amp;quot; / &amp;quot;webapp&amp;quot; / &amp;quot;WEB-INF&amp;quot; / &amp;quot;templates&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Which makes Scalate find the templates in the &lt;em&gt;web&lt;/em&gt; directory instead of &lt;em&gt;main&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Make sure you have these lines in the &lt;strong&gt;plugins.sbt&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;&amp;gt; addSbtPlugin(&amp;quot;com.mojolly.scalate&amp;quot; % &amp;quot;xsbt-scalate-generator&amp;quot; % &amp;quot;0.5.0&amp;quot;)
+&amp;gt;
+&amp;gt; addSbtPlugin(&amp;quot;org.scalatra.sbt&amp;quot; % &amp;quot;scalatra-sbt&amp;quot; % &amp;quot;0.4.0&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I didn&amp;rsquo;t need to change anything on my &lt;strong&gt;web.xml&lt;/strong&gt; and &lt;strong&gt;ScalatraBootstrap&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;The configuration described above allows me to run the application via&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; ./sbt container:start
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;that is how I normally run the application locally and also allows me to create a fat jar file and execute the &lt;em&gt;JettyLauncher&lt;/em&gt; class that is how I run in production:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; java -cp &amp;lt;myapplication&amp;gt;.jar com.codurance.JettyLauncher
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The fat jar file is created via:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; ./sbt assembly
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This is how the collapsed directory structure looks on &lt;a href=&#34;https://www.jetbrains.com/idea/&#34;&gt;IntelliJ IDEA&lt;/a&gt;:&lt;/p&gt;
+
+&lt;p&gt;
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-11-21-folder-structure-collapsed.jpg&#34;  class=&#34;img img-responsive style-screengrab&#34; style=&#34;max-height: 98px;&#34;/&gt;
+
+and this is how it looks when expanded:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-11-21-folder-structure-expanded.jpg&#34;  class=&#34;img img-responsive style-screengrab&#34; style=&#34;max-height: 500px;&#34;/&gt;
+
+
+&lt;p&gt;Although it took me a while to figure all this out, I&amp;rsquo;m happy to be able to structure my project the way it makes sense to us.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Practicing Well-Crafted Design</title>
+      <link>http://codurance.com/blog/practicing-well-crafted-design/</link>
+      <pubDate>Sun, 01 Nov 2015 18:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/practicing-well-crafted-design/</guid>
+      <description>
+
+&lt;p&gt;Katas are great, but not enough. In the past year I’ve been trying to find ways to teach our craftsmen and apprentices how to design software. Although we could discuss good design principles, it was very difficult to find a way to practice them. Katas are great for learning TDD, micro design, working in baby steps, and a few techniques for dealing with legacy code but we need more. We would like to practice requirements gathering, domain modelling, and well-crafted code all together, with the same fast feedback loop we get when we do katas. The problem is that we need a far bigger problem with overlapping rules so that we can experience incremental software design. Inspired by a session we had a &lt;a href=&#34;https://www.socrates-conference.de/&#34;&gt;SoCraTes Germany 2015&lt;/a&gt;, we are evolving a deliberate practice session that allows us to achieve that.&lt;/p&gt;
+
+&lt;h1 id=&#34;the-session&#34;&gt;The Session&lt;/h1&gt;
+
+&lt;p&gt;The objective is to pick a game (card, board, dice) and implement the code in a way where the code clearly describes the rules of the game. Any person not part of the group that wrote the code should be able to look at the code and very quickly understand how the game works.&lt;/p&gt;
+
+&lt;h3 id=&#34;setup&#34;&gt;Setup&lt;/h3&gt;
+
+&lt;p&gt;The session is run using mob programming. Make sure you have a projector and a whiteboard or flip chart.&lt;/p&gt;
+
+&lt;h3 id=&#34;format&#34;&gt;Format&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;First step&lt;/strong&gt;: People in the mob choose a game and elect a domain expert, who is someone that either knows the game well or will be responsible to figure out how the game works in case no one knows the game.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Second step&lt;/strong&gt;: The mob chooses a driver to be the hands of the mob.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Third step&lt;/strong&gt;: The domain expert gives a very brief description of the game. 5 minutes maximum. Whiteboard/flipchart can be used.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Fourth step&lt;/strong&gt;: Developers start coding and will need to rely on their ability to ask the right questions in order to extract the information they need from the domain expert.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Fifth step&lt;/strong&gt;: Run a retrospective to discuss what was learnt during the session.&lt;/p&gt;
+
+&lt;p&gt;Set aside &lt;em&gt;at least&lt;/em&gt; two hours for the session — 100 minutes for the coding part and 20 minutes for the retrospective. The majority of the sessions I ran took significantly longer: 2.5 to 5 hours.&lt;/p&gt;
+
+&lt;h3 id=&#34;ground-rules&#34;&gt;Ground rules&lt;/h3&gt;
+
+&lt;p&gt;In order to mitigate emotional aspects (debates can become quite heated), we created some ground rules for the session.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Give preference&lt;/strong&gt;: Don’t force your idea. Always give preference to someone else’s idea. You know how you code and you can always do the exercise on your own later.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Don’t shout or interrupt&lt;/strong&gt;: Let other people speak. The session is meant to be a pleasant learning experience. If things are not going your way, calm down, sit back and try to learn a different way of doing things.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Don’t discuss for too long&lt;/strong&gt;: Pick an idea and run with it. We can always refactor later. Avoid analysis paralysis.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Constantly move forward&lt;/strong&gt;: If the mob doesn’t decide, the driver should start typing and move forward.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;One idea for at least 10 minutes&lt;/strong&gt;: It’s OK to change directions but once the majority decided on one approach, avoid throwing many different ideas at the driver. We need some time for an idea to mature before we move to another one.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Objections are noted&lt;/strong&gt;: Objections to the current idea are noted in the code or whiteboard if someone is really frustrated, but the team still moves on.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Write the ground rules on a flip chart or whiteboard &lt;em&gt;before&lt;/em&gt; the session starts and keep them visible at all times. Point at them if the debate becomes heated or someone is misbehaving.&lt;/p&gt;
+
+&lt;h1 id=&#34;tips-for-running-the-session&#34;&gt;Tips for running the session&lt;/h1&gt;
+
+&lt;p&gt;I’ve run this session quite a few times and I’ve learnt different things each time, including how to run the session in a better way. Here are some tips.&lt;/p&gt;
+
+&lt;h3 id=&#34;size-of-the-mob&#34;&gt;Size of the mob&lt;/h3&gt;
+
+&lt;p&gt;The smaller the mob is, the better. I recommend a mob of 3 to 5 developers.&lt;/p&gt;
+
+&lt;h3 id=&#34;driver&#34;&gt;Driver&lt;/h3&gt;
+
+&lt;p&gt;Should be someone who is quite fast on the keyboard in order to capture the thoughts of the mob. The faster the driver types, the faster the mob gets feedback and decides on next steps. As the mob will be constantly changing their minds about the implementation (different people, different ideas), it is important that they get fast feedback on how the code would look like.&lt;/p&gt;
+
+&lt;p&gt;I recommend that only one person should type. We don’t want to waste time with people trying to get familiar with a different computer, tools, keyboard, shortcuts, etc.&lt;/p&gt;
+
+&lt;h3 id=&#34;domain-expert&#34;&gt;Domain expert&lt;/h3&gt;
+
+&lt;p&gt;The role of the domain expert is simply to clarify the rules of the game and they can be a referee in terms of the domain language to be used. They have the last say on names of verbs and nouns. The domain expert is not a Product Owner; they don’t dictate which features to build or the order they should be built. The domain expert can contribute to the code as well but not overrule the design decisions made by the mob.&lt;/p&gt;
+
+&lt;h3 id=&#34;facilitator&#34;&gt;Facilitator&lt;/h3&gt;
+
+&lt;p&gt;Having a facilitator could be a very good idea. The facilitator would be responsible to make sure the discussions remain civilised and that everyone has a say.&lt;/p&gt;
+
+&lt;h3 id=&#34;games-we-tried&#34;&gt;Games we tried&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/Mia_(game)&#34;&gt;Mia&lt;/a&gt;, &lt;a href=&#34;https://en.wikipedia.org/wiki/Oh_Hell&#34;&gt;Oh Hell!&lt;/a&gt;, &lt;a href=&#34;https://en.wikipedia.org/wiki/The_Great_Dalmuti&#34;&gt;The Great Dalmuti&lt;/a&gt;, &lt;a href=&#34;https://en.wikipedia.org/wiki/Monopoly_(game)&#34;&gt;Monopoly&lt;/a&gt;, and a few others I don’t remember the name of.&lt;/p&gt;
+
+&lt;h3 id=&#34;boundaries-of-the-games&#34;&gt;Boundaries of the games&lt;/h3&gt;
+
+&lt;p&gt;Make sure the boundaries of the game are defined. For example, use the console as an interface to the game. Maybe some players could be AI players while others could be humans playing through the console. Defining the boundaries will help developers to understand at which level they need to test and how to build the engine of the game.&lt;/p&gt;
+
+&lt;h1 id=&#34;variations-and-challenges&#34;&gt;Variations and challenges&lt;/h1&gt;
+
+&lt;p&gt;Below is a list of things we also tried at &lt;a href=&#34;http://codurance.com&#34;&gt;Codurance&lt;/a&gt;, during &lt;a href=&#34;https://www.socrates-conference.de/&#34;&gt;SoCraTes Germany&lt;/a&gt;, and &lt;a href=&#34;http://www.socratesbe.org/&#34;&gt;SoCraTes Belgium&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;constraints&#34;&gt;Constraints&lt;/h3&gt;
+
+&lt;p&gt;If the developers in the mob are very experienced, feel free to add &lt;a href=&#34;https://www.google.com/webhp?sourceid=chrome-instant&amp;amp;ion=1&amp;amp;espv=2&amp;amp;ie=UTF-8#q=code%20retreat%20constraints&#34;&gt;constraints&lt;/a&gt; to the session. Just be aware that this is already quite a difficult session and constraints may impede you to practice incremental design.&lt;/p&gt;
+
+&lt;h3 id=&#34;larger-number-of-developers&#34;&gt;Larger number of developers&lt;/h3&gt;
+
+&lt;p&gt;If running this session with many developers (community events), you can split them in small mobs (3 to 5 people each mob). Each mob will pick a game and spend around 90 minutes coding it. Once the time is up, each mob individually will put their code in a projector and let the other groups try to guess what game they coded and what the rules were. Mobs should avoid naming their projects or main classes after the name of the chosen game, of course.&lt;/p&gt;
+
+&lt;h3 id=&#34;pick-a-game-no-one-knows-how-to-play&#34;&gt;Pick a game no one knows how to play&lt;/h3&gt;
+
+&lt;p&gt;This was a very interesting session. We had to read the instructions of the game on Wikipedia, understand it, and code it in a very short period of time. This approach forced us to exercise our ability to understand requirements and model them quickly. Quite often, as we discovered new requirements, we had to change the code significantly, which gave us many interesting design insights.&lt;/p&gt;
+
+&lt;h3 id=&#34;play-the-game-before-implementing-it&#34;&gt;Play the game before implementing it&lt;/h3&gt;
+
+&lt;p&gt;Some developers mentioned that we should play the game for a few minutes before trying to implement it. This is a very sensible thing to do: we would all understand the game better and hopefully produce a better code. This can be done to make the session easier. However, in our day-to-day job, it’s not always possible to “play&amp;rdquo; requirements we get from Product Owners (or whoever is in charge of the requirements). Not playing the game before coding will keep the session closer to reality, that means, we will need to rely on our ability to ask the right questions to the domain expert in order to get the information we need. Figuring out what to code and when is also a good skill to practice.&lt;/p&gt;
+
+&lt;h3 id=&#34;trying-with-a-real-team-and-domain-expert-product-owner&#34;&gt;Trying with a real team and domain expert / product owner&lt;/h3&gt;
+
+&lt;p&gt;We haven’t done this yet but we think it could be a very interesting idea to run this exercise with a real team. The product owner (or whoever is in charge of the requirements) would play the role of domain expert. I believe that this would help the team to gel and also help product owners have a better appreciation for the effort that goes into taking requirements and coding them.&lt;/p&gt;
+
+&lt;p&gt;As the domain expert (played by the product owner) introduces new rules, developers will need to refactor the code or even throw a big chunk of their code away. The product owner will see the impact that new features have in the code and what developers have to go through to make things work. The language used by the domain expert can also significantly influence the complexity of the code.&lt;/p&gt;
+
+&lt;p&gt;The problem we foresee here is that the domain expert will get bored quickly if the team is not very experienced and fast. It’s very important that developers keep discussions focused and keep making process.&lt;/p&gt;
+
+&lt;p&gt;If anyone tries this session with a real team and a real product owner, please drop me a line at sandro at codurance dot com. I would love to know more about your experience.&lt;/p&gt;
+
+&lt;h3 id=&#34;why-games&#34;&gt;Why games?&lt;/h3&gt;
+
+&lt;p&gt;Board, card, and dice games normally have their rules very closely related to each other, providing us with a very rich domain. Implementing new rules will always force us to refactor or completely rewrite something that is already in there. The rules are normally quite easy to understand but quite complex to implement, which means that we can focus on the modelling/coding side instead of wasting time trying to understand a complex domain before writing any code.&lt;/p&gt;
+
+&lt;h1 id=&#34;summary&#34;&gt;Summary&lt;/h1&gt;
+
+&lt;p&gt;This is an advanced hands-on session. It’s not a session that should be used to learn basics of TDD, a new language, or software design. This is not a session for everyone to have a bit of play on the keyboard either. Developers in the mob must be very familiar with different TDD styles and many design principles in order for this session to work well.&lt;/p&gt;
+
+&lt;p&gt;This session was created so we can practice how to design software quickly and well, which includes constantly talking to the business, understanding requirements, defining a ubiquitous language, and of course, write well-crafted code that represents the problem domain.&lt;/p&gt;
+
+&lt;p&gt;Thanks to everyone at &lt;a href=&#34;http://codurance.com&#34;&gt;Codurance&lt;/a&gt;, &lt;a href=&#34;https://www.socrates-conference.de/&#34;&gt;SoCraTes Germany&lt;/a&gt;, and &lt;a href=&#34;http://www.socratesbe.org/&#34;&gt;SoCraTes Belgium&lt;/a&gt; who participated in the mob sessions and contributed with ideas to evolve the session.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>My first walking skeleton</title>
+      <link>http://codurance.com/blog/My-first-walking-skeleton/</link>
+      <pubDate>Wed, 26 Aug 2015 09:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/My-first-walking-skeleton/</guid>
+      <description>
+
+&lt;blockquote&gt;
+&lt;p&gt;A Walking Skeleton is a tiny implementation of the system that performs a small end-to-end function. It need not use the final architecture, but it should link together the main architectural components. The architecture and the functionality can then evolve in parallel.
+&lt;footer&gt; &lt;cite&gt;&lt;a href=&#34;http://alistair.cockburn.us/index.php/Walking_skeleton&#34;&gt;Alistair Cockburn&lt;/a&gt;&lt;/cite&gt;&lt;/footer&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;One of the goals I had for my apprenticeship was to learn more about Continuous Integration and Continuous Deployment. Building my own little pet project fit in nicely with that, and I wanted to try a couple of new things with it.
+A concept I was very curious about was the &lt;a href=&#34;http://blog.codeclimate.com/blog/2014/03/20/kickstart-your-next-project-with-a-walking-skeleton/&#34;&gt;Walking Skeleton&lt;/a&gt;. I read about it in &lt;a href=&#34;http://www.growing-object-oriented-software.com/&#34;&gt;Growing Object-Oriented Software Guided by Tests&lt;/a&gt; and as I understood it, it was a way to test-drive my architecture and reduce risk in the beginning of my project.&lt;/p&gt;
+
+&lt;h3 id=&#34;taking-on-the-challenge&#34;&gt;Taking on the challenge&lt;/h3&gt;
+
+&lt;p&gt;I had started the project in &lt;a href=&#34;http://www.scala-lang.org/&#34;&gt;Scala&lt;/a&gt; and used &lt;a href=&#34;http://www.scala-sbt.org/&#34;&gt;SBT&lt;/a&gt; as a build tool, both of which I&amp;rsquo;d never used before in a project. As I had limited experience with functional programming, I watched the videos from the Coursera Lectures on &lt;a href=&#34;https://www.coursera.org/course/progfun&#34;&gt;Functional Programming Principles in Scala&lt;/a&gt;. Solving some of the riddles there was quite fun! Unfortunately, that didn&amp;rsquo;t help with the hurdles and hiccups of using SBT and a couple of plugins that didn&amp;rsquo;t play well with the newest Scala version. Quite a couple of times I got stuck and had to ask my mentor for help. But pairing with him always brought a great deal of motivation and progress.&lt;/p&gt;
+
+&lt;h3 id=&#34;making-the-first-steps&#34;&gt;Making the first steps&lt;/h3&gt;
+
+&lt;p&gt;The next task was to decide how to get the integration up and running quickly.
+I first set up a simple &lt;a href=&#34;https://en.wikipedia.org/wiki/%22Hello,_World!%22_program&#34;&gt;Hello World&lt;/a&gt; and deploying it to &lt;a href=&#34;https://devcenter.heroku.com/articles/getting-started-with-scala#set-up&#34;&gt;Heroku&lt;/a&gt;. I decided to pass on using play and use as few plugins and frameworks as possible.&lt;/p&gt;
+
+&lt;p&gt;My initial steps were:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;create a &lt;a href=&#34;https://github.com/codurance/gr8craft&#34;&gt;repository&lt;/a&gt; for my project&lt;/li&gt;
+&lt;li&gt;open a console in the directory of the local clone of the repository&lt;/li&gt;
+&lt;li&gt;install SBT with &lt;code&gt;brew install sbt&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;create a &lt;a href=&#34;https://github.com/codurance/gr8craft/tree/7bcf1bfb42ec87cfddeb48cf8c5160b4834adbd4&#34;&gt;simple HelloWorld and SBT config&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;install Heroku with &lt;code&gt;brew install heroku&lt;/code&gt; and &lt;code&gt;heroku login&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;create the app on Heroku with &lt;code&gt;heroku create&lt;/code&gt; (I renamed it later)&lt;/li&gt;
+&lt;li&gt;deploy with &lt;code&gt;git push heroku&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;show the log with &lt;code&gt;heroku logs&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Of course, not everything worked as intended from the start. As you can see from my commit history, it took a few tries and pairing with my mentor to get the app really working and the Hello World output to show up in the logs.
+ SBT was particularly challenging, as it was so unfamiliar. Once I got it working on my machine, it was easy to deploy and run on Heroku, though.&lt;/p&gt;
+
+&lt;h3 id=&#34;defining-the-domain&#34;&gt;Defining the domain&lt;/h3&gt;
+
+&lt;p&gt;The idea I wanted to implement was a &lt;a href=&#34;https://twitter.com/gr8craft&#34;&gt;small bot&lt;/a&gt; helping developers to remember good design principles while they were reading twitter. I registered a twitter account and, with the help of my mentor, decided on it&amp;rsquo;s first feature:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Feature: Hourly Article Tweet
+  As a follower of gr8craft
+  I want hourly tweets to software design articles in my timeline
+  so that they inspire me to do better design
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I described the initial domain:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;Clock&amp;quot; reaches &amp;quot;Full Hour&amp;quot; triggers &amp;quot;Tweet&amp;quot; contains &amp;quot;Link&amp;quot; points to &amp;quot;Article&amp;quot; is stored in &amp;quot;Shelf&amp;quot;.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And I wrote an acceptance test for the feature:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Scenario: Hour reached
+    Given the next article on the shelf about &amp;quot;DDD&amp;quot; can be found at &amp;quot;http://t.co/lqJDZlGcJE&amp;quot;
+    When the hour is reached
+    Then gr8craft tweets &amp;quot;Your hourly recommended article about DDD: http://t.co/lqJDZlGcJE&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;test-driving-the-skeleton&#34;&gt;Test-driving the skeleton&lt;/h3&gt;
+
+&lt;p&gt;I set up my first test with &lt;a href=&#34;https://cucumber.io/&#34;&gt;Cucumber&lt;/a&gt;, tweeting against the real Twitter API using &lt;a href=&#34;http://twitter4j.org&#34;&gt;twitter4j&lt;/a&gt; and asserting that the last tweet was actually the expected one. I set up a testing account especially for this purpose. Before each test run, I clean up the timeline so as not to run into the problem of having twitter reject duplicated tweets. Another problem was that Twitter shortened the link I posted, making it hard to test if it was actually the link I was expecting. By using the shortened version directly I avoided setting up a complicated assertion to see that the shortened version was redirecting to the same location.
+The ApplicationRunner was developed test-driven using mocks.&lt;/p&gt;
+
+&lt;p&gt;Initially, I didn&amp;rsquo;t know how the scheduling would work. That&amp;rsquo;s why I started with a fake scheduler that would use the real clock to set up a trigger for new tweets. When I got a little further in I realized that using a scheduled thread executor was much simpler and easier to tests, so I changed that.&lt;/p&gt;
+
+&lt;p&gt;I implemented the application and went on to figure out the scheduling. My first refactoring was ahead - I started by test-driving the new way of scheduling: updating the  &lt;a href=&#34;https://github.com/codurance/gr8craft/commit/9ec1e4b8a479a4055e373c6e7295abdc08edd22e&#34;&gt;ScheduledExecutor&lt;/a&gt; and using &lt;a href=&#34;https://github.com/codurance/gr8craft/commit/9bab89bc5768b4803b1c797d5c869863a56aea84&#34;&gt;TweetRunner&lt;/a&gt; to do the actual work. I wanted to test the scheduler, so I made the time interval configurable and used Scala Test&amp;rsquo;s &lt;a href=&#34;http://doc.scalatest.org/2.0/index.html#org.scalatest.concurrent.Eventually$&#34;&gt;Eventually&lt;/a&gt; to give it a few tries:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@RunWith(classOf[JUnitRunner])
+class ScheduledExecutorShould extends FunSuite with Matchers with Eventually with BeforeAndAfter with OneInstancePerTest {
+
+  var wasScheduled = false
+  val scheduler = new ScheduledExecutor(NANOSECONDS, new Runnable {
+    override def run(): Unit = wasScheduled = true
+  })
+
+  after(scheduler.shutdown())
+
+  test(&amp;quot;schedule the runnable&amp;quot;) {
+    scheduler.schedule()
+
+    ensureRunnableWasScheduled
+    scheduler.isShutDown shouldBe false
+  }
+
+  test(&amp;quot;shutdown the runnable&amp;quot;) {
+    scheduler.schedule()
+    ensureRunnableWasScheduled
+
+    scheduler.shutdown()
+
+    scheduler.isShutDown shouldBe true
+  }
+
+  def ensureRunnableWasScheduled: Unit = {
+    eventually(timeout(5.seconds), interval(1.seconds)) {
+      wasScheduled shouldBe true
+    }
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;All that was left is to change my Cucumber steps and application to use the new Scheduling mechanism and TweetRunner. The tests were green and I could see the result on the &lt;a href=&#34;https://twitter.com/gr8crafttest&#34;&gt;testing account&lt;/a&gt;. Success!&lt;/p&gt;
+
+&lt;h3 id=&#34;making-it-run-properly&#34;&gt;Making it run properly&lt;/h3&gt;
+
+&lt;p&gt;To make the new application run on Heroku, I needed to &lt;a href=&#34;http://twitter4j.org/en/configuration.html&#34;&gt;configure the twitter4j environment variables&lt;/a&gt; there. I didn&amp;rsquo;t want to publish them by adding them to the github repository and had used a file to configure them locally.
+Heroku allows for easy configuration of environment variables via the website or the command line. I chose the latter and configured them by simply executing&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;heroku config:add oauth.consumerKey=**********
+heroku config:add oauth.consumerSecret=************
+heroku config:add oauth.accessToken=**************************************************
+heroku config:add oauth.accessTokenSecret=******************************************
+$ git push heroku master
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;logging-the-essentials&#34;&gt;Logging the essentials&lt;/h3&gt;
+
+&lt;p&gt;It is important to log the interaction with external resources like Twitter and the Scheduler, and to record errors in the right place. If you wait to do this for too long, it can make maintaining your application a real pain. I already benefitted from having the logging to localize problems.&lt;/p&gt;
+
+&lt;p&gt;I introduced &lt;a href=&#34;http://slf4s.org/&#34;&gt;slf4s&lt;/a&gt; and &lt;a href=&#34;http://logback.qos.ch/&#34;&gt;logback&lt;/a&gt; into the mix. This allowed me to easily log from any Scala class by using the &lt;em&gt;Logging&lt;/em&gt; trait:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;class TwitterApiService(twitter: Twitter) extends TwitterService with Logging {
+  ...
+  def sendToTwitter(tweet: String): Unit = {
+    log.info(&amp;quot;sending tweet to Twitter: &amp;quot; + tweet)
+
+    twitter.updateStatus(tweet)
+
+    log.info(&amp;quot;successfully tweeted &amp;quot; + tweet)
+  }
+  ...
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Since twitter4j was generating a lot of noise communicating with the Twitter API, I had to create a logback configuration file and set it to a different logging level:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;configuration&amp;gt;
+    &amp;lt;appender name=&amp;quot;STDOUT&amp;quot; class=&amp;quot;ch.qos.logback.core.ConsoleAppender&amp;quot;&amp;gt;
+        &amp;lt;encoder&amp;gt;
+            &amp;lt;pattern&amp;gt;%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n&amp;lt;/pattern&amp;gt;
+        &amp;lt;/encoder&amp;gt;
+    &amp;lt;/appender&amp;gt;
+
+    &amp;lt;logger name=&amp;quot;twitter4j&amp;quot; level=&amp;quot;INFO&amp;quot;/&amp;gt;
+
+    &amp;lt;root level=&amp;quot;debug&amp;quot;&amp;gt;
+        &amp;lt;appender-ref ref=&amp;quot;STDOUT&amp;quot;/&amp;gt;
+    &amp;lt;/root&amp;gt;
+&amp;lt;/configuration&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;setting-up-continuous-integration&#34;&gt;Setting up Continuous Integration&lt;/h3&gt;
+
+&lt;p&gt;There were a few tasks left to making the whole thing run not only by manually running the cucumber test in the IDE. I noticed not all the tests were executing in the IDE. That&amp;rsquo;s because it was looking for JUnit tests. This was an easy fix by adding &lt;code&gt;@RunWith(classOf[JUnitRunner])&lt;/code&gt;. Now to make the cucumber tests run when I executed &lt;code&gt;sbt test&lt;/code&gt; on the console, I needed to add &lt;a href=&#34;https://github.com/sbt/junit-interface&#34;&gt;JUnit Interface&lt;/a&gt; to my SBT dependencies. I had decided against using a SBT Cucumber plugin, as the ones I found were incompatible with the newest version of Scala.&lt;/p&gt;
+
+&lt;p&gt;To set up Continuous Integration, I installed &lt;code&gt;brew install travis&lt;/code&gt; and created a simple &lt;a href=&#34;http://docs.travis-ci.com/user/languages/scala/&#34;&gt;Travis&lt;/a&gt; configuration file:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;language: scala
+scala:
+- 2.11.7
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Fortunately, Travis can use SBT to automatically build and test without further configuration. The only thing I don&amp;rsquo;t like is that all dependencies have to be loaded again for every build, which makes it kind of slow.
+Travis needed to know the authentication for the twitter4j configuration too. I thought this would be easy to do just by encrypting the variables in &lt;a href=&#34;http://docs.travis-ci.com/user/environment-variables/#Encrypted-Variables&#34;&gt;travis.yml&lt;/a&gt;.
+However, since Travis uses bash, it doesn&amp;rsquo;t allow for dots in the variable name. I created a workaround by setting custom environment variables and using them to programmatically configure twitter4j:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;def createTwitter(suffix: String = &amp;quot;&amp;quot;): Twitter = {
+   val configuration = new ConfigurationBuilder()
+     .setDebugEnabled(true)
+     .setOAuthConsumerKey(readEnvironmentVariable(suffix, &amp;quot;twitter4jconsumerKey&amp;quot;))
+     .setOAuthConsumerSecret(readEnvironmentVariable(suffix, &amp;quot;twitter4jconsumerSecret&amp;quot;))
+     .setOAuthAccessToken(readEnvironmentVariable(suffix, &amp;quot;twitter4jaccessToken&amp;quot;))
+     .setOAuthAccessTokenSecret(readEnvironmentVariable(suffix, &amp;quot;twitter4jaccessTokenSecret&amp;quot;))
+     .build()
+
+   new TwitterFactory(configuration).getInstance()
+ }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The suffix is used so that I can have a different configuration for the production code and the tests, which run on a different Twitter account. Of course, I had to set these variables in my local command line, IDE and on Heroku as
+well.&lt;/p&gt;
+
+&lt;p&gt;I added the variables to the Travis config automatically via&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;travis encrypt twitter4jconsumerKey4testing=********** --add env.matrix
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Still, the tests were failing on Travis since the retry timeout was not high enough. Once the problem was found, it was easy to fix and the build was finally green.&lt;/p&gt;
+
+&lt;h3 id=&#34;deploying-to-heroku-automatically&#34;&gt;Deploying to Heroku automatically&lt;/h3&gt;
+
+&lt;p&gt;That was surprisingly easy! I just used the &lt;a href=&#34;http://docs.travis-ci.com/user/deployment/heroku/&#34;&gt;wizard provided by Travis&lt;/a&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;travis setup heroku
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I answered three simple questions and it automatically added the &lt;a href=&#34;https://github.com/codurance/gr8craft/commit/2570086f4ba9927f956141a552bc64cd932b10dd&#34;&gt;necessary information&lt;/a&gt; to my travis.yml. It just worked!&lt;/p&gt;
+
+&lt;h3 id=&#34;configuring-alternative-step-definitions-for-cucumber&#34;&gt;Configuring alternative step definitions for Cucumber&lt;/h3&gt;
+
+&lt;p&gt;Since I am running my Cucumber tests via JUnit, I could configure them with options to provide a location for the StepDefinitions. This way, I could use the same scenario definition with both the real Twitter API and a mocked version:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@RunWith(classOf[Cucumber])
+@CucumberOptions(glue = Array(&amp;quot;gr8craft.features&amp;quot;))
+class CucumberFeatures {
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;coming-to-a-conclusion&#34;&gt;Coming to a conclusion&lt;/h3&gt;
+
+&lt;p&gt;My next goal is to introduce a database with multiple articles, so that the bot will provide value to followers. I will then expand the domain and move along to the next feature, which will allow the bot to answer to mentions.&lt;/p&gt;
+
+&lt;p&gt;One of the lessons I learned over the last few weeks was (again) the value of pairing and code reviews. When I was stuck, pairing with my mentor or asking him for advice helped me instantly. He could see things from a different perspective, cover my blind spots, give encouragement and ideas and provide insights. I am very grateful for this support.&lt;/p&gt;
+
+&lt;p&gt;With this approach, I quickly found that my idea of how scheduling would work was off and I could easily refactor to cater for it. And I figured out the quirks of setting up the automatic testing, integration and deployment, which will pay off with every change I make.&lt;/p&gt;
+
+&lt;p&gt;I think the Walking Skeleton approach is a lot of effort at the start and it takes some time to see it work. But it&amp;rsquo;s worth it, but once it runs you get a very rewarding feeling. And you reduce the risk of something going wrong later on when you don&amp;rsquo;t expect it and didn&amp;rsquo;t plan for it.&lt;/p&gt;
+
+&lt;p&gt;I encourage you to try a Walking Skeleton when you start your next project!&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

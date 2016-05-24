@@ -1,0 +1,1285 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Java on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/java/</link>
+    <description>Recent content in Java on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Mon, 28 Mar 2016 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/java/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Mutual Problems</title>
+      <link>http://codurance.com/blog/mutual-problems/</link>
+      <pubDate>Mon, 28 Mar 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/mutual-problems/</guid>
+      <description>
+
+&lt;p&gt;The HTTPS protocol is the well-established standard for securing our connections. Understanding how this protocol works is not a problem and the corresponding &lt;a href=&#34;https://tools.ietf.org/html/rfc2818&#34;&gt;RFC document&lt;/a&gt; is available since 2000.&lt;/p&gt;
+
+&lt;p&gt;Despite HTTPS is used so widely, you can still find a software which doesn&amp;rsquo;t handle this protocol without unnecessary complexity. Unfortunately I&amp;rsquo;v experienced  problems during the implementation of &lt;a href=&#34;https://en.wikipedia.org/wiki/Mutual_authentication&#34;&gt;mutual authentication&lt;/a&gt; in the language which should not surprise me at all. It is &lt;strong&gt;Java&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;how-does-https-work&#34;&gt;How does HTTPS work?&lt;/h2&gt;
+
+&lt;p&gt;Before I describe what kind of problems I&amp;rsquo;ve got with my implementation, I will describe how mutual authentication works. The HTTPS protocol uses the TLS/SSL protocol to secure the connection. The TLS/SSL protocol defines the authentication handshake which allows to connect any client with the server in a secure way.
+During &lt;a href=&#34;https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_handshake&#34;&gt;The handshake&lt;/a&gt; the following steps are performed:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A client sends the message which initiates the connection.&lt;/li&gt;
+&lt;li&gt;The server sends its certificate to the client.&lt;/li&gt;
+&lt;li&gt;The client verifies the certificate using the certificate issued by the trusted authority.&lt;/li&gt;
+&lt;li&gt;The server sends the request for the client&amp;rsquo;s certificate.&lt;/li&gt;
+&lt;li&gt;The client sends its certificate to the server.&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;The server verifies the client&amp;rsquo;s certificate.&lt;/li&gt;
+&lt;li&gt;The server and the client exchange the master secret which is used during the encryption of data.&lt;/li&gt;
+&lt;li&gt;The connection is established.&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Together with my teammate we tried to implemented the HTTPS client in &lt;strong&gt;Java&lt;/strong&gt;. Combining our knowledge about the TLS/SSL handshake and the experience from the manual test with &lt;code&gt;curl&lt;/code&gt; we assumed that only three files were required to implement the client side: &lt;strong&gt;a client&amp;rsquo;s certificate&lt;/strong&gt;, &lt;strong&gt;a client&amp;rsquo;s private key&lt;/strong&gt; and &lt;strong&gt;a trusted certificate to verify the server&amp;rsquo;s certificate&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Oh, how wrong we were to think so.&lt;/p&gt;
+
+&lt;h2 id=&#34;java-the-problem-the-solution-and-why-is-it-so-hard&#34;&gt;Java - the problem, the solution and why is it so hard&lt;/h2&gt;
+
+&lt;p&gt;Because it is quite unusual to use mutual authentication every day, we asked the best source in the world for a small assistance. A first look at the results served by &lt;em&gt;uncle Google&lt;/em&gt; didn&amp;rsquo;t revealed the complexity behind the implementation, but each click on the results led us to more and more confusing solutions (some of them where from 90&amp;rsquo;s). To make matters worse we had to use &lt;a href=&#34;https://hc.apache.org/&#34;&gt;Apache HttpComponents&lt;/a&gt; to implement our connection, but most of the proposed solutions were based on the pure &lt;strong&gt;Java&lt;/strong&gt; libraries.&lt;/p&gt;
+
+&lt;p&gt;The knowledge from the internet allows us to establish that:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Java&lt;/strong&gt; cannot use directly any certificates or private keys (like e.g. &lt;code&gt;curl&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Java&lt;/strong&gt; requires separate files (&lt;strong&gt;Java Keystores&lt;/strong&gt;) which can contain original certificates and keys.&lt;/li&gt;
+&lt;li&gt;We needed a trusted keystore with the certificate required for the server&amp;rsquo;s certificate verification for each HTTPS connection.&lt;/li&gt;
+&lt;li&gt;We needed a keys keystore with the client&amp;rsquo;s certificate and the client&amp;rsquo;s private key for mutual authentication.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;First we had to create the trusted keystore. We created the keystore with the certificate using the &lt;code&gt;keytool&lt;/code&gt; command:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ keytool -import -alias trusted_certificate -keystore trusted.jks -file trusted.crt
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We stored in the keystore file &lt;code&gt;trusted.jks&lt;/code&gt; the certificate &lt;code&gt;trusted.crt&lt;/code&gt; under the alias &lt;code&gt;trusted_certificate&lt;/code&gt;. During the execution of this command we were asked to input a password for this keystore. We used this password later to get access to the keystore file.&lt;/p&gt;
+
+&lt;p&gt;To create a keystore a few additional steps were required. In most cases you will probably receive two files from the company which issues the client&amp;rsquo;s certificate. The first file will be the client&amp;rsquo;s certificate in the &lt;code&gt;pem&lt;/code&gt; format. This certificate will be sent to the server. The second file is the client&amp;rsquo;s private key (also in the &lt;code&gt;pem&lt;/code&gt; format) which is used during the handshake to confirm that you are the owner of the client&amp;rsquo;s certificate.&lt;/p&gt;
+
+&lt;p&gt;Unfortunately &lt;strong&gt;Java&lt;/strong&gt; only supports the &lt;code&gt;PKCS12&lt;/code&gt; format. So we had to translate our certificate and private key to &lt;code&gt;PKCS12&lt;/code&gt; format. We can do that using OpenSSL.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ openssl pkcs12 -export \
+    -in client.crt \
+    -inkey client.key \
+    -out key.p12 \
+    -name client
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We generated the file &lt;code&gt;key.p12&lt;/code&gt; from the files &lt;code&gt;client.crt&lt;/code&gt; and &lt;code&gt;client.key&lt;/code&gt;. Once again a password input was required. This password is used to protect the private key.&lt;/p&gt;
+
+&lt;p&gt;From the file in the &lt;code&gt;PKCS12&lt;/code&gt; format we can generate another keystore by importing our &lt;code&gt;PKCS12&lt;/code&gt; into the new keystore:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ keytool -importkeystore \
+    -destkeystore key.jks \
+    -deststorepass &amp;lt;&amp;lt;keystore_password&amp;gt;&amp;gt; \
+    -destkeypass &amp;lt;&amp;lt;key_password_in_keystore&amp;gt;&amp;gt; \
+    -alias client \
+    -srckeystore key.p12 \
+    -srcstoretype PKCS12 \
+    -srcstorepass &amp;lt;&amp;lt;original_password_of_PKCS12_file&amp;gt;&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This command looks a little bit more complex, but it is fairly easy to decrypt. At the beginning of the command we declare the parameters of the new keystore named &lt;code&gt;key.jks&lt;/code&gt;. We define the password for the keystore and the password for the private key which will be used by this keystore. We also assign the private key to some alias in the keystore (in this case it is &lt;code&gt;client&lt;/code&gt;).
+Next we specify the source file (&lt;code&gt;key.p12&lt;/code&gt;), the format of this file and the original password.&lt;/p&gt;
+
+&lt;p&gt;With &lt;code&gt;trusted.jks&lt;/code&gt; and &lt;code&gt;key.jks&lt;/code&gt; we were ready to code. In the first step we had to describe how we wanted to use our keystores.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;File trustedKeystoreFile = new File(&amp;quot;trusted.jks&amp;quot;);
+File keystoreFile = new File(&amp;quot;key.jks&amp;quot;);
+
+SSLContext sslcontext = SSLContexts.custom()
+    .loadTrustMaterial(trustedKeystoreFile, 
+                    &amp;quot;&amp;lt;&amp;lt;trusted_keystore_password&amp;gt;&amp;gt;&amp;quot;.toCharArray())
+    .loadKeyMaterial(keystoreFile, 
+                    &amp;quot;&amp;lt;&amp;lt;keystore_password&amp;gt;&amp;gt;&amp;quot;.toCharArray(), 
+                    &amp;quot;&amp;lt;&amp;lt;original_password_of_PKCS12_file&amp;gt;&amp;gt;&amp;quot;.toCharArray())
+    .build();
+
+SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(
+                sslcontext,
+                new String[]{&amp;quot;TLSv1.2&amp;quot;},
+                null,
+                SSLConnectionSocketFactory.getDefaultHostnameVerifier());
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We took our keystore files and we built an SSL context. Next we created the socket factory which provides proper HTTPS connection for our requests.&lt;/p&gt;
+
+&lt;p&gt;And finally we where able to call our endpoint from &lt;strong&gt;Java&lt;/strong&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;try (CloseableHttpClient httpclient = HttpClients.custom()
+        .setSSLSocketFactory(sslsf)
+        .build()) {
+
+    HttpGet httpGet = new HttpGet(&amp;quot;https://ourserver.com/our/endpoint&amp;quot;);
+
+    try (CloseableHttpResponse response = httpclient.execute(httGet)) {
+        HttpEntity entity = response.getEntity();
+        System.out.println(response.getStatusLine());
+        EntityUtils.consume(entity);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Done. After creating two additional files (keystores) which were the equivalent of our original certificate and the private key we implemented &lt;strong&gt;mutual authentication&lt;/strong&gt; with &lt;strong&gt;Java&lt;/strong&gt;. Maybe the implementation of HTTPS connections in &lt;strong&gt;Java&lt;/strong&gt; has some justification, but now it is just a headache.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;I want to thank Marco Vermeulen (&lt;a href=&#34;https://twitter.com/marc0der&#34;&gt;twitter: marc0der&lt;/a&gt;) for the inspiration and the pairing session.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Isolating integration tests and mocking dependencies with Spring Boot</title>
+      <link>http://codurance.com/blog/isolating-integration-tests-with-the-spring-framework/</link>
+      <pubDate>Sun, 31 Jan 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/isolating-integration-tests-with-the-spring-framework/</guid>
+      <description>&lt;p&gt;Integration tests can be slow and unreliable because they depend on too many components in the system. Up to a certain point, this is unavoidable: integration tests are here to validate how each part of your system plays with other internal or external components.&lt;/p&gt;
+
+&lt;p&gt;We can, however, improve some integration tests by only spinning up the required dependencies, instead of the whole system. Let&amp;rsquo;s imagine an application that depends on a database, a third-party REST API and a message queue:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2016-01-31-isolating-integration-tests-with-the-spring-framework.md/my-application.png&#34; alt=&#34;Our application with 3 dependencies&#34; title=&#34;Our application with 3 dependencies&#34; class=&#34;img img-responsive style-screengrab&#34; style=&#34;margin:auto;display:block;&#34;/&gt;
+
+
+&lt;p&gt;Assume now that we would like our integration test to validate a behavior that only includes calls to the REST API but no call to the database or the message queue. To give a concrete example, let&amp;rsquo;s assume we want to check that our REST client is correctly configured to time out after 3 seconds.&lt;/p&gt;
+
+&lt;p&gt;All we need for this is a small &lt;code&gt;Controller&lt;/code&gt; that will mock the REST API by waiting before returning an answer to the REST client. The wait time will be passed as a parameter in the query string.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Profile(&amp;quot;restTemplateTimeout&amp;quot;)
+@RestController
+@RequestMapping(value = &amp;quot;/test&amp;quot;)
+public class DelayedWebServerController {
+
+  @RequestMapping(value = &amp;quot;/delayRestTemplate&amp;quot;, method = GET)
+  public String answerWithDelay(@RequestParam Long waitTimeMs) {
+
+    if (waitTimeMs &amp;gt; 0) {
+      try {
+        Thread.sleep(waitTimeMs);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    return &amp;quot;Delayed Result&amp;quot;;
+  }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;What is the &lt;code&gt;@Profile&lt;/code&gt; annotation used for? If we inject this controller into our standard application context, this has several drawbacks:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The test will be slow: we only need to start one controller, not the whole thing&lt;/li&gt;
+&lt;li&gt;Our controller will be picked up by Spring and injected into every other integration test, slowing down each integration test and maybe stepping on another test&amp;rsquo;s toes&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;A better alternative would be to spin up a minimal Spring Boot application exposing only our &lt;code&gt;DelayedWebServerController&lt;/code&gt;. We will also tell Spring Boot to scan only the packages we are interested in, and to exclude persistence-related auto-configuration since we do not need it to spin up a controller. This is done in a &lt;code&gt;Configuration&lt;/code&gt; class like this one:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Profile(&amp;quot;restTemplateTimeout&amp;quot;)
+@Configuration
+@EnableAutoConfiguration(
+    exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
+@ComponentScan(basePackages = &amp;quot;my.application.resttemplate.timeout&amp;quot;)
+public class DelayedWebServerConfiguration {
+    //The class is empty and only used to support the annotations
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The Spring context configuration can get quite confusing, let us look at the annotations one after the other:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;@Profile&lt;/code&gt;: This tells Spring that this configuration should only be used when the &lt;code&gt;restTemplateTimeout&lt;/code&gt; profile is active. Further in this article, we will see how we enable this profile for a specific integration test. It is this annotation that prevents the configuration to be picked up by other unrelated integration tests. Note that our &lt;code&gt;DelayedWebServerController&lt;/code&gt; is identically annotated.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@Configuration&lt;/code&gt;: Standard annotation to tell Spring that this is a context configuration class.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@EnableAutoConfiguration&lt;/code&gt;: Here we disable some of the Spring Boot &amp;ldquo;magic&amp;rdquo; that we do not need for our specific test&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@ComponentScan&lt;/code&gt;: We speed up the Spring Boot application startup by only scanning one package instead of the whole project. Any Spring-annotated class that is outside of this package will not be picked up by Spring.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Here is how the integration test looks like:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@RunWith(SpringJUnit4ClassRunner.class)
+@WebIntegrationTest(&amp;quot;server.port:0&amp;quot;)
+@SpringApplicationConfiguration(classes = DelayedWebServerConfiguration.class)
+@ActiveProfiles(&amp;quot;restTemplateTimeout&amp;quot;)
+public class RestTemplateShould {
+
+  @Rule
+  public ExpectedException thrown = none();
+
+  @Value(&amp;quot;${local.server.port}&amp;quot;)
+  private int port;
+
+  @Autowired
+  private RestTemplate restTemplate;
+
+  @Test
+  public void throw_timeout_if_response_lasts_more_than_two_seconds() {
+    thrown.expect(ResourceAccessException.class);
+    thrown.expectCause(instanceOf(SocketTimeoutException.class));
+
+    callEndpointWithDelay(3000);
+  }
+
+  @Test
+  public void do_not_throw_timeout_if_response_lasts_less_than_two_seconds() {
+    callEndpointWithDelay(10);
+  }
+
+  private void callEndpointWithDelay(long delayMs) {
+    restTemplate.getForObject(
+        &amp;quot;http://localhost:&amp;quot; + port + &amp;quot;/test/delayRestTemplate?waitTimeMs=&amp;quot; + delayMs, String.class);
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Of course, all those classes are stored in our test source folder (usually &lt;code&gt;src/test/java&lt;/code&gt;) since they are not required for production.&lt;/p&gt;
+
+&lt;p&gt;Let us have a look again at the annotations:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;@RunWith&lt;/code&gt;: The test will use the Spring Junit runner who will take care of creating the Spring context for us.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@WebIntegrationTest&lt;/code&gt;: Tells Spring that this is an integration test running a web application, otherwise by default Spring will not run an HTTP server in test mode. We also set the &lt;code&gt;server.port&lt;/code&gt; to a value of &lt;code&gt;0&lt;/code&gt; so that Spring Boot choose a random port for the HTTP server to listen to. This allows to have several tests running in parallel, or to have another version of the application running in the background.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@SpringApplicationConfiguration&lt;/code&gt;: We tell Spring where it will find the &lt;code&gt;DelayedWebServerConfiguration&lt;/code&gt; class we created before.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@ActiveProfiles&lt;/code&gt;: Enables the &lt;code&gt;restTemplateTimeout&lt;/code&gt; profile, otherwise the &lt;code&gt;Controller&lt;/code&gt; and the &lt;code&gt;Configuration&lt;/code&gt; will be filtered out.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We now have an integration test running with a limited set of dependencies instead of the whole application. What if we wanted to go further and add mocks into the game? This may be required when a dependency does not have a dev environment or that it is too complicated to call from a developer&amp;rsquo;s workstation. In that case, we can add those mocks to the &lt;code&gt;Configuration&lt;/code&gt; class and they will be injected into the test&amp;rsquo;s Spring context.&lt;/p&gt;
+
+&lt;p&gt;Here is a &lt;code&gt;Configuration&lt;/code&gt; example where we inject a custom &lt;code&gt;CustomerService&lt;/code&gt; mocked by Mockito instead of the default one:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Profile(&amp;quot;validationTests&amp;quot;)
+@Configuration
+@EnableAutoConfiguration(
+    exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
+@ComponentScan(basePackages = {&amp;quot;my.application.controller&amp;quot;,
+    &amp;quot;my.application.actions&amp;quot;})
+public class ValidationEndToEndConfiguration {
+    @Bean
+  public CustomerService customerService() {
+    return Mockito.mock(CustomerService.class);
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With this approach, we can make our integration tests more resilient. For slow or unreliable dependencies, it is more efficient to have the developers run their integration tests against a mocked version. However, do not forget that in the end your application will have to integrate with the real system, not the mocked one. For this reason, it makes sense to have the continuous integration server run the tests against the real system at the very least every day.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Testing multithreaded code in Java</title>
+      <link>http://codurance.com/blog/Testing-multithreaded-code-in-java/</link>
+      <pubDate>Sun, 13 Dec 2015 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/Testing-multithreaded-code-in-java/</guid>
+      <description>&lt;p&gt;Testing multithreaded code is a tough challenge. The first advice that you get when trying to test concurrency is to isolate your concurrent concerns in the code as much as possible. This a general design advice but in this case it&amp;rsquo;s even more important. Make sure to first properly unit test the logic that is wrapped by the concurrent construct. Otherwise you might spend a long time trying to figure out a concurrency problem that turns out to be flawed business logic in the end.&lt;/p&gt;
+
+&lt;p&gt;Once you have got that covered, you can think about your strategy to test concurrent systems. &lt;a href=&#34;http://www.growing-object-oriented-software.com/&#34;&gt;GOOS&lt;/a&gt; covers how you can do it. &lt;a href=&#34;https://github.com/npryce/goos-code-examples/tree/master/testing-multithreaded-code/src/book/example/threading/races&#34;&gt;Here&lt;/a&gt; you can find the code that I&amp;rsquo;m going to explain:&lt;/p&gt;
+
+&lt;p&gt;First, let&amp;rsquo;s have a look into the system under test:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class AtomicBigCounter {
+    private BigInteger count = BigInteger.ZERO;
+
+    public BigInteger count() {
+        return count;
+    }
+
+    public void inc() {
+        count = count.add(BigInteger.ONE);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As you can see, this class is not thread safe, as it&amp;rsquo;s exposing some state through the inc() method. The state is not thread safe (you could use AtomicInteger instead of BigInteger to fix that). To test that class we&amp;rsquo;ll include a non-concurrent and a concurrent test.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test public void canIncreaseCounter(){
+    ...
+}
+
+@Test public void canIncrementCounterFromMultipleThreadsSimultaneously()
+    throws	InterruptedException {
+    MultithreadedStressTester stressTester = new MultithreadedStressTester(25000);
+
+    stressTester.stress(new Runnable() {
+        public void run() {
+            counter.inc();
+        }
+    });
+
+    stressTester.shutdown();
+
+    assertThat(&amp;quot;final count&amp;quot;, counter.count(),
+    equalTo(BigInteger.valueOf(stressTester.totalActionCount())));
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The stress tester will exercise the method n loops with m threads. As our method is incrementing by one, we should see that &lt;code&gt;n*m&lt;/code&gt; is equal to the &lt;code&gt;counter.count()&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The interesting class is the MultithreadedStressTester though:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public void stress(final Runnable action) throws InterruptedException {
+    spawnThreads(action).await();
+}
+
+private CountDownLatch spawnThreads(final Runnable action) {
+    final CountDownLatch finished = new CountDownLatch(threadCount);
+
+    for (int i = 0; i &amp;lt; threadCount; i++) {
+        executor.execute(new Runnable() {
+            public void run() {
+                try {
+                    repeat(action);
+                }
+                finally {
+                    finished.countDown();
+                }
+            }
+        });
+    }
+    return finished;
+}
+
+private void repeat(Runnable action) {
+    for (int i = 0; i &amp;lt; iterationCount; i++) {
+        action.run();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If you execute that test you will receive different results and sometimes it&amp;rsquo;s even passing! That&amp;rsquo;s because this test is not deterministic, we can&amp;rsquo;t assure how the threads will interleave in every execution. If we want to be as sure as possible that this test finds the possible bug, we should increase the number of threads and iterations, but with the obvious time trade-off.&lt;/p&gt;
+
+&lt;p&gt;You can use a more deterministic approach using &lt;a href=&#34;https://github.com/google/thread-weaver&#34;&gt;Weaver&lt;/a&gt;. To understand how it works, let&amp;rsquo;s illustrate it with an example. Let&amp;rsquo;s say that we have an in-memory and not thread-safe store:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;	private final Map&amp;lt;Level, Scores&amp;gt; scoresByLevel;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We have some service that accesses a repository wrapping that store:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;1	Optional&amp;lt;Scores&amp;gt; scoresFromStore = scoreRepo.findBy(score.level());
+2       if(scoresFromStore.isPresent()) {
+3          scoreRepo.update(score.level(), score);
+4       } else {
+5          scoreRepo.save(score.level(), new Scores().add(score));
+6       }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That service is a singleton living in a server that spawns a thread per request, so we&amp;rsquo;d like to execute that piece atomically. We could use the stress test non-deterministic approach or we could use Weaver. If we think deeply about this problem, we realise we want to test every combination of the following (as an example, Thread 1 executes line 1 in moment x and Thread 2 executes line 1 in moment x, would be -&amp;gt; T1/1 : T2/1)&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;T1/1 : T2/1&lt;/li&gt;
+&lt;li&gt;T1/1 : T2/2&lt;/li&gt;
+&lt;li&gt;T1/1 : T2/3&lt;/li&gt;
+&lt;li&gt;&amp;hellip;.&lt;/li&gt;
+&lt;li&gt;T1/2 : T2/1&lt;/li&gt;
+&lt;li&gt;T1/2 : T2/2&lt;/li&gt;
+&lt;li&gt;T1/2 : T2/3&lt;/li&gt;
+&lt;li&gt;&amp;hellip;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;For instance, we&amp;rsquo;ll have a problem if T1/5 and T2/2, as T1 didn&amp;rsquo;t save yet, and T2 has already got an empty score from store. That means that T1 will save a score in a level and then T2 will do the same, breaking the logic. And that&amp;rsquo;s exactly what Weaver does, it grabs a method and executes the above combinations using two threads.&lt;/p&gt;
+
+&lt;p&gt;If I get rid of the preparation code (annotated with @ThreadedBefore), the test code will look like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@ThreadedMain
+public void mainThread() {
+    scoreService.save(LEVEL_ID, SCORE_VALUE, aUser);
+}
+
+@ThreadedSecondary
+public void secondThread() {
+    scoreService.save(LEVEL_ID, ANOTHER_SCORE_VALUE, aUser);
+}
+
+@ThreadedAfter
+public void after() {
+    Optional&amp;lt;Scores&amp;gt; scores = scoreRepo.findBy(aLevel());
+    assertThat(scores.isPresent()).isTrue();
+    assertThat(scores.get().contains(aScoreWith(aUser))).isTrue();
+    assertThat(scores.get().contains(aDifferentScoreWith(aUser))).isTrue();
+}
+
+@Test
+public void testThreading() {
+    new AnnotatedTestRunner().runTests(this.getClass(), ScoreService.class);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This test will always fail, as it is deterministic. As you can see, testing concurrency is quite hard, and that&amp;rsquo;s why I&amp;rsquo;m a supporter of modern frameworks that try to hide that hassle into a platform or overcome the problem through immutable data. You can read more about it &lt;a href=&#34;http://felipefzdz.github.io/2015/01/02/concurrency-flavours/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Design Patterns in the 21st Century: Conclusion</title>
+      <link>http://codurance.com/blog/design-patterns-in-the-21st-century-part-five/</link>
+      <pubDate>Fri, 17 Apr 2015 18:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/design-patterns-in-the-21st-century-part-five/</guid>
+      <description>&lt;p&gt;This is part five of my talk, &lt;a href=&#34;http://talks.samirtalwar.com/design-patterns-in-the-21st-century.html&#34;&gt;Design Patterns in the 21st Century&lt;/a&gt;.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Over the past week, we&amp;rsquo;ve seen three examples of design patterns that can be drastically improved by approaching them with a functional mindset. Together, these three span the spectrum.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The Abstract Factory pattern is an example of a &lt;strong&gt;creational&lt;/strong&gt; pattern, which increases flexibility during the application wiring process&lt;/li&gt;
+&lt;li&gt;The Adapter pattern, a &lt;strong&gt;structural&lt;/strong&gt; pattern, is a huge aid in object composition&lt;/li&gt;
+&lt;li&gt;The Chain of Responsibility pattern is a good demonstration of a &lt;strong&gt;behavioural&lt;/strong&gt; &lt;em&gt;anti-pattern&lt;/em&gt; that actually makes the communication between objects &lt;em&gt;more&lt;/em&gt; rigid&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We took these three patterns, made them a lot smaller, removed a lot of boilerplate, and knocked out a bunch of extra classes we didn&amp;rsquo;t need in the process.&lt;/p&gt;
+
+&lt;p&gt;In all cases, we split things apart, only defining the coupling between them in the way objects were constructed. But more than that: we made them functional. The difference between domain objects and infrastructural code became much more explicit. This allowed us to generalise, using the built-in interfaces to do most of the heavy lifting for us, allowing us to eradicate lots of infrastructural types and concentrate on our domain.&lt;/p&gt;
+
+&lt;p&gt;It&amp;rsquo;s funny, all this talk about our business domain. It&amp;rsquo;s almost as if the resulting code became a lot more object-oriented too.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Design Patterns in the 21st Century: The Chain of Responsibility Pattern</title>
+      <link>http://codurance.com/blog/design-patterns-in-the-21st-century-part-four/</link>
+      <pubDate>Thu, 16 Apr 2015 18:30:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/design-patterns-in-the-21st-century-part-four/</guid>
+      <description>
+
+&lt;p&gt;Here&amp;rsquo;s a thing you might not see a lot.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test public void hungryHungryPatrons() {
+    KitchenStaff alice = new PieChef();
+    KitchenStaff bob = new DollopDistributor();
+    KitchenStaff carol = new CutleryAdder();
+    KitchenStaff dan = new Server();
+
+    alice.setNext(bob);
+    bob.setNext(carol);
+    carol.setNext(dan);
+
+    Patron patron = new Patron();
+    alice.prepare(new Pie()).forPatron(patron);
+
+    assertThat(patron, hasPie());
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It might look odd, but the idea is fairly common. For example, the Java Servlets framework uses the concept of a &lt;code&gt;FilterChain&lt;/code&gt; to model a sequence of filters upon a request.&lt;/p&gt;
+
+&lt;p&gt;You can use &lt;code&gt;Filter&lt;/code&gt; objects to do pretty much anything with a request. Here&amp;rsquo;s one that tracks how many hits there have been to a site. Notice that it passes the &lt;code&gt;request&lt;/code&gt; and &lt;code&gt;response&lt;/code&gt; objects onto the next filter in the chain when it&amp;rsquo;s done.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public final class HitCounterFilter implements Filter {
+    // initialization and destruction methods go here
+
+    public void doFilter(
+            ServletRequest request,
+            ServletResponse response,
+            FilterChain chain)
+    {
+        int hits = getCounter().incCounter();
+        log(“The number of hits is ” + hits);
+        chain.doFilter(request, response);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We might use an object in the chain to modify the input or output (in this case, the request or response):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public final class SwitchEncodingFilter implements Filter {
+    // initialization and destruction methods go here
+
+    public void doFilter(
+            ServletRequest request,
+            ServletResponse response,
+            FilterChain chain)
+    {
+        request.setEncoding(“UTF-8”);
+        chain.doFilter(request, response);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We might even bail out of the chain early if things are going pear-shaped.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public final class AuthorizationFilter implements Filter {
+    // initialization and destruction methods go here
+
+    public void doFilter(
+            ServletRequest request,
+            ServletResponse response,
+            FilterChain chain)
+    {
+        if (!user().canAccess(request)) {
+            throw new AuthException(user);
+        }
+        chain.doFilter(request, response);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Basically, once you hit an element in the chain, it has full control.&lt;/p&gt;
+
+&lt;p&gt;In UML, it looks a little like this:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-04-13-design-patterns/chain-of-responsibility-pattern-uml.png&#34; alt=&#34;Chain of Responsibility pattern UML diagram&#34; title=&#34;Chain of Responsibility pattern UML diagram&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;h4 id=&#34;this-is-probably-bad-practice&#34;&gt;This is probably bad practice.&lt;/h4&gt;
+
+&lt;p&gt;This may be a little contentious, but I&amp;rsquo;d say that most implementations of the Chain of Responsibility pattern are pretty confusing. Because the chain relies on each and every member playing its part correctly, it&amp;rsquo;s very easy to simply lose things (in the case above, HTTP requests) by missing a line or two, reordering the chain without thinking through the ramifications, or mutating the &lt;code&gt;ServletRequest&lt;/code&gt; in a fashion that makes later elements in the chain misbehave.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s dive a little further into how we can salvage something from all of this.&lt;/p&gt;
+
+&lt;p&gt;Remember our hungry patron?&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test public void
+hungryHungryPatrons() {
+    KitchenStaff alice = new PieChef();
+    KitchenStaff bob = new DollopDistributor();
+    KitchenStaff carol = new CutleryAdder();
+    KitchenStaff dan = new Server();
+
+    alice.setNext(bob);
+    bob.setNext(carol);
+    carol.setNext(dan);
+
+    Patron patron = new Patron();
+    alice.prepare(new Pie()).forPatron(patron);
+
+    assertThat(patron, hasPie());
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That assertion is using &lt;a href=&#34;https://code.google.com/p/hamcrest/wiki/Tutorial#Sugar&#34;&gt;Hamcrest matchers&lt;/a&gt;, by the way. Check them out if you&amp;rsquo;re not too familiar with them. They&amp;rsquo;re amazing.&lt;/p&gt;
+
+&lt;h4 id=&#34;step-1-stop-mutating&#34;&gt;Step 1: Stop mutating.&lt;/h4&gt;
+
+&lt;p&gt;Not all Chain of Responsibility implementations involve mutation, but for those that do, it&amp;rsquo;s best to get rid of it as soon as possible. Making your code immutable makes it much easier to refactor further without making mistakes.&lt;/p&gt;
+
+&lt;p&gt;There are three cases of mutation here.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Each member of staff has the &amp;ldquo;next&amp;rdquo; member set later, and the patrons themselves are mutated. Instead of setting the next member of staff later, we&amp;rsquo;ll construct each one with the next.&lt;/li&gt;
+&lt;li&gt;Though you can&amp;rsquo;t see it, Alice, the &lt;code&gt;PieChef&lt;/code&gt;, sets a flag on the &lt;code&gt;Pie&lt;/code&gt; to mark it as &lt;code&gt;cooked&lt;/code&gt; for Bob, the &lt;code&gt;DollopDistributor&lt;/code&gt;. Instead of changing the object, we&amp;rsquo;ll have her accept an &lt;code&gt;UncookedPie&lt;/code&gt; and pass a &lt;code&gt;CookedPie&lt;/code&gt; to Bob. We then adapt Bob to accept a &lt;code&gt;CookedPie&lt;/code&gt;. This ensures we can&amp;rsquo;t get the order wrong, as &lt;code&gt;Bob&lt;/code&gt; will never receive an uncooked pie.&lt;/li&gt;
+&lt;li&gt;And as for the patron, we&amp;rsquo;ll start off with a &lt;code&gt;HungryPatron&lt;/code&gt; and have them return a new instance of themselves upon feeding.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test public void
+hungryHungryPatrons() {
+    KitchenStaff dan = new Server();
+    KitchenStaff carol = new CutleryAdder(dan);
+    KitchenStaff bob = new DollopDistributor(carol);
+    KitchenStaff alice = new PieChef(bob);
+
+    Patron hungryPatron = new HungryPatron();
+    Patron happyPatron = alice.prepare(new UncookedPie()).forPatron(hungryPatron);
+
+    assertThat(happyPatron, hasPie());
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This hasn&amp;rsquo;t changed much, unfortunately. It&amp;rsquo;s still very confusing why we giving the pie to Alice results in the patron receiving it, and we could still get things in the wrong order or ask the wrong person to do something.&lt;/p&gt;
+
+&lt;h4 id=&#34;step-2-make-it-type-safe&#34;&gt;Step 2: Make it type-safe.&lt;/h4&gt;
+
+&lt;p&gt;Part of the problem with the ordering is that even though Alice gives the next person a &lt;code&gt;CookedPie&lt;/code&gt;, we could tell her to give it to anyone, resulting in a &lt;code&gt;ClassCastException&lt;/code&gt; or something equally fun. By parameterising the types, we can avoid this, ensuring that both the input and output types are correct.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test public void
+hungryHungryPatrons() {
+    KitchenStaff&amp;lt;WithCutlery&amp;lt;Meal&amp;gt;&amp;gt; dan = new Server();
+    KitchenStaff&amp;lt;Meal&amp;gt; carol = new CutleryAdder(dan);
+    KitchenStaff&amp;lt;CookedPie&amp;gt; bob = new DollopDistributor(carol);
+    KitchenStaff&amp;lt;UncookedPie&amp;gt; alice = new PieChef(bob);
+
+    Patron hungryPatron = new HungryPatron();
+    Patron happyPatron = alice.prepare(new UncookedPie()).forPatron(hungryPatron);
+
+    assertThat(happyPatron, hasPie());
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Each of our constructors will change too. For example, &lt;code&gt;PieChef&lt;/code&gt;&amp;rsquo;s constructor used to look like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public PieChef(KitchenStaff next) {
+    this.next = next;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And now its parameter specifies the type it accepts:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public PieChef(KitchenStaff&amp;lt;CookedPie&amp;gt; next) {
+    this.next = next;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;step-3-separate-behaviours&#34;&gt;Step 3: Separate behaviours.&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;KitchenStaff&lt;/code&gt; does two things: prepare food, but also hand over the food to the next person. Let&amp;rsquo;s split that up into two different concepts. We&amp;rsquo;ll construct an instance of &lt;code&gt;KitchenStaff&lt;/code&gt;, then tell them who to delegate to next.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test public void
+hungryHungryPatrons() {
+    KitchenStaff&amp;lt;WithCutlery&amp;lt;Meal&amp;gt;, Serving&amp;gt; dan = new Server();
+    KitchenStaff&amp;lt;Meal, Serving&amp;gt; carol = new CutleryAdder().then(dan);
+    KitchenStaff&amp;lt;CookedPie, Serving&amp;gt; bob = new DollopDistributor().then(carol);
+    KitchenStaff&amp;lt;UncookedPie, Serving&amp;gt; alice = new PieChef().then(bob);
+
+    Patron hungryPatron = new HungryPatron();
+    Patron happyPatron = alice.prepare(new UncookedPie()).forPatron(hungryPatron);
+
+    assertThat(happyPatron, hasPie());
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In this situation, &lt;code&gt;then&lt;/code&gt; doesn&amp;rsquo;t modify the object directly, but instead returns a new instance of &lt;code&gt;KitchenStaff&lt;/code&gt; who knows to pass it on. It looks something like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;private static interface KitchenStaff&amp;lt;I, O&amp;gt; {
+    O prepare(I input);
+
+    default &amp;lt;Next&amp;gt; KitchenStaff&amp;lt;I, Next&amp;gt; then(KitchenStaff&amp;lt;O, Next&amp;gt; next) {
+        return input -&amp;gt; {
+            O output = prepare(input);
+            return next.prepare(output);
+        };
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To do this, we also have to return a value rather than operating purely on side effects, ensuring that we &lt;em&gt;always&lt;/em&gt; pass on the value. In situations where we may not want to continue, we can return an &lt;code&gt;Optional&amp;lt;T&amp;gt;&lt;/code&gt; value, which can contain either something (&lt;code&gt;Optional.of(value)&lt;/code&gt;) or nothing (&lt;code&gt;Optional.empty()&lt;/code&gt;).&lt;/p&gt;
+
+&lt;h4 id=&#34;step-4-split-the-domain-from-the-infrastructure&#34;&gt;Step 4: Split the domain from the infrastructure.&lt;/h4&gt;
+
+&lt;p&gt;Now that we have separated the chaining from the construction of the &lt;code&gt;KitchenStaff&lt;/code&gt;, we can separate the two. &lt;code&gt;alice&lt;/code&gt;, &lt;code&gt;bob&lt;/code&gt; and friends are useful objects to know about in their own right, and it&amp;rsquo;s pretty confusing to see them only as part of the chain. Let&amp;rsquo;s leave the chaining until later.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test public void
+hungryHungryPatrons() {
+    KitchenStaff&amp;lt;UncookedPie, CookedPie&amp;gt; alice = new PieChef();
+    KitchenStaff&amp;lt;CookedPie, Meal&amp;gt; bob = new DollopDistributor();
+    KitchenStaff&amp;lt;Meal, WithCutlery&amp;lt;Meal&amp;gt;&amp;gt; carol = new CutleryAdder();
+    KitchenStaff&amp;lt;WithCutlery&amp;lt;Meal&amp;gt;, Serving&amp;gt; dan = new Server();
+
+    KitchenStaff&amp;lt;UncookedPie, Serving&amp;gt; staff = alice.then(bob).then(carol).then(dan);
+
+    Patron hungryPatron = new HungryPatron();
+    Patron happyPatron = staff.prepare(new UncookedPie()).forPatron(hungryPatron);
+
+    assertThat(happyPatron, hasPie());
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So now we have a composite object, &lt;code&gt;staff&lt;/code&gt;, which embodies the chain of operations. This allows us to see the individuals as part of it as separate entities.&lt;/p&gt;
+
+&lt;h4 id=&#34;step-5-identify-redundant-infrastructure&#34;&gt;Step 5: Identify redundant infrastructure.&lt;/h4&gt;
+
+&lt;p&gt;That &lt;code&gt;KitchenStaff&lt;/code&gt; type looks awfully familiar at this point.&lt;/p&gt;
+
+&lt;p&gt;Perhaps it looks something like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@FunctionalInterface
+public interface Function&amp;lt;T, R&amp;gt; {
+    R apply(T t);
+
+    ...
+
+    default &amp;lt;V&amp;gt; Function&amp;lt;T, V&amp;gt; andThen(Function&amp;lt;? super R, ? extends V&amp;gt; after) {
+        Objects.requireNonNull(after);
+        return (T t) -&amp;gt; after.apply(apply(t));
+    }
+
+    ...
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Oh, look, it&amp;rsquo;s a function! And &lt;code&gt;then&lt;/code&gt; is simply function composition. Our &lt;code&gt;KitchenStaff&lt;/code&gt; type appears to be pretty much a subset of the &lt;code&gt;Function&lt;/code&gt; type, so why not just use that instead?&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test public void
+hungryHungryPatrons() {
+    Function&amp;lt;UncookedPie, CookedPie&amp;gt; alice = new PieChef();
+    Function&amp;lt;CookedPie, Meal&amp;gt; bob = new DollopDistributor();
+    Function&amp;lt;Meal, WithCutlery&amp;lt;Meal&amp;gt;&amp;gt; carol = new CutleryAdder();
+    Function&amp;lt;WithCutlery&amp;lt;Meal&amp;gt;, Serving&amp;gt; dan = new Server();
+
+    Function&amp;lt;UncookedPie, Serving&amp;gt; staff = alice.andThen(bob).andThen(carol).andThen(dan);
+
+    Patron hungryPatron = new HungryPatron();
+    Patron happyPatron = staff.apply(new UncookedPie()).forPatron(hungryPatron);
+
+    assertThat(happyPatron, hasPie());
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;step-6-optionally-replace-classes-with-lambdas-and-method-references&#34;&gt;Step 6: Optionally replace classes with lambdas and method references.&lt;/h4&gt;
+
+&lt;p&gt;Sometimes you really don&amp;rsquo;t need a full class. In this case, the implementation is simple enough that we can just use method references instead.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test public void
+hungryHungryPatrons() {
+    Function&amp;lt;UncookedPie, CookedPie&amp;gt; alice = UncookedPie::cook;
+    Function&amp;lt;CookedPie, Meal&amp;gt; bob = CookedPie::addCream;
+    Function&amp;lt;Meal, WithCutlery&amp;lt;Meal&amp;gt;&amp;gt; carol = WithCutlery::new;
+    Function&amp;lt;WithCutlery&amp;lt;Meal&amp;gt;, Serving&amp;gt; dan = Serving::new;
+
+    Function&amp;lt;UncookedPie, Serving&amp;gt; staff = alice.andThen(bob).andThen(carol).andThen(dan);
+
+    Patron hungryPatron = new HungryPatron();
+    Patron happyPatron = staff.apply(new UncookedPie()).forPatron(hungryPatron);
+
+    assertThat(happyPatron, hasPie());
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This drastically cuts down on boilerplate and lets us see what&amp;rsquo;s actually going on.&lt;/p&gt;
+
+&lt;p&gt;Our new structure is quite different—far more so than the earlier examples.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-04-13-design-patterns/chain-of-responsibility-pattern-uml-functional.png&#34; alt=&#34;Updated Chain of Responsibility pattern UML diagram&#34; title=&#34;Updated Chain of Responsibility pattern UML diagram&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;By decoupling the business domain (in this case, pie preparation) from the infrastructure (composed functions), we&amp;rsquo;re able to come up with much cleaner, terser code. Our behavioural classes (focusing around preparation) disappeared, leaving only the domain objects themselves (&lt;code&gt;UncookedPie&lt;/code&gt;, for example) and the methods on them (e.g. &lt;code&gt;cook&lt;/code&gt;), which is where the behaviour should probably live anyway.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Design Patterns in the 21st Century: The Adapter Pattern</title>
+      <link>http://codurance.com/blog/design-patterns-in-the-21st-century-part-three/</link>
+      <pubDate>Wed, 15 Apr 2015 14:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/design-patterns-in-the-21st-century-part-three/</guid>
+      <description>&lt;p&gt;This is part three of my talk, &lt;a href=&#34;http://talks.samirtalwar.com/design-patterns-in-the-21st-century.html&#34;&gt;Design Patterns in the 21st Century&lt;/a&gt;.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;The Adapter pattern bridges worlds. In one world, we have an interface for a concept; in another world, we have a different interface. These two interfaces serve different purposes, but sometimes we need to transfer things across. In a well-written universe, we can use &lt;em&gt;adapters&lt;/em&gt; to make objects following one protocol adhere to the other.&lt;/p&gt;
+
+&lt;p&gt;There are two kinds of Adapter pattern. We&amp;rsquo;re not going to talk about this one:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;interface Fire {
+    &amp;lt;T&amp;gt; Burnt&amp;lt;T&amp;gt; burn(T thing);
+}
+
+interface Oven {
+    Food cook(Food food);
+}
+
+class WoodFire implements Fire { ... }
+
+class MakeshiftOven extends WoodFire implements Oven {
+    @Override public Food cook(Food food) {
+        Burnt&amp;lt;Food&amp;gt; noms = burn(food);
+        return noms.scrapeOffBurntBits();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This form, the &lt;em&gt;class Adapter pattern&lt;/em&gt;, freaks me out, because &lt;code&gt;extends&lt;/code&gt; gives me the heebie jeebies. &lt;em&gt;Why&lt;/em&gt; is out of the scope of this essay; feel free to ask me any time and I&amp;rsquo;ll gladly talk your ears (and probably your nose) off about it.&lt;/p&gt;
+
+&lt;p&gt;Instead, let&amp;rsquo;s talk about the &lt;em&gt;object Adapter pattern&lt;/em&gt;, which is generally considered far more useful and flexible in all regards.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s take a look at the same class, following this alternative:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;class MakeshiftOven implements Oven {
+    private final Fire fire;
+
+    public MakeshiftOven(Fire fire) {
+        this.fire = fire;
+    }
+
+    @Override public Food cook(Food food) {
+        Burnt&amp;lt;Food&amp;gt; noms = fire.burn(food);
+        return noms.scrapeOffBurntBits();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And we&amp;rsquo;d use it like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Oven oven = new MakeshiftOven(fire);
+Food bakedPie = oven.cook(pie);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The pattern generally follows this simple structure:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-04-13-design-patterns/adapter-pattern-uml.png&#34; alt=&#34;Adapter pattern UML diagram&#34; title=&#34;Adapter pattern UML diagram&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;That&amp;rsquo;s nice, right?&lt;/p&gt;
+
+&lt;p&gt;Yes. Sort of. We can do better.&lt;/p&gt;
+
+&lt;p&gt;We already have a reference to a &lt;code&gt;Fire&lt;/code&gt;, so constructing another object just to play with it seems a bit… overkill. And that object implements &lt;code&gt;Oven&lt;/code&gt;. Which has a &lt;em&gt;single abstract method&lt;/em&gt;. I&amp;rsquo;m seeing a trend here.&lt;/p&gt;
+
+&lt;p&gt;Instead, we can make a function that does the same thing.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Oven oven = food -&amp;gt; fire.burn(food).scrapeOffBurntBits();
+Food bakedPie = oven.cook(pie);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We could go one further and compose method references, but it actually gets worse.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// Do *not* do this.
+Function&amp;lt;Food, Burnt&amp;lt;Food&amp;gt;&amp;gt; burn = fire::burn;
+Function&amp;lt;Food, Food&amp;gt; cook = burn.andThen(Burnt::scrapeOffBurntBits);
+Oven oven = cook::apply;
+Food bakedPie = oven.cook(pie);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This is because Java can&amp;rsquo;t convert between functional interfaces implicitly, so we need to give it lots of hints about what each phase of the operation is. Lambdas, on the other hand, are implicitly coercible to any functional interface with the right types, and the compiler does a pretty good job of figuring out how to do it.&lt;/p&gt;
+
+&lt;p&gt;Our new UML diagram will look something like this:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-04-13-design-patterns/adapter-pattern-uml-functional.png&#34; alt=&#34;Updated Adapter pattern UML diagram&#34; title=&#34;Updated Adapter pattern UML diagram&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;Often, though, all we really need is a method reference. For example, take the &lt;code&gt;Executor&lt;/code&gt; interface.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;package java.util.concurrent;
+
+/**
+ * An object that executes submitted {@link Runnable} tasks.
+ */
+public interface Executor {
+    void execute(Runnable command);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It consumes &lt;code&gt;Runnable&lt;/code&gt; objects, and it&amp;rsquo;s a very useful interface.&lt;/p&gt;
+
+&lt;p&gt;Now let&amp;rsquo;s say we have one of those, and a bunch of &lt;code&gt;Runnable&lt;/code&gt; tasks, held in a &lt;code&gt;Stream&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Executor executor = ...;
+Stream&amp;lt;Runnable&amp;gt; tasks = ...;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;How do we execute all of them on our &lt;code&gt;Executor&lt;/code&gt;?&lt;/p&gt;
+
+&lt;p&gt;This won&amp;rsquo;t work:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;tasks.forEach(executor);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It turns out the &lt;code&gt;forEach&lt;/code&gt; method on &lt;code&gt;Stream&lt;/code&gt; &lt;em&gt;does&lt;/em&gt; take a consumer, but a very specific type:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface Stream&amp;lt;T&amp;gt; {
+    ...
+
+    void forEach(Consumer&amp;lt;? super T&amp;gt; action);
+
+    ...
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;A &lt;code&gt;Consumer&lt;/code&gt; looks like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@FunctionalInterface
+public interface Consumer&amp;lt;T&amp;gt;
+{
+    void accept(T t);
+
+    ...
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;At first glance, that doesn&amp;rsquo;t look so helpful. But note that &lt;code&gt;Consumer&lt;/code&gt; is a functional interface, so we can use lambdas to specify them really easily. That means that we can do this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;tasks.forEach(task -&amp;gt; executor.execute(task));
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Which can be simplified further to this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;tasks.forEach(executor::execute);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Java 8 has made adapters so much simpler that I hesitate to call them a pattern any more. The concept is still very important; by explicitly creating adapters, we can keep these two worlds separate except at defined boundary points. The implementations, though? They&amp;rsquo;re just functions.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Tomorrow, we&amp;rsquo;ll be looking at the Chain of Responsibility pattern.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Design Patterns in the 21st Century: The Abstract Factory Pattern</title>
+      <link>http://codurance.com/blog/design-patterns-in-the-21st-century-part-two/</link>
+      <pubDate>Tue, 14 Apr 2015 10:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/design-patterns-in-the-21st-century-part-two/</guid>
+      <description>&lt;p&gt;This is part two of my talk, &lt;a href=&#34;http://talks.samirtalwar.com/design-patterns-in-the-21st-century.html&#34;&gt;Design Patterns in the 21st Century&lt;/a&gt;.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;This pattern is used &lt;em&gt;everywhere&lt;/em&gt; in Java code, especially in more &amp;ldquo;enterprisey&amp;rdquo; code bases. It involves an interface and an implementation. The interface looks something like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface Bakery {
+    Pastry bakePastry(Topping topping);
+    Cake bakeCake();
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And the implementation:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class DanishBakery implements Bakery {
+    @Override public Pastry bakePastry(Topping topping) {
+        return new DanishPastry(topping);
+    }
+
+    @Override public Cake bakeCake() {
+        return new Aeblekage(); // mmmm, apple cake...
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;More generally, the Abstract Factory pattern is usually implemented according to this structure.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-04-13-design-patterns/abstract-factory-pattern-uml.png&#34; alt=&#34;Abstract Factory pattern UML diagram&#34; title=&#34;Abstract Factory pattern UML diagram&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;In this example, &lt;code&gt;Pastry&lt;/code&gt; and &lt;code&gt;Cake&lt;/code&gt; are &amp;ldquo;abstract products&amp;rdquo;, and &lt;code&gt;Bakery&lt;/code&gt; is an &amp;ldquo;abstract factory&amp;rdquo;. Their implementations are the concrete variants.&lt;/p&gt;
+
+&lt;p&gt;Now, that&amp;rsquo;s a fairly general example.&lt;/p&gt;
+
+&lt;p&gt;In actual fact, most factories only have one &amp;ldquo;create&amp;rdquo; method.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@FunctionalInterface
+public interface Bakery {
+    Pastry bakePastry(Topping topping);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Oh look, it&amp;rsquo;s a function.&lt;/p&gt;
+
+&lt;p&gt;This denegerate case is pretty common in in the Abstract Factory pattern, as well as many others. While most of them provide for lots of discrete pieces of functionality, and so have lots of methods, we often tend to break them up into single-method types, either for flexibility or because we just don&amp;rsquo;t need more than one thing at a time.&lt;/p&gt;
+
+&lt;p&gt;So how would we implement this pastry maker?&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class DanishBakery implements Bakery {
+    @Override public Pastry apply(Topping topping) {
+        return new DanishPastry(Topping topping);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;OK, sure, that was easy. It looks the same as the earlier &lt;code&gt;DanishBakery&lt;/code&gt; except it can&amp;rsquo;t make cake. Delicious apple cake… what&amp;rsquo;s the point of that?&lt;/p&gt;
+
+&lt;p&gt;Well, if you remember, &lt;code&gt;Bakery&lt;/code&gt; has a &lt;strong&gt;Single Abstract Method&lt;/strong&gt;. This means it&amp;rsquo;s a &lt;strong&gt;Functional Interface&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;So what&amp;rsquo;s the functional equivalent to this?&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Bakery danishBakery = topping -&amp;gt; new DanishPastry(topping);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Or even:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Bakery danishBakery = DanishPastry::new;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Voila. Our &lt;code&gt;DanishBakery&lt;/code&gt; class has gone.&lt;/p&gt;
+
+&lt;p&gt;But we can go further.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;package java.util.function;
+/**
+ * Represents a function that
+ * accepts one argument and produces a result.
+ *
+ * @since 1.8
+ */
+@FunctionalInterface
+public interface Function&amp;lt;T, R&amp;gt; {
+    /**
+     * Applies this function to the given argument.
+     */
+    R apply(T t);
+
+    ...
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can replace the &lt;code&gt;Bakery&lt;/code&gt; with &lt;code&gt;Function&amp;lt;Topping, Pastry&amp;gt;&lt;/code&gt;; they have the same types.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Function&amp;lt;Topping, Pastry&amp;gt; danishBakery = DanishPastry::new;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In this case, we might want to keep it, as it has a name relevant to our business, but often, &lt;code&gt;Factory&lt;/code&gt;-like objects serve no real domain purpose except to help us decouple our code. (&lt;code&gt;UserServiceFactory&lt;/code&gt;, anyone?) This is brilliant, but on these occasions, we don&amp;rsquo;t need explicit classes for it—Java 8 has a bunch of interfaces built in, such as &lt;code&gt;Function&lt;/code&gt;, &lt;code&gt;Supplier&lt;/code&gt; and many more in the &lt;code&gt;java.util.function&lt;/code&gt; package, that suit our needs fairly well.&lt;/p&gt;
+
+&lt;p&gt;Here&amp;rsquo;s our updated UML diagram:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-04-13-design-patterns/abstract-factory-pattern-uml-functional.png&#34; alt=&#34;Updated Abstract Factory pattern UML diagram&#34; title=&#34;Updated Abstract Factory pattern UML diagram&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;Aaaaaah. Much better.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Tomorrow, we&amp;rsquo;ll be looking at the Adapter pattern.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Design Patterns in the 21st Century, Part One</title>
+      <link>http://codurance.com/blog/design-patterns-in-the-21st-century-part-one/</link>
+      <pubDate>Mon, 13 Apr 2015 12:30:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/design-patterns-in-the-21st-century-part-one/</guid>
+      <description>
+
+&lt;p&gt;I&amp;rsquo;ve been having a bit of trouble blogging recently. In an effort to get back into it, I thought I&amp;rsquo;d take &lt;a href=&#34;http://talks.samirtalwar.com/design-patterns-in-the-21st-century.html&#34;&gt;a talk that I presented at JAX London last year&lt;/a&gt;, split it up into blog-sized posts as it&amp;rsquo;s pretty long, and post them all week. If you haven&amp;rsquo;t read it before or seen the talk, I hope you enjoy it.&lt;/p&gt;
+
+&lt;p&gt;Oh, and if you&amp;rsquo;d rather just read the whole thing in one go, flick through the slides (which are almost entirely code), or watch the recorded version as a video, head to &lt;a href=&#34;http://talks.samirtalwar.com/design-patterns-in-the-21st-century.html&#34;&gt;my talks page&lt;/a&gt;.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&#34;what-do-you-want-from-me&#34;&gt;What do you want from me?&lt;/h3&gt;
+
+&lt;p&gt;I want you to stop using design patterns.&lt;/p&gt;
+
+&lt;h3 id=&#34;um&#34;&gt;Um…&lt;/h3&gt;
+
+&lt;p&gt;OK, let me rephrase that.&lt;/p&gt;
+
+&lt;p&gt;I want you to stop using design patterns like it&amp;rsquo;s &lt;em&gt;1999&lt;/em&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;this-is-a-book&#34;&gt;This is a book.&lt;/h2&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-04-13-design-patterns/book.jpg&#34; alt=&#34;Design Patterns, by Gamma, Helm, Johnson and Vlissides&#34; title=&#34;Design Patterns, by Gamma, Helm, Johnson and Vlissides&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;&lt;em&gt;Design Patterns&lt;/em&gt; was a book by the &amp;ldquo;Gang of Four&amp;rdquo;, first published very nearly 20 years ago (at the time of writing this essay), which attempted to canonicalise and formalise the tools that many experienced software developers and designers found themselves using over and over again.&lt;/p&gt;
+
+&lt;p&gt;The originator of the concept (and the term &amp;ldquo;design pattern&amp;rdquo;) was Christopher Alexander, who wasn&amp;rsquo;t a software developer at all. Alexander was an architect who came up with the idea of rigorously documenting common problems in design with their potential solutions.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The elements of this language are entities called patterns. Each pattern describes a problem that occurs over and over again in our environment, and then describes the core of the solution to that problem, in such a way that you can use this solution a million times over, without ever doing it the same way twice. &lt;cite&gt;— Christopher Alexander&lt;/cite&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Alexander, and the Gang of Four after him, did more than just document solutions to common problems in their respective universes. By naming these patterns and providing a good starting point, they hoped to provide a consistent &lt;em&gt;language&lt;/em&gt;, as well as providing these tools up front so that even novices might benefit from them.&lt;/p&gt;
+
+&lt;h2 id=&#34;and-now-an-aside-on-functional-programming&#34;&gt;And now, an aside, on functional programming.&lt;/h2&gt;
+
+&lt;p&gt;Functional programming is all about &lt;em&gt;&lt;del&gt;functions&lt;/del&gt; &lt;ins&gt;values&lt;/ins&gt;&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Values like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;int courses = 3;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;But also like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Course dessert = prepareCake.madeOf(chocolate);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Preparation prepareCake = new Preparation() {
+    @Override
+    public Course madeOf(Ingredient deliciousIngredient) {
+        return new CakeMix(eggs, butter, sugar)
+                .combinedWith(deliciousIngredient);
+    }
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Preparation looks like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@FunctionalInterface
+interface Preparation {
+    Course madeOf(Ingredient deliciousIngredient);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So of course, the &lt;code&gt;prepareCake&lt;/code&gt; object could also be written like this.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Preparation prepareCake =
+    deliciousIngredient -&amp;gt;
+        new CakeMix(eggs, butter, sugar)
+            .combinedWith(deliciousIngredient);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Because &lt;code&gt;Preparation&lt;/code&gt; is an interface with a &lt;strong&gt;Single Abstract Method&lt;/strong&gt;, any lambda with the same type signature as &lt;code&gt;Preparation&lt;/code&gt;&amp;rsquo;s method signature can be assigned to an object of type &lt;code&gt;Preparation&lt;/code&gt;. This means that &lt;code&gt;Preparation&lt;/code&gt; is a &lt;strong&gt;functional interface&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;We can go one further. Let&amp;rsquo;s extract that &lt;code&gt;new CakeMix&lt;/code&gt; out. Assuming it&amp;rsquo;s an immutable object with no external dependencies, this shouldn&amp;rsquo;t be a problem.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Mix mix = new CakeMix(eggs, butter, sugar);
+Preparation prepareCake =
+    deliciousIngredient -&amp;gt; mix.combinedWith(deliciousIngredient);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then we can collapse that lambda expression into a method reference.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Mix mix = new CakeMix(eggs, butter, sugar);
+Preparation prepareCake = mix::combinedWith;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;well&#34;&gt;Well.&lt;/h3&gt;
+
+&lt;p&gt;Yes. It&amp;rsquo;s weird, but it works out.&lt;/p&gt;
+
+&lt;p&gt;We&amp;rsquo;re assigning &lt;code&gt;prepareCake&lt;/code&gt; a reference to the &lt;code&gt;combinedWith&lt;/code&gt; method of &lt;code&gt;mix&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;mix::combinedWith
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;mix::combinedWith&lt;/code&gt; is a &lt;em&gt;method reference&lt;/em&gt;. Its type looks like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Course combinedWith(Ingredient);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And it&amp;rsquo;s (pretty much) exactly the same as &lt;code&gt;deliciousIngredient -&amp;gt; cakeMix.combinedWith(deliciousIngredient)&lt;/code&gt;. That means it conforms to our &lt;code&gt;Preparation&lt;/code&gt; interface above.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Tomorrow, we&amp;rsquo;ll take a look at the first of our design patterns, the Abstract Factory pattern. See you then.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Spring Integration based Dispatcher-Worker with Worker Queues</title>
+      <link>http://codurance.com/blog/spring-integration-based-dispatcher-worker-with-worker-queues/</link>
+      <pubDate>Sat, 12 Jan 2013 21:34:55 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/spring-integration-based-dispatcher-worker-with-worker-queues/</guid>
+      <description>&lt;p&gt;In the back-office world the central concept in most of the systems is one of a Trade. A Trade has many events (e.g. Inception, Amend, Novation, Termination). Generally events from different trades can be processed in parallel because they have no interdependencies, however, events from the same trade cannot be processed in parallel due to the fact that they modify the same internal instance of a Trade.&lt;/p&gt;
+
+&lt;p&gt;A useful pattern for this kind of scenario is dispatcher-worker with worker queues. Each worker has a job queue which it processes in a sequential fashion. Each job queue only contains events for a single trade. This allows parallel processing across trades while maintaining sequential processing on events for a single trade.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://mashb.files.wordpress.com/2013/01/dispatcher-worker.png&#34; alt=&#34;Dispatcher Worker&#34; title=&#34;Dispatcher Worker&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;I&amp;rsquo;ve developed simple version of this concept using Spring Integration. The first step is to create a Router that routes inbound trade events into channels that are specific to a trade. If the channel doesn&amp;rsquo;t exist then the Router will create a new one and register it with the Spring framework.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public String dispatch(CustomMessage inputMessage) {
+  String channelName = inputMessage.getId() + CHANNEL_SUFFIX;
+
+  synchronized (channelName.intern()) {
+    if (activeChannels.get(channelName) == null) {
+      QueueChannel activeChannel = createNewChannel(channelName);
+      PollingConsumer activeConsumer = createConsumerWithWorker(inputMessage, activeChannel);
+      activeConsumer.start();
+    }
+  }
+
+  return channelName;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Creation of a channel is the only place where synchronisation is required. We only synchronise on the channel name which corresponds to the trade id. Hence contention is minimal. I also attach a Polling Consumer to the channel at the point that the channel is created. Creation of a channel and registering it to Spring framework is quite straight forward as shown in the snippet below:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;private QueueChannel createNewChannel(String channelName) {
+  QueueChannel activeChannel = new QueueChannel();
+  activeChannel.setBeanName(channelName);
+  activeChannels.put(channelName, activeChannel);
+  applicationContext.getBeanFactory().registerSingleton(channelName, activeChannel);
+  return activeChannel;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Although I attach a Polling Consumer to each channel. We don&amp;rsquo;t have to have a thread per channel. We can use a Task Executor to run the polling consumers which will allow much better control over the number of concurrent threads in the system using a thread pool:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;private void startConsumingFromChannel(final String consumerName, final PollingConsumer activeConsumer) {
+  activeConsumer.setBeanName(consumerName);
+  activeConsumer.setAutoStartup(true);
+  activeConsumer.setBeanFactory(applicationContext.getBeanFactory());
+  activeConsumer.setTaskExecutor(consumerExecutorPool);
+  applicationContext.getBeanFactory().registerSingleton(consumerName, activeConsumer);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Finally (not yet implemented) you can run a Reaper Thread that can remove channels and consumers that have not seen activity for a specified threshold. You can also back the inbound channel with a Message Store to ensure that the system can come backup in a consistent state on failure.&lt;/p&gt;
+
+&lt;p&gt;The source code is at &lt;a href=&#34;https://github.com/mashooq/designpatterns/tree/master/dispatcherworker&#34;&gt;Github&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Saxon XQuery With Multiple Documents</title>
+      <link>http://codurance.com/blog/saxon-xquery-with-multiple-documents/</link>
+      <pubDate>Sat, 14 Jan 2012 20:53:44 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/saxon-xquery-with-multiple-documents/</guid>
+      <description>&lt;p&gt;Saxon is a wonderful API for XML processing. It provides complete support for XPath, XQuery and XSLT. Although I&amp;rsquo;m always baffled with it&amp;rsquo;s lack of adoption compared to Xalan and Xerces. Having said that the online documentation can definitely do with some improvement.  The following is a quick example of of how you may execute an XQuery that takes multiple XML documents as input.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
+public void runXQueryWithMultipleInputDocuments() throws SaxonApiException {
+    Processor processor = new Processor(false);
+
+    DocumentBuilder documentBuilder = processor.newDocumentBuilder();
+    XdmNode document = documentBuilder.build(
+            new StreamSource(new StringReader(&amp;quot;&amp;lt;my&amp;gt;&amp;lt;document&amp;gt;content&amp;lt;/document&amp;gt;&amp;lt;/my&amp;gt;&amp;quot;)));
+    XdmNode document2 = documentBuilder.build(
+            new StreamSource(new StringReader(&amp;quot;&amp;lt;my&amp;gt;&amp;lt;document&amp;gt;content2&amp;lt;/document&amp;gt;&amp;lt;/my&amp;gt;&amp;quot;)));
+
+    XQueryCompiler xQueryCompiler = processor.newXQueryCompiler();
+    XQueryExecutable xQueryExecutable = xQueryCompiler.compile(
+            &amp;quot;declare variable $mydoc external; &amp;quot; +
+            &amp;quot;declare variable $mydoc2 external; &amp;quot; +
+            &amp;quot;&amp;lt;newdoc&amp;gt;&amp;lt;doc1&amp;gt;{$mydoc/my/document/text()}&amp;lt;/doc1&amp;gt;&amp;quot; +
+            &amp;quot;&amp;lt;doc2&amp;gt;{$mydoc2/my/document/text()}&amp;lt;/doc2&amp;gt;&amp;lt;/newdoc&amp;gt;&amp;quot;);
+
+    XQueryEvaluator xQueryEvaluator = xQueryExecutable.load();
+
+    QName name = new QName(&amp;quot;mydoc&amp;quot;);
+    xQueryEvaluator.setExternalVariable(name, document);
+    QName name2 = new QName(&amp;quot;mydoc2&amp;quot;);
+    xQueryEvaluator.setExternalVariable(name2, document2);
+
+    System.out.println(xQueryEvaluator.evaluate());
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This result is an output of:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;  &amp;lt;newdoc&amp;gt;
+   &amp;lt;doc1&amp;gt;content&amp;lt;/doc1&amp;gt;
+   &amp;lt;doc2&amp;gt;content2&amp;lt;/doc2&amp;gt;
+&amp;lt;/newdoc&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>JVM Profiling: Thread Dumps</title>
+      <link>http://codurance.com/2010/02/26/jvm-profiling-thread-dumps/</link>
+      <pubDate>Fri, 26 Feb 2010 14:25:09 +0000</pubDate>
+      
+      <guid>http://codurance.com/2010/02/26/jvm-profiling-thread-dumps/</guid>
+      <description>&lt;p&gt;Thread dumps are possilby the most useful tool in diagnosing concurrancy related issues. You can get a thread dump at any time by sending a break signal to the JVM. In Windows it&amp;rsquo;s &lt;code&gt;CTRL-Break&lt;/code&gt; and in Unix/Linux it&amp;rsquo;s &lt;code&gt;kill -3 &amp;lt;pid&amp;gt;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;The possible issues to look for are:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Deadlocks: You &amp;rsquo;ll find something similar to &amp;ldquo;&lt;code&gt;Found one Java-level deadlock:&amp;quot;&lt;/code&gt; in the tread dump. Have a look &lt;a href=&#34;http://java.sun.com/docs/books/tutorial/essential/concurrency/deadlock.html&#34;&gt;here&lt;/a&gt; for an explanation of deadlocks.&lt;/li&gt;
+&lt;li&gt;Blocked: If there a number of threads blocked then look in the thread dump if they are blocked on the same monitor. This will indicate a heavily contented resource. You can see which thread has locked on the monitor by searching for &amp;ldquo;&lt;code&gt;locked &amp;lt;monitor_id&amp;gt;&lt;/code&gt;&amp;rdquo;. You may want to review the design of this code (if you can change it) to ensure that you&amp;rsquo;re not over-zealous with locking or that the locking thread is not blocking on another monitor. Have a look at &lt;a href=&#34;http://en.wikipedia.org/wiki/Software_transactional_memory&#34;&gt;Software Transactional Memory &lt;/a&gt; for a possible alternative to locking.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;You may also use &amp;ldquo;Thread Telemetry&amp;rdquo; view avialable in most JVM profiling tools (e.g. JProbe, JProfiler, YourKit etc.). This gives you an historical view of thread states in the JVM. Very useful for monitoring JVM performance over a period of time and spotting live-lock situations.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Find the jar file containing a class</title>
+      <link>http://codurance.com/blog/find-the-jar-file-containing-a-class/</link>
+      <pubDate>Wed, 13 Jan 2010 14:17:09 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/find-the-jar-file-containing-a-class/</guid>
+      <description>&lt;p&gt;I often need to know which jar file contains a particular class and I&amp;rsquo;m sure most people have that problem at some point. You can use &lt;a href=&#34;http://www.jarfinder.com&#34;&gt;jarFinder&lt;/a&gt; but it&amp;rsquo;s not always up-to-date or the class might be in a jar private to your organisation. You can use the following command to do a search on your file systems for all jars, and search in them for the class you&amp;rsquo;re trying to find:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;    find -name *.jar -print -exec jar tvf {} \; | egrep &amp;quot;\.jar|&amp;lt;Class Name&amp;gt;&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Replace &lt;em&gt;Class Name&lt;/em&gt; with the name of your class (Case sensitive). Use &lt;a href=&#34;http://www.cygwin.com/&#34;&gt;cygwin &lt;/a&gt;if you are on windows.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

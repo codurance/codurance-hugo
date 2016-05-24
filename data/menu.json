@@ -1,0 +1,58 @@
+[
+  {
+    "partial": "page/menu_group",
+    "name": "Services",
+    "links": [
+      {
+        "name": "Software Creation",
+        "url": "/services/software-creation"
+      },
+      {
+        "name": "Training",
+        "url": "/services/training"
+      }
+    ]
+  },
+  {
+    "partial": "page/menu_item",
+    "name": "Videos",
+    "url": "/videos"
+  },
+  {
+    "partial": "page/menu_item",
+    "name": "Blog",
+    "url": "/blog"
+  },
+  {
+    "partial": "page/menu_group",
+    "name": "About Us ",
+    "links": [
+      {
+        "name": "Our Team",
+        "url": "/aboutus/ourteam"
+      },
+      {
+        "name": "Our Company",
+        "url": "/aboutus/ourcompany"
+      },
+      {
+        "name": "Our Practices",
+        "url": "/aboutus/ourpractices"
+      },
+      {
+        "name": "Our Community",
+        "url": "http://www.meetup.com/london-software-craftsmanship"
+      }
+    ]
+  },
+  {
+    "partial": "page/menu_item",
+    "name": "Work with us",
+    "url": "/work-with-us"
+  },
+  {
+    "partial": "page/menu_item",
+    "name": "Contact Us",
+    "url": "/aboutus/contact"
+  }
+]

@@ -1,0 +1,5 @@
+{{ if .IsNamedParams }}
+<img src="{{ .Get "src" }}" {{ if .Get "title" }}alt="{{ .Get "title" }}" title="{{ .Get "title" }}"{{ end }} class="img img-responsive style-screengrab"{{ if .Get "style" }} style="{{ .Get "style" | safeCSS }}"{{ end }}/>
+{{ else }}
+<img src="{{ .Get 0 }}" {{ if len .Params | eq 2 }}alt="{{ .Get 1 }}" title="{{ .Get 1 }}"{{ end }} class="img img-responsive style-screengrab"{{ if len .Params | eq 3 }} style="{{ .Get 2 | safeCSS }}"{{ end }}/>
+{{ end }}

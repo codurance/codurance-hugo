@@ -1,0 +1,12 @@
+name = "Codurance"
+license = "MIT"
+licenselink = "https://github.com/yourname/yourtheme/blob/master/LICENSE.md"
+description = ""
+homepage = "http://codurance.com/"
+tags = ["company", "blog"]
+features = ["blog", "services"]
+min_version = 0.15
+
+[author]
+  name = "Codurance"
+  homepage = "http://codurance.com/"

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Javascript on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/javascript/</link>
+    <description>Recent content in Javascript on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Tue, 17 Mar 2015 10:49:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/javascript/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>JavaScript - A Tough Love</title>
+      <link>http://codurance.com/blog/javascript-a_tough_love/</link>
+      <pubDate>Tue, 17 Mar 2015 10:49:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/javascript-a_tough_love/</guid>
+      <description>
+
+&lt;p&gt;In the 90’s we were witnesses of browser wars. Wars which created one of the most hated languages: Javascript. Web designers touch by Javascript at the beginning of 21st century constantly refused to fix bugs titled as “It doesn’t work in Internet Explorer” or “Netscape Navigator doesn’t show…”. At this time we used pure languages and tried to understand the design of our web browser in order to cope with compatibility issues.&lt;/p&gt;
+
+&lt;p&gt;Thanks to DOM, DHTML and Ajax, JavaScript went to another level. It became “lingua franca” for those who wanted to create dynamic web pages not web business cards. Now, with Node.js, we can also implement server-side applications in Javascript.&lt;/p&gt;
+
+&lt;p&gt;So, why we do we hate it so much?&lt;/p&gt;
+
+&lt;h2 id=&#34;why-i-don-t-hate-javascript-anymore&#34;&gt;Why I don’t hate Javascript anymore&lt;/h2&gt;
+
+&lt;p&gt;When I start to speak about JavaScript with people focused on another language e.g. Java I can hear some noises of pain, discomfort or a tortured human being. Aversion to Javascript was probably imprinted in all software communities during 90’s and it infected next generations. I understand that maybe in 2005 writing JavaScript code was still a painful process, because of insufficient tools, meaningless error messages and slow engines. JavaScript is no longer a slow and clumsy brother of Java.&lt;/p&gt;
+
+&lt;h3 id=&#34;i-ve-got-a-framework&#34;&gt;I’ve got a framework&lt;/h3&gt;
+
+&lt;p&gt;Without JavaScript it would be impossible to create dynamic applications. Document Object Model (DOM) gave us the possibility to respond to user interaction in the same way as in a desktop application. JQuery-like libraries created a layer of abstraction above DOM and they enriched web elements with behaviours. That wasn’t enough for Javascript developers. More complex web sites required better structure of source code. The answer for this was the need of a JavaScript framework.&lt;/p&gt;
+
+&lt;p&gt;Javascript frameworks organise code and simplify interaction with web browser. Some of the more popular ones being &lt;a href=&#34;https://angularjs.org/&#34;&gt;AngularJS&lt;/a&gt;, &lt;a href=&#34;http://backbonejs.org/&#34;&gt;Backbone&lt;/a&gt;, &lt;a href=&#34;http://emberjs.com/&#34;&gt;Ember&lt;/a&gt; or &lt;a href=&#34;http://knockoutjs.com/&#34;&gt;Knockout&lt;/a&gt;. They base themselves on the MVC model and models derived from MVC. If you don’t like the approach represented by them you can choose more exotic frameworks such as &lt;a href=&#34;http://www.polymer-project.org&#34;&gt;Polymer&lt;/a&gt; and &lt;a href=&#34;http://facebook.github.io/react/&#34;&gt;React&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;i-ve-got-a-test&#34;&gt;I’ve got a test&lt;/h3&gt;
+
+&lt;p&gt;The source code cannot exist without tests. &lt;a href=&#34;http://qunitjs.com/&#34;&gt;QUnit&lt;/a&gt;, &lt;a href=&#34;http://jasmine.github.io/&#34;&gt;Jasmine&lt;/a&gt; or &lt;a href=&#34;http://mochajs.org/&#34;&gt;Mocha&lt;/a&gt; are unit test frameworks that can help you to test your code. Unit test libraries already provide basic assertions, but you can extend this functionality by using &lt;a href=&#34;http://chaijs.com/&#34;&gt;chai&lt;/a&gt; or &lt;a href=&#34;http://shouldjs.github.io/&#34;&gt;should.js&lt;/a&gt; libraries. If you want to use mocks, stubs and spies in your code, there are libraries for that too (e.g. &lt;a href=&#34;http://sinonjs.org/&#34;&gt;sinon&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;Node.js is the best choice if you need some environment to run tests. &lt;a href=&#34;http://karma-runner.github.io/&#34;&gt;Karma&lt;/a&gt; or &lt;a href=&#34;https://github.com/airportyh/testem&#34;&gt;Testem&lt;/a&gt; give us possibility to verify behaviours in web browsers. Tests can be also executed as part of a Continuous Integration pipeline using a headless browser (&lt;a href=&#34;http://phantomjs.org/&#34;&gt;PhantomJS&lt;/a&gt;).&lt;/p&gt;
+
+&lt;h3 id=&#34;i-ve-got-a-choice&#34;&gt;I’ve got a choice&lt;/h3&gt;
+
+&lt;p&gt;If you still don’t like JavaScript, you can find languages that can ease you into it. CoffeScript, TypeScript, ClojureScript and Dart are languages which introduce syntactical sugar and they are transcompiled to JavaScript.&lt;/p&gt;
+
+&lt;h2 id=&#34;embrace-javascript&#34;&gt;Embrace JavaScript&lt;/h2&gt;
+
+&lt;p&gt;Currently we don’t have better alternative for JavaScript in web browsers. Until then we can make our lives better by embracing it, knowing that at times it can be ugly and harsh. Be kind to the unwanted child of the browser wars.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Team on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/team/</link>
+    <description>Recent content in Team on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Sat, 13 Jun 2015 19:00:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/team/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Big Data Skills Spectrum</title>
+      <link>http://codurance.com/blog/big-data-skills-spectrum/</link>
+      <pubDate>Sat, 13 Jun 2015 19:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/big-data-skills-spectrum/</guid>
+      <description>
+
+&lt;p&gt;Big Data has been a hype for many years. I’ve seen a few “Big Data” projects start in the past with a lot of fanfare and promise.The promise has always been that “we will start getting a holistic picture of our departmental silos and gain numerous insights from our data that will help us get ahead of our competitors”. The promise was rarely, if ever, fulfilled and the “Big Data” team slowly faded into the rest of the melting pot that we call the “IT department” in most large enterprises.&lt;/p&gt;
+
+&lt;p&gt;Part of the problem is how we build these Big Data teams. The technology and expertise in these teams have been primarily Java / C# developers, Relational DBAs, some Business Objects type skills (essentially basic reporting), ETL primarily using SQL and Stored Procedures. Recently I’ve seen use of less traditional databases, such as Mark Logic with XQuery, taking the place of SQL as well as compute grids and data grids like Gigaspaces and Gemfire. In all of these cases the solutions or the skills in the team were not aligned with the aspiration of the business.&lt;/p&gt;
+
+&lt;p&gt;Recently we have had the chance to build a Big Data team for one of our clients. We know we have very large quantities of data to deal with. Some of the processing can happen in batch but other aspects needs to happen in real-time. We have a few ideas for the kind of insights that we are looking for but also know that mostly we don’t know what kind of insights the data can provide and how it will help us drive better features for our customers.&lt;/p&gt;
+
+&lt;p&gt;We are lucky that the Big Data space has matured in the past few years. From technology point of view certain leaders have emerged. Hadoop and Cassandra have been around for a while. We have Kafka for highly scalable events processing, we have Spark, Storm, Scalding etc. for ETL and machine style jobs. Machine Learning libraries are maturing, languages such as R are gaining wider adoption, and Data Science is emerging as a bonafide profession.&lt;/p&gt;
+
+&lt;h2 id=&#34;team-skills-spectrum&#34;&gt;Team Skills Spectrum&lt;/h2&gt;
+
+&lt;p&gt;Creating a modern Big Data team requires a spectrum of skills:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/big-data-spectrum.jpg&#34; alt=&#34;Skills Spectrum&#34; title=&#34;Skills Spectrum&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;h3 id=&#34;fine-tuning&#34;&gt;Fine Tuning&lt;/h3&gt;
+
+&lt;p&gt;Big Data, if you truly have big data, requires a scalable solution. Solutions of this size, open source or commercial, will require some fine tuning with regards to performance, reliability, security, and maintainability. The way you use underlying technologies will need be sympathetic to how the technology works best. Fine Tuning happens throughout the lifecycle of your software and not just in production. You will require expertise in the technologies you are using. At least a subset of the team must have a working understanding in this area but that is not enough. It is advisable to have regular, not necessarily full-time, fine tuning expertise available in your team.&lt;/p&gt;
+
+&lt;h3 id=&#34;data-modeling&#34;&gt;Data Modeling&lt;/h3&gt;
+
+&lt;p&gt;Good Data Modelling is a dying skill in my experience but not any less important. In fact with Big Data this skill is more and more relevant. How you model data from different perspectives is paramount to its usefulness. This skill is essentially one of a good Business Analyst with an emphasis on data. The role also requires an innate understanding of the business. Modelling, visualising, adapting, and evolving data according to the business needs is a role in its own right and must not be overlooked.&lt;/p&gt;
+
+&lt;h3 id=&#34;deployment-automation&#34;&gt;Deployment Automation&lt;/h3&gt;
+
+&lt;p&gt;Big Data solutions are generally very complex and have many moving parts. Deployment Automation is absolutely necessary to keep control of these highly distributed environments. Environment provisioning and deployment automation will not only reduce the risk of things going wrong in production but also enable more comprehensive testing — both automated and exploratory.&lt;/p&gt;
+
+&lt;h3 id=&#34;etl-development&#34;&gt;ETL Development&lt;/h3&gt;
+
+&lt;p&gt;I call this ETL development for want of a better term. ETL in the traditional sense is only a part of this role. This is the software development part of your software. Some aspects will require more traditional Extract-Transform-Load of data, other aspects will require productionising of the Data Science algorithms. XP development practices such as TDD ad Continuous Integration are as applicable here as much as any other type of software development.&lt;/p&gt;
+
+&lt;h3 id=&#34;practical-data-science&#34;&gt;Practical Data Science&lt;/h3&gt;
+
+&lt;p&gt;These are ETL developers who have a good understanding of data mining and predictive analytics fields or Data Scientist who are also good developers. They may also have a good grasp of Data Modelling. An excellent grasp of both development and data science is quite rare however people who specialise in one but also have a good grasp of the other are not so rare.&lt;/p&gt;
+
+&lt;h3 id=&#34;theoretical-data-science&#34;&gt;Theoretical Data Science&lt;/h3&gt;
+
+&lt;p&gt;These are hardcore specialists who live and breath statistical modelling and Data Mining theory. Their job is come up with novel answers from the data which can then be productionised by the developers. It is very important that they are provided with suitable environments where they can experiment with different models using representative data. They are effectively the research and development end of the team.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-whole-team&#34;&gt;The whole Team&lt;/h2&gt;
+
+&lt;p&gt;A well balanced team is as always made up of &lt;a href=&#34;https://en.wikipedia.org/wiki/T-shaped_skills&#34;&gt;T-Shaped&lt;/a&gt; skills where each team member contributes across disciplines with other experts in the team. Extreme Programing practices and Software Craftsmanship principles are as appropriate here as on any other software development team.&lt;/p&gt;
+
+&lt;p&gt;It is very important to understand that a Big Data team has its own specialist spectrum of skills. Some of these skills are very different to the ones found in most general software development teams. Taking a general development team and calling them them “The Big Data team” will not bring the benefits of “Big Data” to your organisation. You will need to ensure that the spectrum of skills listed here are also part of that team.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Project Documentation</title>
+      <link>http://codurance.com/blog/project-documentation/</link>
+      <pubDate>Thu, 07 Feb 2013 17:59:29 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/project-documentation/</guid>
+      <description>&lt;p&gt;Our project has a number of places where we keep documentation. To name but a few we have a Wiki, Sharepoint Site, Jira etc. When I want to know something that is specific to my project the first place I look is my e-mail archive or shout a question to my team and if it&amp;rsquo;s a general question about a framework or library then I go for the Google.&lt;/p&gt;
+
+&lt;p&gt;We had an issue today with the Oracle Pooled Datasource XML Type handling. Our XML retrieval was coming back with an extra space in the middle of the document. Naturally this was a general question and we hit Google. A few people had some similar issues and had some not so great workarounds mentioned. I then happened to be talking to one of my colleagues and mentioned the problem to him. He told me that they faced this problem a while back and developed a much nicer work around. I would&amp;rsquo;ve gone with the ugly workaround from the web if I hadn&amp;rsquo;t spoken to him.&lt;/p&gt;
+
+&lt;p&gt;So why the long story; well if the web is the first place we hit for general questions then why don&amp;rsquo;t we document our general questions on the web so that we may have a better chance of finding it rather than buried deep in someone&amp;rsquo;s mail trail or an internal wiki or even worse in someone&amp;rsquo;s head.&lt;/p&gt;
+
+&lt;p&gt;The same goes for project specific documentation - often the most useful insights are buried in mail trails - that&amp;rsquo;s why I search my mail archive before I look anywhere else. It&amp;rsquo;s not the most effective place to keep some of the most valuable project documentation. The problem is some of these valuable mail trails start with some ad-hoc point-to-point conversation.&lt;/p&gt;
+
+&lt;p&gt;I once worked on a project where they had an internal version of Stack Overflow and all discussion, questions, insights, messages were conducted using this application creating a wealth of searchable project documentation. However this does not fit the bill completely because you have to make a conscious decision that the point-to-point conversation you are about to have will end up in a valuable mail trail.&lt;/p&gt;
+
+&lt;p&gt;Only if there was a button to &amp;ldquo;promote&amp;rdquo; a mail-trail into a searchable forum? Maybe there is - I&amp;rsquo;m hitting Google &amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,72 @@
+<div class="container content">
+    <div class="headline-center margin-bottom-50">
+        <h2>Our Team</h2>
+    </div>
+
+    {{ $ourteam := where .Site.Pages "Type" "ourteam" }}
+    {{ $numberOfMembers := len $ourteam }}
+
+    {{ range $index, $page := $ourteam }}
+        {{ $beginningOfRow := eq (mod $index 2) 0 }}
+        {{ $lastMember := eq (add $index 1) $numberOfMembers }}
+        {{ if $beginningOfRow }}
+            {{ $notFirstRow := ne $index 0 }}
+            {{ if $notFirstRow }}
+    </div>
+            {{ end }}
+    <div class="row team margin-bottom-40">
+        {{ end }}
+        <div class="col-sm-6 profile-window profile-window-grow" data-toggle="modal" data-target=".team-{{ replace .Params.name " " "-" | lower }}">
+            <div class="col-sm-6">
+                <img class="img-responsive" src="{{ .Params.image }}" />
+            </div>
+            <div class="col-sm-6"> <!-- Inner Right Column -->
+                <h3>{{ .Params.name }} <br><small>{{ .Params.role }}</small></h3>
+                <div>
+                    <p>{{ .Params.short_description | safeHTML }}</p>
+                    <i class="fa fa-plus" style="color: #e67e22;">
+                    </i>
+                    <span style="color: #e67e22;">Read more</span>
+                </div>
+                <ul class="list-unstyled list-inline team-socail">
+                    <li><a href="http://twitter.com/{{ .Params.twitter }}"><i class="fa fa-twitter"></i></a></li>
+                    {{ if .Params.github }}
+                    <li><a href="http://github.com/{{ .Params.github }}"><i class="fa fa-github"></i></a></li>
+                    {{ end }}
+                </ul>
+            </div>
+        </div>
+
+        {{ if $lastMember }}
+    </div>
+        {{ end }}
+    {{ end }}
+
+    <!--MODAL CLASS -->
+    {{ range $index, $page := $ourteam }}
+    <div class="modal fade team-{{ replace .Params.name " " "-" | lower }}" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog profile-window modal-window">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">x</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3>{{ .Params.name }}<br> <small>{{ .Params.role }}</small></h3>
+                </div>
+                <div class="modal-body">
+                    <p><img class="img-responsive margin-bottom-30 profile-image" src="{{ .Params.image }}" alt="{{ .Params.name }}">
+                    </p>
+                    {{ .Params.full_description | safeHTML }}
+                    <ul class="list-unstyled list-inline team-socail">
+                        <li><a href="http://twitter.com/{{ .Params.twitter }}"><i class="fa fa-twitter fa-3x"></i></a></li>
+                        {{ if .Params.github }}
+                        <li><a href="http://github.com/{{ .Params.github }}"><i class="fa fa-github fa-3x"></i></a></li>
+                        {{ end }}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ end }}
+</div>
