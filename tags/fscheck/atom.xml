@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Fscheck on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/fscheck/</link>
+    <description>Recent content in Fscheck on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Wed, 25 Nov 2015 09:00:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/fscheck/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Property based testing</title>
+      <link>http://codurance.com/blog/property-based-testing/</link>
+      <pubDate>Wed, 25 Nov 2015 09:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/property-based-testing/</guid>
+      <description>
+
+&lt;h3 id=&#34;background&#34;&gt;Background&lt;/h3&gt;
+
+&lt;p&gt;Craftsmanship in software strives for high, predictable, repeatable and affordable quality. This is the reason why we care about design, code reviews and of course testing.
+Test Driven Development helps us create a flexible implementation that meets the expectations of our clients in terms of features, performance and quality. As professionals we have to master as many tools as possible to reach our goal of steadily providing value.&lt;/p&gt;
+
+&lt;h3 id=&#34;property-based-testing&#34;&gt;Property based testing&lt;/h3&gt;
+
+&lt;p&gt;The above is the reason why I am exploring Property Based Testing. I like to think about it as &lt;em&gt;&amp;ldquo;Let the machine do the heavy lifting for you&amp;rdquo;&lt;/em&gt; or as &lt;a href=&#34;http://vimeo.com/68383317&#34;&gt;John Huges&lt;/a&gt; says &lt;em&gt;&amp;ldquo;Don&amp;rsquo;t write tests, generate them&amp;rdquo;&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;I am not claiming that you should stop writing unit tests. I find that when driving the design &lt;a href=&#34;https://www.youtube.com/watch?v=XHnuMjah6ps&#34;&gt;Outside-in&lt;/a&gt; hence declaring the relations between my components, unit tests are the tool to use.
+Sometimes when I want to discover deeper properties of my domain, I am faced with features that have more edge cases than my brain could handle.
+In such cases, generating a wide array of inputs to test my program is appealing. This is where I think property testing becomes a viable tool.&lt;/p&gt;
+
+&lt;p&gt;If you are asking &amp;ldquo;How can I set up a development environment in .NET that would allow me to experiment and work with this tool?&amp;rdquo; the following tutorial is for you.&lt;/p&gt;
+
+&lt;h3 id=&#34;development-environment-details&#34;&gt;Development environment details&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Windows 10 Home Edition&lt;/li&gt;
+&lt;li&gt;Visual Studio 2013 version 12 Update 5&lt;/li&gt;
+&lt;li&gt;Resharper version 8.2.3&lt;/li&gt;
+&lt;li&gt;NCrunch version 1.48.0.5&lt;/li&gt;
+&lt;li&gt;FsCheck version 2.2.2&lt;/li&gt;
+&lt;li&gt;FsCheck.NUnit version 2.2.2&lt;/li&gt;
+&lt;li&gt;NUnit version 2.6.4&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;steps&#34;&gt;Steps&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Open Visual Studio and create an F# Project&lt;/li&gt;
+&lt;li&gt;Open the Nuget Package Manager following &lt;em&gt;TOOLS &amp;gt; Nuget Package Manager &amp;gt; Package Manager Console&lt;/em&gt; from the main menu and type
+
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;Install-Package FsCheck&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Install-Package FsCheck.Nunit&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Comment out the content in &lt;strong&gt;FsCheckAddin.fs&lt;/strong&gt; file to allow &lt;a href=&#34;http://www.ncrunch.net/&#34;&gt;NCrunch&lt;/a&gt; to run the tests&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-cs&#34;&gt;    //[&amp;lt;NUnitAddin(Description = &amp;quot;FsCheck addin&amp;quot;)&amp;gt;] 
+    //type FsCheckAddin() = 
+    //  interface IAddin with 
+    //      override x.Install host = 
+    //          let tcBuilder = new FsCheckTestCaseBuilder() 
+    //          host.GetExtensionPoint(&amp;quot;TestCaseBuilders&amp;quot;).Install(tcBuilder) 
+    //          true 
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;In your test file add the following&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-cs&#34;&gt;    module Properties = 
+        
+        open NUnit.Framework 
+        open FsCheck
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Add this test to enable &lt;a href=&#34;http://www.ncrunch.net/&#34;&gt;NCrunch&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-cs&#34;&gt;        //Needed to enable NCrunch 
+        [&amp;lt;Ignore&amp;gt;][&amp;lt;Test&amp;gt;] 
+        let ignoreMe() = () 
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Create a static class whose methods are the properties you want to test. For this example I&amp;rsquo;ll test an incorrect implementation of a list - &lt;strong&gt;the reverse of a list is always equal to the original&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-cs&#34;&gt;        type ListProperties =     
+            // Note: should fail     
+            static member reverseIsAsTheOriginal (xs:int list) =          
+                List.rev xs = xs
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Add the following test to verify the property defined in the &lt;code&gt;ListProperties&lt;/code&gt; type&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-cs&#34;&gt;        [&amp;lt;Test&amp;gt;] 
+        let verifyAll () =      
+            Check.QuickThrowOnFailureAll&amp;lt;ListProperties&amp;gt;()
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Enable &lt;a href=&#34;http://www.ncrunch.net/&#34;&gt;NCrunch&lt;/a&gt; following &lt;em&gt;NCRUNCH &amp;gt; Enable NCrunch&lt;/em&gt; from the main menu and let the engine catch the error&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;If everything is in place you should see the visual error for the feedback
+&lt;center&gt;&lt;img class=&#34;img-responsive&#34; class=&#34;img-responsive&#34; src=&#34;http://codurance.com/assets/img/custom/blog/2015-11-25-Property-based-testing/NCrunch-visual-feed-back-error.png&#34;&gt;&lt;/center&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Run All Tests in the Resharper Runner to check the output
+&lt;center&gt;&lt;img class=&#34;img-responsive&#34; src=&#34;http://codurance.com/assets/img/custom/blog/2015-11-25-Property-based-testing/Resharper-tests-run-error.png&#34;&gt;&lt;/center&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;You should read a message similar to&lt;/p&gt;
+
+&lt;p&gt;~~~console
+&amp;mdash; Checking ListProperties &amp;mdash;
+System.Reflection.TargetInvocationException : Exception has been thrown by the target of an invocation.
+  &amp;mdash;-&amp;gt; System.Exception : ListProperties.ReverseOfReverseIsAsTheOriginal-Falsifiable, after 6 tests (3 shrinks) (StdGen (1165808905,296086422)):
+Original:
+[-1; 2; -2]
+Shrunk:
+    [1; 0]
+~~&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;This shows that the property was falsifiable (as expected) but let&amp;rsquo;s try to gather more informations to address the issue&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Change the test so that it provides a verbose output when failing&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-cs&#34;&gt;        [&amp;lt;Test&amp;gt;] 
+        let verifyAll () = 
+            Check.VerboseThrowOnFailureAll&amp;lt;ListProperties&amp;gt;()
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Re-run the tests through Resharper Runner and read the output&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-console&#34;&gt;    --- Checking ListProperties ---
+    0:
+    [-2]
+    1:
+    [-2; -2]
+    2:
+    []
+    3:
+    [1; 1]
+    4:
+    [-2]
+    5:
+    [-3; 1; 5; -3; 6; 2; 6; -2]
+    shrink:
+    [1; 5; -3; 6; 2; 6; -2]
+    shrink:
+    [5; -3; 6; 2; 6; -2]
+    shrink:
+    [-3; 6; 2; 6; -2]
+    shrink:
+    [6; 2; 6; -2]
+    shrink:
+    [2; 6; -2]
+    shrink:
+    [6; -2]
+    shrink:
+    [6; 2]
+    shrink:
+    [6; 0]
+    shrink:
+    [3; 0]
+    shrink:
+    [2; 0]
+    shrink:
+    [1; 0]
+    System.Reflection.TargetInvocationException : Exception has been thrown by the target of an invocation.
+      ----&amp;gt; System.Exception : ListProperties.ReverseOfReverseIsAsTheOriginal-Falsifiable, after 6 tests (11 shrinks) (StdGen (1681135586,296086423)):
+    Original:
+    [-3; 1; 5; -3; 6; 2; 6; -2]
+    Shrunk:
+    [1; 0]
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;The output shows the &amp;ldquo;shrinking process&amp;rdquo; from the sixth input (identified by 5:) original value &lt;code&gt;[-3; 1; 5; -3; 6; 2; 6; -2]&lt;/code&gt; to the  &amp;ldquo;shrunk&amp;rdquo; (reduced) input &lt;code&gt;[1; 0]&lt;/code&gt; that still falsifies (makes it fail) the property&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Let&amp;rsquo;s correct the property as &lt;strong&gt;the reverse of the reverse of a list is equal to the original&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-cs&#34;&gt;        type ListProperties =
+            static member ReverseOfReverseIsAsTheOriginal (xs:int list) = 
+                List.rev (List.rev xs) = xs
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Re-run the tests that should be all green by now and read the output. You&amp;rsquo;ll notice it&amp;rsquo;s very verbose as expected and shows all the inputs used to verify the property.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;You are now ready to experiment with &lt;a href=&#34;http://fscheck.github.io/FsCheck/index.html&#34;&gt;FsCheck&lt;/a&gt;!
+&lt;a href=&#34;https://twitter.com/Parajao&#34;&gt;Let me know&lt;/a&gt; what is your experience with property based testing in F#.&lt;/p&gt;
+
+&lt;h3 id=&#34;resources&#34;&gt;Resources:&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://fscheck.github.io/FsCheck/index.html&#34;&gt;FsCheck&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.ncrunch.net/&#34;&gt;NCrunch&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.eecs.northwestern.edu/~robby/courses/395-495-2009-fall/quick.pdf&#34;&gt;QuickCheck&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.packtpub.com/application-development/testing-f&#34;&gt;Testing FSharp&lt;/a&gt; Chapter 11&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

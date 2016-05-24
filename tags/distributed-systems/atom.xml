@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Distributed Systems on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/distributed-systems/</link>
+    <description>Recent content in Distributed Systems on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Thu, 28 Apr 2016 00:20:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/distributed-systems/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Async systems with sync clients</title>
+      <link>http://codurance.com/blog/Async-systems-with-sync-clients/</link>
+      <pubDate>Thu, 28 Apr 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/Async-systems-with-sync-clients/</guid>
+      <description>
+
+&lt;p&gt;As the &lt;a href=&#34;http://www.reactivemanifesto.org/&#34;&gt;Reactive Manifesto&lt;/a&gt; says Reactive systems are:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Responsive&lt;/li&gt;
+&lt;li&gt;Resilient&lt;/li&gt;
+&lt;li&gt;Elastic&lt;/li&gt;
+&lt;li&gt;Message Driven&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The last principle often goes together with non-blocking async protocols. This style of communication &amp;ldquo;allows recipients to only consume resources while staying active, leading to less system overhead&amp;rdquo;. This fits perfectly with new demands of efficiency derived from the elastic model of cloud providers. However not every system is async and integrating an async system with a sync client could be tricky.&lt;/p&gt;
+
+&lt;h2 id=&#34;integration-strategies&#34;&gt;Integration Strategies&lt;/h2&gt;
+
+&lt;p&gt;We can fix the mismatch of communication styles through a couple of strategies.&lt;/p&gt;
+
+&lt;h3 id=&#34;polling&#34;&gt;Polling&lt;/h3&gt;
+
+&lt;p&gt;This involves work for both parties. First round trip of this protocol involves client sending some request to the server with an outcome of ACK/NACK. This is called fire and forget. Assuming HTTP, the server will return status code 202 (Accepted). The async process will eventually succeed or fail and that result will be exposed by the server via a different endpoint. The client will have to periodically poll that endpoint to figure out the status of the operation.&lt;/p&gt;
+
+&lt;p&gt;Polling is by nature inefficient but could be a good solution when the technological stack doesn&amp;rsquo;t allow bidirectional protocols like &lt;a href=&#34;https://www.wikiwand.com/en/WebSocket&#34;&gt;Web Sockets&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;hiding-asynchronicity&#34;&gt;Hiding asynchronicity&lt;/h3&gt;
+
+&lt;p&gt;If we don&amp;rsquo;t have control over those clients, we&amp;rsquo;ll probably have to hide our async nature under some sync layer. That layer will implement a polling or pub/sub mechanism bounded by a timeout.&lt;/p&gt;
+
+&lt;h2 id=&#34;learning-by-example&#34;&gt;Learning by example&lt;/h2&gt;
+
+&lt;p&gt;In this series of posts we&amp;rsquo;ll implement last strategy with a pub/sub mechanism. We&amp;rsquo;ll add some essential complexities to our domain to make the exercise more juicy.&lt;/p&gt;
+
+&lt;p&gt;We&amp;rsquo;ll be working on something similar to &lt;a href=&#34;https://craigslist.org&#34;&gt;Craiglist&lt;/a&gt;, a website with classified advertisements. However our platform will have a social focus (as everything nowadays). That means that a user can post an item into some group and/or to her followers. People can report dubious items and we will take seriously those reports as they&amp;rsquo;re threats to our reputation. So much so that the authorities have direct access to an API that can take down an item immediately.&lt;/p&gt;
+
+&lt;p&gt;Our system is formed by several microservices based on &lt;a href=&#34;http://akka.io/&#34;&gt;Akka&lt;/a&gt;, using &lt;a href=&#34;http://kafka.apache.org/&#34;&gt;Kafka&lt;/a&gt; for inter-process communication. The police platform has only sync clients and they don&amp;rsquo;t seem keen to implement a polling mechanism to verify that an item has been actually removed. We need to communicate with them synchronously and that&amp;rsquo;s not negotiable. In the next posts we&amp;rsquo;ll see the details of our solution, but as an advancement, let&amp;rsquo;s see the high level architecture. Don&amp;rsquo;t worry if you don&amp;rsquo;t understand everything yet.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/law_enforcement.png&#34; alt=&#34;Law enforcement architecture&#34; title=&#34;Law enforcement architecture&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;&lt;a href=&#34;http://codurance.com/2016/04/28/async-systems-with-sync-clients/&#34;&gt;Part 1&lt;/a&gt; | &lt;a href=&#34;http://codurance.com/2016/04/30/akka-basics/&#34;&gt;Part 2&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Sorted pagination in Cassandra</title>
+      <link>http://codurance.com/blog/sorted-pagination-in-cassandra/</link>
+      <pubDate>Sun, 17 Apr 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/sorted-pagination-in-cassandra/</guid>
+      <description>
+
+&lt;p&gt;Cassandra is a fantastic database for different use cases. There are different situations when you need to twist Cassandra a little and studying one of those could be a helpful exercise to better understand what is Cassandra about. Databases are complex beasts, approaching them with the right level of abstraction is vital. Their final goal is not storing data per se, but make that data accessible. Those read patterns will define which database is the best tool for the job.&lt;/p&gt;
+
+&lt;h2 id=&#34;time-series-in-cassandra&#34;&gt;Time series in Cassandra&lt;/h2&gt;
+
+&lt;p&gt;A time series is a collection of data related to some variable. Facebook&amp;rsquo;s timeline would be a great example. A user will write a serie of posts over time. The access patterns to that data will be something like &amp;lsquo;return the 20 last posts of user 1234&amp;rsquo;. The DDL of a table that models that query would be:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;CREATE TABLE timeline (
+	user_id uuid,
+	post_id timeuuid,
+	content text,
+	PRIMARY KEY (user_id, post_id)
+)
+WITH CLUSTERING ORDER BY (post_id DESC);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In Cassandra Primary Keys are formed by Partition Keys and Clustering Keys. Primary keys enforce the uniqueness of some cells in a different way to relational databases. There is no strong enforcement of that uniqueness, if you try to insert some cell related to an already existing primary key, that will be updated. Also the other way around: a &amp;lsquo;missing&amp;rsquo; update will end up as insert. That&amp;rsquo;s called upsert.&lt;/p&gt;
+
+&lt;p&gt;Partition keys ensure in which node of the cluster the data is going to live. If you include at least one clustering key, the partition key will identify N rows. That could be confusing for someone coming from traditional relational databases. Cassandra does its best trying to bring its concepts into SQL terminology, but sometimes it could be weird for newbies. An example of Timeline table would be:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-console&#34;&gt;user_id--------------------------------post_id--------content
+346e896a-c6b4-4d4e-826d-a5a9eda50636---today----------Hi
+346e896a-c6b4-4d4e-826d-a5a9eda50636---yesterday------Hola
+346e896a-c6b4-4d4e-826d-a5a9eda50636---one week ago---Bye
+346e896a-c6b4-4d4e-826d-a5a9eda50636---two weeks ago--Ciao
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In order to understand the example I converted post_id values into something that makes sense for the reader. As you can see there are several values with the same partition key (user_id) and that works as we defined a clustering key (post_id) that clusters those values and sorts them (descending in this case). Remember that uniqueness is defined by the primary key (partition plus clustering key) so if we insert a row identified with &amp;lsquo;346e896a-c6b4-4d4e-826d-a5a9eda50636&amp;rsquo; and &amp;lsquo;today&amp;rsquo; the content will be updated. Nothing gets really updated in disk as Cassandra works with immutable structures in disk, but at read time different writes with the same primary key will be resolved in descending order.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s see some queries to finish this example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;SELECT * FROM timeline
+where user_id = 346e896a-c6b4-4d4e-826d-a5a9eda50636
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;-&amp;gt; It will return four rows sorted by post_id DESC&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;SELECT content FROM timeline
+where user_id = 346e896a-c6b4-4d4e-826d-a5a9eda50636 LIMIT 1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;-&amp;gt; It will return &amp;lsquo;Hi&amp;rsquo;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;SELECT content FROM
+timeline where user_id = 346e896a-c6b4-4d4e-826d-a5a9eda50636 and post_id &amp;gt; today LIMIT 2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;-&amp;gt; It will return &amp;lsquo;Hola&amp;rsquo; and &amp;lsquo;Bye&amp;rsquo;&lt;/p&gt;
+
+&lt;p&gt;As you can see implementing sorted pagination is extremely easy when modeling Time Series in Cassandra. Besides it will be super performant as Cassandra stores all the rows identified by a single partition key in the same node, so a single roundtrip will be needed to fetch this data (assuming read consistency level ONE)&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s see what happens when we want to implement sorted pagination in a different use case.&lt;/p&gt;
+
+&lt;h2 id=&#34;sorted-sets-in-cassandra&#34;&gt;Sorted sets in Cassandra&lt;/h2&gt;
+
+&lt;p&gt;If we think in the previous example at data structure abstraction level, we can see that we just modeled a Map whose values are Sorted Sets. What happens if we want to model something like a Sorted Set with Cassandra?&lt;/p&gt;
+
+&lt;p&gt;Our scenario is the following. The users of our system can be suspended or unsuspended through some admin portal. The admins would like to have a look into the last users that have been suspended along the suspension&amp;rsquo;s reason in order to verify that decision or revoke it. That&amp;rsquo;s pretty similar to our previous paginated queries so let&amp;rsquo;s how we can model that with Cassandra.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;CREATE TABLE suspended_users (
+	user_id uuid,
+	occurred_on timestamp,
+	reason text
+)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I&amp;rsquo;ve deliberately left out the Primary Key from this DDL so we can discuss different options.&lt;/p&gt;
+
+&lt;h2 id=&#34;understanding-clustering-keys&#34;&gt;Understanding Clustering Keys&lt;/h2&gt;
+
+&lt;p&gt;Previously we used clustering keys to provide some order into our data. Let&amp;rsquo;s go with that option:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;PRIMARY KEY (user_id, occurred_on)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Can you see what is wrong with this? Forget about implementation details for a second and answer this question, how many times a user will appear in this table? As your self-elected product owner I&amp;rsquo;ll say that only one. Once a user is unsuspended I&amp;rsquo;d like to remove the user from that table and a user that is suspended can&amp;rsquo;t be suspended again. Next question: where do we want to keep some order? Not inside users (even less in this case, as our single user will be always &amp;lsquo;ordered&amp;rsquo;), but amongst users. This design won&amp;rsquo;t work.&lt;/p&gt;
+
+&lt;h2 id=&#34;understanding-partition-keys-and-partitioners&#34;&gt;Understanding Partition Keys and Partitioners&lt;/h2&gt;
+
+&lt;p&gt;I have a new bit of information that might help you. This table will be updated in real time, so that means that this table should keep some kind of logical insertion order. As we didn&amp;rsquo;t get into the details of Cassandra we could think that the following will work:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;PRIMARY KEY (user_id)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let&amp;rsquo;s see how that logical insertion order maps into the physical one. Cassandra stores its data in a ring of nodes. Each node gets assigned one token (or several if we use vnodes). When you CRUD some data Cassandra will calculate where in the ring lives that data using a &lt;a href=&#34;http://docs.datastax.com/en/cassandra/2.0/cassandra/architecture/architecturePartitionerM3P_c.html&#34;&gt;Partitioner&lt;/a&gt; that will hash the Partition Key. When using recommended partitioners &lt;a href=&#34;http://docs.datastax.com/en/cql/3.1/cql/cql_using/paging_c.html&#34;&gt;Cassandra rows are ordered by the hash of their value and hence the order of rows is not meaningful&lt;/a&gt;, so that logical insertion order will be logical and nothing else. That means that this query will return 20 users without any meaningful order:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;SELECT * FROM suspended_users LIMIT 20;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Using the token function we could paginate large sets of data as it was explained in &lt;a href=&#34;http://docs.datastax.com/en/cql/3.1/cql/cql_using/paging_c.html&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;SELECT * FROM suspended_users where token(user_id) &amp;gt; token([Last user_id received]) LIMIT 20;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;However, we want to paginate a sorted set by suspension time and descending.&lt;/p&gt;
+
+&lt;h2 id=&#34;presenting-reverse-lookups&#34;&gt;Presenting Reverse Lookups&lt;/h2&gt;
+
+&lt;p&gt;Denormalisation is something usual in Cassandra. In order to overcome restrictions imposed by Cassandra implementation, denormalising our data is a suggested approach. Thanks to our previous example we understood that to keep some order between data we need to cluster it. Nobody forces us to use a suspended_users table even if our domain talks about it. As we need some fixed variable to create a time serie, we&amp;rsquo;ll go with the status:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;CREATE TABLE users_by_status (
+  status text,
+  occurred_on timestamp,
+  user_id uuid
+  reason text,
+  PRIMARY KEY (status, occurred_on, user_id)
+) WITH CLUSTERING ORDER BY (occurred_on DESC);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Partition and clustering keys can be compounded. In this particular key, &amp;lsquo;status&amp;rsquo; will be the partition key and &amp;lsquo;occurred_on&amp;rsquo;/&amp;lsquo;user_id&amp;rsquo; the clustering key. Default order is ASC, so that&amp;rsquo;s why we specified &amp;lsquo;occurred_on&amp;rsquo; DESC inside of CLUSTERING ORDER BY. It&amp;rsquo;s important to note that &amp;lsquo;user_id&amp;rsquo; will serve for uniqueness purposes in this design even if it will order rows in the unlikely case of two users being suspended at the very exact time.&lt;/p&gt;
+
+&lt;p&gt;Now that we created an &amp;lsquo;artificial&amp;rsquo; clustering, we can paginate in a sorted way like in our first example. This presents several problems though. Cassandra won&amp;rsquo;t split data inside of a row, and the recommended maximum size of rows inside of a partition is 200k. If you foresee that your system will grow more than that you can split the rows with the technique of compounds partitions keys using temporal buckets.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;CREATE TABLE users_by_status (
+  bucket text,
+  status text,
+  occurred_on timestamp,
+  user_id uuid
+  reason text,
+  PRIMARY KEY ((bucket, status), occurred_on, user_id)
+) WITH CLUSTERING ORDER BY (occurred_on DESC);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Being the bucket something like MM-YYYY or whatever fine-grained precission that your data will suggest you. Here I present a new bit of CQL (Cassandra Query Language) that is compounded partition keys. As you can see whatever is inside of those nested parentheses will be the partition key.&lt;/p&gt;
+
+&lt;p&gt;Next issue is how we will delete or update users that need to be unsuspended. The admin could have the user_id and occured_on and that wouldn&amp;rsquo;t be a problem as he could do a query like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;DELETE FROM users_by_status WHERE status = &#39;SUSPENDED&#39; and occurred_on = ... and user_id = ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Unfortunately that admin could get a request from some privileged managers to unsuspend a user. The manager don&amp;rsquo;t know when the suspension happened, they only know who is the user. That means that we can&amp;rsquo;t access to the concrete row as we don&amp;rsquo;t have &amp;lsquo;occurred_on&amp;rsquo;. Remember that to query in Cassandra you need to provide the whole partition key (otherwise Cassandra won&amp;rsquo;t know in which node it has to go to fetch the data) and optional parts of the clustering key (but always from left to right).&lt;/p&gt;
+
+&lt;p&gt;In order to overcome this issue we could create a secondary index into &amp;lsquo;user_id&amp;rsquo; column. In relational databases, indexes allow us to query faster some data creating a denormalised structure. In Cassandra those secondary indexes allows us query by columns that otherwise will be impossible to use. However, they&amp;rsquo;re disencouraged as they&amp;rsquo;re a great hit in performance, as they require several roundtrips into different nodes.&lt;/p&gt;
+
+&lt;p&gt;Next solution is creating our own secondary index manually in something called reverse lookup. Let&amp;rsquo;s see how it looks:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;CREATE TABLE suspended_users (
+  user_id uuid,
+  occurred_on timestamp,
+  PRIMARY KEY (user_id)
+);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This table will serve us as reverse lookup. Just having the &amp;lsquo;user_id&amp;rsquo; we&amp;rsquo;ll be able to access to &amp;lsquo;occurred_on&amp;rsquo; value and then we&amp;rsquo;ll be able to query users_by_status table. This approach has some drawbacks. Whenever we insert or delete a user we&amp;rsquo;ll have to go to two tables, but that&amp;rsquo;s a fixed number. With a secondary index we will have to go to N nodes in the worst case. So it goes from O(1) to O(N). Our code will be more complicated also, as we&amp;rsquo;ll have to contact with two different tables.&lt;/p&gt;
+
+&lt;p&gt;That presents a more serious drawback that is eventual consistency and transactions in Cassandra. Transactions are not built in the core of Cassandra (there are concepts like lightweight transactions or batches, but those are inefficient too), so that means that our code needs to take care manually about transactions.&lt;/p&gt;
+
+&lt;p&gt;If we want to delete a user we should start from users_by_status table. If we start the other way around, and the second deletion fails, we&amp;rsquo;ll be unable to delete in the future that row as we&amp;rsquo;ve deleted the reverse lookup entry. We can introduce the Saga pattern that basically defines a rollback nemesis in every single step of a programmatic transaction.&lt;/p&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;CONCLUSION&lt;/h2&gt;
+
+&lt;p&gt;As you could see, something pretty straightforward in a relational database as querying paginated a set of sorted data, could be tricky in Cassandra as soon as we introduce some requirements. If your infrastructure allows it, you should use a polyglot persistence approach that uses the best tool for every use case. Anyway, Cassandra gives you enough flexibility to model data even when it&amp;rsquo;s not its best use case.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Coupling in distributed systems</title>
+      <link>http://codurance.com/blog/coupling-in-distributed-systems/</link>
+      <pubDate>Sun, 07 Feb 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/coupling-in-distributed-systems/</guid>
+      <description>
+
+&lt;p&gt;Coupling and cohesion are key quality indicators. We strive for systems highly cohesive and loosely coupled, but high doesn&amp;rsquo;t mean pure. The same goes with functional programming, we aim for isolating and reducing side effects, but we need them unless we want a useless system. It&amp;rsquo;s good to modularise our systems, so whenever those modules need to talk to each other they&amp;rsquo;ll effectively couple themselves. Our work is to create cohesive modules and minimising coupling as much as possible.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s provide an example. Our system has the following structure:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Different deployables, aka, microservices architecture.&lt;/li&gt;
+&lt;li&gt;Intracommunication through &lt;a href=&#34;http://kafka.apache.org/&#34;&gt;Kafka&lt;/a&gt; (pub-sub messaging). No HTTP involved.&lt;/li&gt;
+&lt;li&gt;1 Producer to N Consumers scenarios.&lt;/li&gt;
+&lt;li&gt;Json for data serialization.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The messages that are published and consumed in this system have a schema and it&amp;rsquo;s our choice making it implicit or explicit and validating that schema at compile or runtime execution. Before analysing the trade-offs of every approach let&amp;rsquo;s say some words about compile vs runtime approaches.&lt;/p&gt;
+
+&lt;h2 id=&#34;proofing-software-correctness-as-soon-as-possible&#34;&gt;Proofing software correctness as soon as possible&lt;/h2&gt;
+
+&lt;p&gt;I&amp;rsquo;ve been a user of statically typed languages most of my career so I&amp;rsquo;m really biased with this topic. I strongly believe in Lean concepts as the importance of minimising waste. At the same time I love the therapeutic ideas behind Agile, TDD or BDD about exposing the truth as soon as possible. Static types, and in the end the compiler, help me to achieve those goals.&lt;/p&gt;
+
+&lt;p&gt;I would prefer spending my time creating tests under the &lt;a href=&#34;https://twitter.com/sarahmei/status/685907333889810432&#34;&gt;motivations&lt;/a&gt; of providing living documentation, easing future refactors or helping me to drive the design, more than helping catching bugs that the type system should take care of. Writing a test that checks the behaviour of a method when receiving null it&amp;rsquo;s a waste of time if we can make it impossible to write a line of code that passes a null.&lt;/p&gt;
+
+&lt;p&gt;Compile world is not perfect though, as it&amp;rsquo;s definitively slower on development and constrains developers (someone could say that less freedom might be a nice to have in this context)&lt;/p&gt;
+
+&lt;h2 id=&#34;runtime-approaches&#34;&gt;Runtime approaches&lt;/h2&gt;
+
+&lt;p&gt;Now that I&amp;rsquo;ve been honest with you about my compile bias I can explain different approaches and trade-offs for the schema validation problem.&lt;/p&gt;
+
+&lt;h3 id=&#34;implicit-schemas&#34;&gt;Implicit schemas&lt;/h3&gt;
+
+&lt;p&gt;First runtime approach is the loosest one: using implicit schemas and trusting in the good will of producers. As nobody is checking the validity of messages before being published into Kafka that means that consumers could blow up.&lt;/p&gt;
+
+&lt;p&gt;First corrective measure is assuring that only the processing of the poisoned message will blow and not the whole consumer. An example of that would be providing a resume supervision strategy on &lt;a href=&#34;http://doc.akka.io/docs/akka-stream-and-http-experimental/2.0.2/scala.html&#34;&gt;Akka Streams&lt;/a&gt; when the message doesn&amp;rsquo;t hold the expected implicit schema.&lt;/p&gt;
+
+&lt;p&gt;Second corrective measure would be not simply swallowing those crashes but being able to communicate them to proper actors (being humans or software). Good practice is to provide dead letter queues for poisoned messages just in case we want to manipulate and retry the processing of those messages at that level.&lt;/p&gt;
+
+&lt;p&gt;Before getting into explicit schemas I would say that those measures are usually not enough but they are a good safety net, as shit happens, and we need to be prepared.&lt;/p&gt;
+
+&lt;h3 id=&#34;explicit-schemas&#34;&gt;Explicit schemas&lt;/h3&gt;
+
+&lt;p&gt;If we want to avoid poisoned messages getting into our topics we could provide a middle-man service to intercept and validate explicit schemas. &lt;a href=&#34;http://docs.confluent.io/1.0/schema-registry/docs/index.html&#34;&gt;Schema registry&lt;/a&gt; is an example of that for Kafka, and its documentation is full of insights about how to implement that in a distributed, highly available and scalable way.&lt;/p&gt;
+
+&lt;p&gt;That&amp;rsquo;s an integration service that could be a single point of failure but, at the same time, it could be valuable to have a centralised repo of schemas when we have a lot of consumers and the complexity of the system would be hard to grasp in de-centralised fashion. That service will be stateless so in order to avoid single point of failures we could make it redundant in a farm of services to allow high availability.&lt;/p&gt;
+
+&lt;h2 id=&#34;compile-approaches&#34;&gt;Compile approaches&lt;/h2&gt;
+
+&lt;p&gt;The last approach would be creating software that makes it impossible to create message that do not hold the expected schema. Assuming &lt;a href=&#34;http://www.scala-lang.org/&#34;&gt;Scala&lt;/a&gt;, we could create a jar that contains &lt;a href=&#34;http://docs.scala-lang.org/tutorials/tour/case-classes.html&#34;&gt;case classes&lt;/a&gt; that are object materialisations of a schema.&lt;/p&gt;
+
+&lt;p&gt;What are the benefits of this approach?&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Fail early. We don&amp;rsquo;t have to wait until testing or production to verify that the messages published by some producer are correct.&lt;/li&gt;
+&lt;li&gt;Centralised knowledge.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;What is the solvable problem?&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Cascade updates. If our microservices live in different repos, then we need to make sure that updates into that common binary are applied into producer and consumers. That&amp;rsquo;s cumbersome and if it&amp;rsquo;s not done could generate unexpected bugs as we introduced a false sense of security with that library. That could be solved using a &lt;a href=&#34;http://danluu.com/monorepo/&#34;&gt;monorepo&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;What is the biggest problem?&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Breaking isolation of deployables. One of the points of microservices is being able to deploy its services independently. If you&amp;rsquo;re forced to redeploy N consumer services every time you upgrade the consumer with a non-backward compatible change of the schema library then you&amp;rsquo;re losing that perk. Being able to do small releases is a big enabler of Continuous Delivery, so it&amp;rsquo;s a remarkable loss.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;You could argue that only non-backward compatible changes forces a redeploy of consumers and that we should design our schemas in a way that predicts and minimises those kind of changes.&lt;/p&gt;
+
+&lt;h2 id=&#34;generalising-coupling-problem&#34;&gt;Generalising coupling problem&lt;/h2&gt;
+
+&lt;p&gt;If we generalise the problem we&amp;rsquo;ll see that there are two kinds of coupling: avoidable and mandatory.&lt;/p&gt;
+
+&lt;p&gt;Avoidable coupling comes when we strive for reducing duplication in our codebase. Let&amp;rsquo;s say that we want to extract some requestId from the header of a HTTP request and put it into some &lt;a href=&#34;http://logback.qos.ch/manual/mdc.html&#34;&gt;MDC&lt;/a&gt; in order to be able to trace logs across different threads or services. That code will hardly vary from service to service so it&amp;rsquo;s a good candidate to be extracted and therefore adding some coupling between services. Before of doing that it&amp;rsquo;s good to think in the following:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Coupling is the enemy of microservices and its effects in the future are not easy visible.&lt;/li&gt;
+&lt;li&gt;Following &lt;a href=&#34;https://www.wikiwand.com/en/Conway&#39;s_law&#34;&gt;Conway&amp;rsquo;s law&lt;/a&gt;, breaking isolation of your services breaks the isolation of your teams, so be sure that your organisation is able to cope with that level of communication and integration.&lt;/li&gt;
+&lt;li&gt;The key measure is the rate change. A library that is going to be constantly updated (as could be your schema library) will be more painful to manage as a common dependency than some fairly static library.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Mandatory coupling comes when some info needs to reside in a third entity as it doesn&amp;rsquo;t make sense to be hold by one of the integration entities or it&amp;rsquo;s not worthy to share and duplicate that info into every single entity.&lt;/p&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Even if I am a strong supporter of compiled languages, I think that sharing code through binaries in a distributed environment deserves a deep analysis of the structure and needs of your system. I hope that this post have provided some insights into this topic.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

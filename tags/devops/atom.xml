@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Devops on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/devops/</link>
+    <description>Recent content in Devops on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Wed, 11 May 2016 00:20:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/devops/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>AWS Lambda for Beginners</title>
+      <link>http://codurance.com/blog/aws-lambdas/</link>
+      <pubDate>Wed, 11 May 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/aws-lambdas/</guid>
+      <description>
+
+&lt;p&gt;AWS Lambda is a compute service from Amazon. It makes deployment and provisioning very simple and fits very well with microservices based architecture. You can find out more about AWS Lambda &lt;a href=&#34;http://docs.aws.amazon.com/lambda/latest/dg/welcome.html&#34;&gt;here&lt;/a&gt;. Currently supported platforms are JVM, Node JS and Python.&lt;/p&gt;
+
+&lt;p&gt;The programming model for the lambdas consists of &lt;strong&gt;Handler, Context Object, Logging and Exceptions&lt;/strong&gt;. These are described &lt;a href=&#34;http://docs.aws.amazon.com/lambda/latest/dg/programming-model-v2.html&#34;&gt;here&lt;/a&gt;. Lambda must not hold state because they are brought up and down and replicated as needed. Persistent state should be stored in a service that is outside the lifecycle of the lambda such as Amazon DynamoDB, S3 etc.&lt;/p&gt;
+
+&lt;p&gt;First of all follow the instructions &lt;a href=&#34;http://docs.aws.amazon.com/lambda/latest/dg/setup.html&#34;&gt;here&lt;/a&gt; to setup an AWS Account and AWS Command-line Interface and note down your account id.&lt;/p&gt;
+
+&lt;h3 id=&#34;step-1-the-code&#34;&gt;Step 1: The Code&lt;/h3&gt;
+
+&lt;p&gt;The most basic lambda will look like the following in Python:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def lambda_handler(event, context):
+  return &amp;quot;Hello World!&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;or like the following in Java:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;package example;
+
+import com.amazonaws.services.lambda.runtime.Context; 
+
+public class Hello {
+    public String lambdaHandler(String event, Context context) {
+        return &amp;quot;Hello World!&amp;quot;;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You can follow the, somewhat lengthy, instructions &lt;a href=&#34;http://docs.aws.amazon.com/lambda/latest/dg/get-started-create-function.html&#34;&gt;here&lt;/a&gt; to deploy this function … but that’s no fun! Let’s do it devops style ;)&lt;/p&gt;
+
+&lt;p&gt;Paste the above Python code in a file called &lt;code&gt;helloworld.py&lt;/code&gt;. If you want to use the Java version then follow the instructions &lt;a href=&#34;http://docs.aws.amazon.com/lambda/latest/dg/java-create-jar-pkg-maven-no-ide.html&#34;&gt;here&lt;/a&gt; to build your lambda and create a deployment package using Maven.&lt;/p&gt;
+
+&lt;h3 id=&#34;step-2-the-role&#34;&gt;Step 2: The Role&lt;/h3&gt;
+
+&lt;p&gt;Create a &lt;code&gt;trust.json&lt;/code&gt; file . The trust allows our function to assume the &lt;a href=&#34;http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html&#34;&gt;role&lt;/a&gt; of an AWS Lambda.&lt;/p&gt;
+
+&lt;p&gt;In &lt;code&gt;trust.json&lt;/code&gt; we are allowing the function to assume the role of a &lt;code&gt;lambda.amazonaws.com&lt;/code&gt; service, otherwise the infra will not allow our function to run.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
+  &amp;quot;Version&amp;quot;: &amp;quot;2012-10-17&amp;quot;,
+  &amp;quot;Statement&amp;quot;: [{
+    &amp;quot;Sid&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;Effect&amp;quot;: &amp;quot;Allow&amp;quot;,
+    &amp;quot;Principal&amp;quot;: {
+      &amp;quot;Service&amp;quot;: &amp;quot;lambda.amazonaws.com&amp;quot;
+    },
+    &amp;quot;Action&amp;quot;: &amp;quot;sts:AssumeRole&amp;quot;
+  }]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;step-3-the-deployment&#34;&gt;Step 3: The Deployment&lt;/h3&gt;
+
+&lt;p&gt;Create the following script (&lt;code&gt;deploy.sh&lt;/code&gt;). &lt;em&gt;Note: the script assumes that you have the &lt;code&gt;AWS_ACCOUNT_ID&lt;/code&gt; environment variable set.&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;#!/bin/bash
+
+### Create the lambda package
+zip -j helloworld.zip *.py
+
+### Create the role for the lambda to assume
+role=&amp;quot;helloworld_exec_role&amp;quot;
+trust=&amp;quot;trust.json&amp;quot;
+aws iam create-role --role-name $role --assume-role-policy-document file://$trust
+aws iam update-assume-role-policy --role-name $role --policy-document file://$trust
+
+### Create the lambda function
+function_name=&amp;quot;helloworld&amp;quot;
+handler_name=&amp;quot;helloworld.lambda_handler&amp;quot;
+package_file=helloworld.zip
+runtime=python2.7
+aws lambda create-function \
+  --function-name $function_name \
+  --handler $handler_name \
+  --runtime $runtime \
+  --memory 512 \
+  --timeout 60 \
+  --role arn:aws:iam::${AWS_ACCOUNT_ID}:role/$role \
+  --zip-file fileb://$package_file
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;or for Java:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;#!/bin/bash
+
+### Create the lambda package
+mvn package
+
+### Create the role for the lambda to assume
+role=&amp;quot;helloworld_exec_role&amp;quot;
+trust=&amp;quot;trust.json&amp;quot;
+aws iam create-role --role-name $role --assume-role-policy-document file://$trust
+aws iam update-assume-role-policy --role-name $role --policy-document file://$trust
+
+### Create the lambda function
+function_name=&amp;quot;helloworld&amp;quot;
+handler_name=&amp;quot;example.Hello::lambdaHandler&amp;quot;
+package_file=&amp;quot;target/lambda-java-example-1.0-SNAPSHOT.jar&amp;quot;
+runtime=&amp;quot;java8&amp;quot;
+aws lambda create-function \
+  --function-name $function_name \
+  --handler $handler_name \
+  --runtime $runtime \
+  --memory 512 \
+  --timeout 60 \
+  --role arn:aws:iam::${AWS_ACCOUNT_ID}:role/$role \
+  --zip-file fileb://${package_file}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Make the script executable &lt;code&gt;chmod +x deploy.sh&lt;/code&gt; and deploy your lambda &lt;code&gt;./deploy.sh&lt;/code&gt;. You may get the following error: &amp;ldquo;The role defined for the function cannot be assumed by Lambda.&amp;rdquo; This is because the role has not been replicated through in the Amazon infra. Just run the deploy script again. It will complain that the role already exists but this time the lambda creation should pass. In the future we will look at a status check to make sure that the role has been fully created before we deploy the function.&lt;/p&gt;
+
+&lt;h3 id=&#34;step-5-the-execution&#34;&gt;Step 5: The Execution!&lt;/h3&gt;
+
+&lt;p&gt;Invoke your lambda with the below command. You should see the result in the file called &lt;code&gt;output.txt&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;aws lambda invoke --invocation-type RequestResponse --function-name helloworld --payload &#39;[&amp;quot;&amp;quot;]&#39; output.txt
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;step-6-the-cleanup&#34;&gt;Step 6: The Cleanup&lt;/h3&gt;
+
+&lt;p&gt;To delete the lambda function and then the role paste the following in &lt;code&gt;delete.sh&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;#!/bin/bash
+role=&amp;quot;helloworld_exec_role&amp;quot;
+function_name=&amp;quot;helloworld&amp;quot;
+aws lambda delete-function --function-name $function_name
+aws iam delete-role --role-name $role
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then make the script executable &lt;code&gt;chmod +x delete.sh&lt;/code&gt; and execute &lt;code&gt;./delete.sh&lt;/code&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;step-7-relax-you-have-arrived&#34;&gt;Step 7: Relax &amp;hellip; you have arrived ;)&lt;/h3&gt;
+
+&lt;p&gt;&amp;hellip; and wait for the next post on AWS frolics&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Containers all the way through...</title>
+      <link>http://codurance.com/blog/containers-all-the-way-through/</link>
+      <pubDate>Wed, 16 Mar 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/containers-all-the-way-through/</guid>
+      <description>
+
+&lt;p&gt;In this post I will attempt to cover fundamentals of &lt;strong&gt;Bare Metal Systems&lt;/strong&gt;, &lt;strong&gt;Virtual Systems&lt;/strong&gt; and &lt;strong&gt;Container Systems&lt;/strong&gt;. And the purpose for doing so is to learn about these systems as they stand and also the differences between them, focusing on how they execute programs in their respective environments.&lt;/p&gt;
+
+&lt;h3 id=&#34;bare-metal-systems&#34;&gt;Bare Metal Systems&lt;/h3&gt;
+
+&lt;p&gt;Let&amp;rsquo;s think of our Bare Metal Systems as desktops and laptops we use on a daily basis (or even servers in server rooms and data-centers), and we have the following components:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;the hardware (outer physical layer)&lt;/li&gt;
+&lt;li&gt;the OS platform (running inside the hardware)&lt;/li&gt;
+&lt;li&gt;the programs running on the OS (as processes)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Programs are stored on the hard drive in the form of executable files (a format understandable by the OS) and loaded into memory via one or more processes. Programs interact with the kernel, which forms a core part of the OS architecture and the hardware. The OS coordinate communication between hardware i.e. CPU, I/O devices, Memory, etc… and the programs.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2016-03-16-containers-all-the-way-through/bare-metal-systems.png&#34; alt=&#34;Bare Metal Systems&#34; title=&#34;Bare Metal Systems&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;A more detailed explanation of what programs or executables are, how programs execute and where an Operating System come into play, can be found &lt;a href=&#34;http://stackoverflow.com/questions/1599434/how-does-program-execute-where-does-the-operating-systems-come-into-play&#34;&gt;on this Stackoverflow page [2]&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;virtual-systems&#34;&gt;Virtual Systems&lt;/h3&gt;
+
+&lt;p&gt;On the other hand Virtual Systems, with the help of Virtual System controllers like, &lt;em&gt;Virtual Box&lt;/em&gt; or &lt;em&gt;VMWare&lt;/em&gt; or &lt;a href=&#34;https://en.wikipedia.org/wiki/Hypervisor&#34;&gt;&lt;em&gt;a&lt;/em&gt; &lt;em&gt;hypervisor [1]&lt;/em&gt;&lt;/a&gt; run an operating system on a bare metal system. These systems emulate bare-metal hardware as software abstraction(s) inside which we run the real OS platform. Such systems can be made up of the following layers, and also referred to as a Virtual Machines (VM):&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;a software abstraction of the hardware (Virtual Machine)&lt;/li&gt;
+&lt;li&gt;the OS platform running inside the software abstraction (guest OS)&lt;/li&gt;
+&lt;li&gt;one or more programs running in the guest OS (processes)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;It&amp;rsquo;s like running a computer (abstracted as software) inside another computer. And the rest of the fundamentals from the Bare Metal System applies to this abstraction layer as well. When a process is created inside the Virtual System, then the host OS which runs the Virtual System might also be spawning one or more processes.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2016-03-16-containers-all-the-way-through/virtual-systems.png&#34; alt=&#34;Virtual Systems&#34; title=&#34;Virtual Systems&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;h3 id=&#34;container-systems&#34;&gt;Container Systems&lt;/h3&gt;
+
+&lt;p&gt;Now looking at Container Systems we can say the following:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;they run on top of OS platforms running inside Bare Metal Systems or Virtual Systems&lt;/li&gt;
+&lt;li&gt;containers which allow isolating processes and sharing the kernel between each other (such isolation from other processes and resources are possible in some OSes like say Linux, due to OS kernel features like &lt;a href=&#34;https://en.wikipedia.org/wiki/Cgroups&#34;&gt;&lt;em&gt;cgroups&lt;/em&gt;&lt;/a&gt;[3] and &lt;a href=&#34;http://man7.org/linux/man-pages/man7/namespaces.7.html&#34;&gt;&lt;em&gt;namespaces&lt;/em&gt;&lt;/a&gt;)[4]&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;A container creates an OS like environment, inside which one or more programs can be executed. Each of these executions could result in a one or more processes on the host OS. Container Systems are composed of these layers:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;hardware (accessible via kernel features)&lt;/li&gt;
+&lt;li&gt;the OS platform (shared kernel)&lt;/li&gt;
+&lt;li&gt;one or more programs running inside the container (as processes)&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2016-03-16-containers-all-the-way-through/container-systems.png&#34; alt=&#34;Container Systems&#34; title=&#34;Container Systems&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;h3 id=&#34;summary&#34;&gt;Summary&lt;/h3&gt;
+
+&lt;p&gt;Looking at these enclosures or rounded rectangles within each other, we can already see how it is containers all the way through.&lt;/p&gt;
+
+&lt;div class=&#34;row blog-boxes&#34;&gt;
+   &lt;div class=&#34;blog-box homepage-blog-thumb col-md-4&#34;&gt; 
+    
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2016-03-16-containers-all-the-way-through/bare-metal-systems.png&#34; alt=&#34;Bare Metal Systems&#34; title=&#34;Bare Metal Systems&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+ 
+   &lt;/div&gt;
+   &lt;div class=&#34;blog-box homepage-blog-thumb col-md-4&#34;&gt;
+    
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2016-03-16-containers-all-the-way-through/virtual-systems.png&#34; alt=&#34;Virtual Systems&#34; title=&#34;Virtual Systems&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+   &lt;/div&gt;
+   &lt;div class=&#34;blog-box homepage-blog-thumb col-md-4&#34;&gt;
+    
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2016-03-16-containers-all-the-way-through/container-systems.png&#34; alt=&#34;Container Systems&#34; title=&#34;Container Systems&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+ 
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;There is an increasing number of distinctions between &lt;strong&gt;Bare Metal Systems&lt;/strong&gt;, &lt;strong&gt;Virtual Systems&lt;/strong&gt; and &lt;strong&gt;Container Systems&lt;/strong&gt;. While Virtual Systems encapsulate the Operating System inside a thick hardware virtualisation, Container Systems do something similar but with a much thinner virtualisation layer.&lt;/p&gt;
+
+&lt;p&gt;There are a number of pros and cons between these systems when we look at them individually, i.e. portability, performance, resource consumption, time to recreate such systems, maintenance, et al.&lt;/p&gt;
+
+&lt;h3 id=&#34;word-of-thanks-and-stay-in-touch&#34;&gt;Word of thanks and stay in touch&lt;/h3&gt;
+
+&lt;p&gt;Thank you for your time, feel free to send your queries and comments to &lt;a href=&#34;http://twitter.com/theNeomatrix369&#34;&gt;theNeomatrix369&lt;/a&gt;. Big thanks to my colleagues, our DevOps craftsman &lt;a href=&#34;https://twitter.com/robertfirek&#34;&gt;Robert Firek&lt;/a&gt; and craftsman &lt;a href=&#34;https://twitter.com/dhatanian&#34;&gt;David Hatanian&lt;/a&gt; from &lt;a href=&#34;http://codurance.com/aboutus/ourcompany/&#34;&gt;Codurance&lt;/a&gt; for giving invaluable feedback on my post and steering me in the right direction.&lt;/p&gt;
+
+&lt;h3 id=&#34;resources&#34;&gt;Resources&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;[1] &lt;a href=&#34;https://en.wikipedia.org/wiki/Hypervisor&#34;&gt;Wikipedia page for Hypervisor&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;[2] &lt;a href=&#34;http://stackoverflow.com/questions/1599434/how-does-program-execute-where-does-the-operating-systems-come-into-play&#34;&gt;Stackoverflow page for &amp;ldquo;How does a program execute? Where does the operating systems come into play ?&amp;rdquo;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;[3] &lt;a href=&#34;https://en.wikipedia.org/wiki/Cgroups&#34;&gt;Wikipedia page on cgroups&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;[4] &lt;a href=&#34;http://man7.org/linux/man-pages/man7/namespaces.7.html&#34;&gt;Linux man page on namespaces&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Fsm on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/fsm/</link>
+    <description>Recent content in Fsm on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Tue, 10 May 2016 00:20:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/fsm/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Finite state machines with Akka</title>
+      <link>http://codurance.com/blog/finite-state-machines-with-akka/</link>
+      <pubDate>Tue, 10 May 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/finite-state-machines-with-akka/</guid>
+      <description>
+
+&lt;p&gt;As you could remember from previous posts, &lt;a href=&#34;http://codurance.com/2016/04/28/async-systems-with-sync-clients/&#34;&gt;Part 1&lt;/a&gt; and   &lt;a href=&#34;http://codurance.com/2016/04/30/akka-basics/&#34;&gt;Part 2&lt;/a&gt;, we&amp;rsquo;re implementing a solution that integrates a sync client with an async system. Today we&amp;rsquo;ll see how to keep track of the async operations so we can provide a sync response to the client. Let&amp;rsquo;s start with the architectural diagram.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/law_enforcement.png&#34; alt=&#34;Law enforcement architecture&#34; title=&#34;Law enforcement architecture&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;We can understand the system through an example. The police sends us a request to delete an illegal item, and it expects a response in 10 seconds. Relevant statuses, for this example, are:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;200: the item has been successfully deleted in every container that it was published in&lt;/li&gt;
+&lt;li&gt;404: the item doesn&amp;rsquo;t exist in our system&lt;/li&gt;
+&lt;li&gt;504: timeout trying to delete the item&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The law enforcement service communicates with the Items service asynchronously using &lt;a href=&#34;http://kafka.apache.org/&#34;&gt;Kafka&lt;/a&gt;. That means that we need to subscribe to a &lt;a href=&#34;http://kafka.apache.org/documentation.html#intro_topics&#34;&gt;topic&lt;/a&gt; called &lt;code&gt;item_deleted&lt;/code&gt;. To add complexity to the system, we need to handle some multiplexing as the item could be published in different containers as the personal timeline or different groups. Let&amp;rsquo;s define what we mean with state, before getting into the details of our solution.&lt;/p&gt;
+
+&lt;h2 id=&#34;defining-state&#34;&gt;Defining State&lt;/h2&gt;
+
+&lt;p&gt;State is the ability to keep track of what happened in our system. A stateless application would be a pure function that doesn&amp;rsquo;t have any side effects. It receives an input, transforms it following some rules and returns an output. Such stateless applications are not very useful in a business context. Business and users want to know what happened in the past, so they can make informed decisions.&lt;/p&gt;
+
+&lt;p&gt;We don&amp;rsquo;t need to keep the state in our application server, though. State is often stored in datastores or in clients. One canonical example is session management in an http-based application. Http is a stateless protocol meaning that to keep state between the requests, we&amp;rsquo;ll need to do it ourselves, without help from the protocol.&lt;/p&gt;
+
+&lt;p&gt;Sticky sessions was a popular solution some years ago. State is stored in the server&amp;rsquo;s memory, so clients need to keep track of which server has been assigned to them. This solution has several problems:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Fault tolerance: if the server crashes the session is lost. The user experience in such cases is really bad&lt;/li&gt;
+&lt;li&gt;Scalability: if some server is overwhelmed we can&amp;rsquo;t easily scale out, as some users are tied to that particular server until the end of the session. Replicating sessions between servers is pretty complex&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;A different approach is keeping the session in cookies on the client and/or in some datastore like &lt;a href=&#34;http://redis.io/&#34;&gt;Redis&lt;/a&gt;. Thanks to that we keep our servers stateless, facilitating load balancers to distribute requests efficiently.&lt;/p&gt;
+
+&lt;p&gt;This example takes us through state between requests, but we could have state inside a single request. Let&amp;rsquo;s see how OOP handles state.&lt;/p&gt;
+
+&lt;h2 id=&#34;state-and-behaviour-in-oop&#34;&gt;State and Behaviour in OOP&lt;/h2&gt;
+
+&lt;p&gt;Objects and Actors are responsible for keeping their own state. That encapsulation forces clients to interact with that state through exposed interfaces. State affects the object&amp;rsquo;s behaviour as we can see in this example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;class Account(var balance: Int, var overdraft: Int = 0) {
+
+  def deposit(value: Int) = {
+      balance = balance + value
+  }
+
+  def withdrawal(value: Int) = {
+    val remaining = balance - value
+    if (remaining &amp;lt; 0) {
+      balance = 0
+      overdraft = overdraft + remaining.abs
+      notifyAccountHolder(overdraft)
+    } else {
+      balance = remaining
+    }
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We&amp;rsquo;re swapping the behaviour of withdrawal depending on the state contained in balance. As soon as this code gets more special cases and branches the readability and maintainability worsens. We could use polymorphism, composition or simply extracting private methods in order to make that complexity bearable. Akka provides a really handy DSL called &lt;a href=&#34;https://www.wikiwand.com/en/Finite-state_machine&#34;&gt;Finite State Machines&lt;/a&gt; to achieve that.&lt;/p&gt;
+
+&lt;h2 id=&#34;finite-state-machines&#34;&gt;Finite State Machines&lt;/h2&gt;
+
+&lt;p&gt;As Erlang documentation &lt;a href=&#34;http://erlang.org/documentation/doc-4.8.2/doc/design_principles/fsm.html&#34;&gt;states&lt;/a&gt;:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;A FSM can be described as a set of relations of the form:&lt;/p&gt;
+
+&lt;p&gt;State(S) x Event(E) -&amp;gt; Actions (A), State(S&amp;rsquo;)&lt;/p&gt;
+
+&lt;p&gt;These relations are interpreted as meaning:&lt;/p&gt;
+
+&lt;p&gt;If we are in state S and the event E occurs, we should perform the actions A and make a transition to the state S&amp;rsquo;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;In our example:&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;State(positive balance) x Event(significative withdrawal) -&amp;gt; Actions (update balance, withdrawal, and notify account holder), State(negative balance)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Meanwhile in a negative balance state we could define different rules, as how many times we&amp;rsquo;ll allow the overdraft operation.&lt;/p&gt;
+
+&lt;h2 id=&#34;finite-state-machines-in-akka&#34;&gt;Finite State Machines in Akka&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s see a diagram about the architecture that we&amp;rsquo;re going to implement from a lower point of view:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/fsm.png&#34; alt=&#34;FSM architecture&#34; title=&#34;FSM architecture&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;The Law enforcement service will contain multiple instances of ItemCensor actor.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;  class ItemCensor extends Actor with FSM[State, Data]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In order to keep the example easy to understand, we&amp;rsquo;ll model only two possible states. Simple FSMs are well designed using the &lt;a href=&#34;http://doc.akka.io/docs/akka/current/scala/actors.html#Become_Unbecome&#34;&gt;become/unbecome&lt;/a&gt; functionality.&lt;/p&gt;
+
+&lt;p&gt;It&amp;rsquo;s important to note the difference between State and Data. You could think of State as the labels of the visual representation of your FSM. The Data is local to every state.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;sealed trait State
+
+case object Idle extends State
+
+case object Active extends State
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;sealed trait Data
+
+case object Uninitialized extends Data
+
+final case class ItemsToBeDeleted(items: Seq[Item]) extends Data
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;case class Item(itemId: UUID, containerId: UUID, containerType: String) {
+  def partitionKey = s&amp;quot;${itemId.toString}-${containerId.toString}&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;first-steps-with-fsm&#34;&gt;First steps with FSM&lt;/h2&gt;
+
+&lt;p&gt;In future posts we&amp;rsquo;ll see how to create actors and manage its lifecycle. For now it&amp;rsquo;s enough to know that in our system there is an actor with coordination responsibilities that is in charge of creating, resuming and pooling these ItemCensor actors. When the coordinator creates an instance this is executed inside the FSM:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;  startWith(Idle, Uninitialized)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That Akka method sets the initial state and in our case an empty state data. Now we&amp;rsquo;re ready to receive messages:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;when(Idle) {
+case Event(ItemsReported(items), _) =&amp;gt;
+  items match {
+    case List() =&amp;gt; finishWorkWith(CensorResult(Left(ItemNotFound)))
+    case items =&amp;gt;
+      setTimer(&amp;quot;CensorTimer&amp;quot;, CensorTimeout, 10 seconds)
+      items.foreach(item =&amp;gt; {
+        pipe(itemReportedProducer.publish(item)) to self
+        itemDeletedBus.subscribe(self, item.partitionKey)
+      })
+      goto(Active) using ItemsToBeDeleted(items)
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let&amp;rsquo;s explain this snippet. &lt;code&gt;when&lt;/code&gt; method defines the scope of some state. When in &lt;code&gt;Idle&lt;/code&gt; state this actor will receive messages of type &lt;code&gt;ItemsReported&lt;/code&gt;. The partial function that you define to match messages has some particularity. FSM wraps received messages into &lt;code&gt;Event&lt;/code&gt; objects and include current state data. We pattern match over the message and if we figure out that there are no item in any container we don&amp;rsquo;t even start the work (this will eventually lead to a 404 response). Otherwise we start a timer that will send a message of type &lt;code&gt;CensorTimeout&lt;/code&gt; after 10 seconds.&lt;/p&gt;
+
+&lt;p&gt;After that we publish every item into Kafka. Remember that a single physical item can live in different containers, so that&amp;rsquo;s why we talk about &lt;code&gt;items&lt;/code&gt;. &lt;code&gt;ItemReportedProducer&lt;/code&gt; returns a future and we can &lt;code&gt;pipe&lt;/code&gt; it into the same actor. Thanks to that we can listen to failures of that future and make the process fail early.&lt;/p&gt;
+
+&lt;p&gt;We subscribe the item into an &lt;a href=&#34;http://doc.akka.io/docs/akka/2.4.4/java/event-bus.html&#34;&gt;Akka Event Bus&lt;/a&gt;, so this actor can react exclusively to its deleted items. Finally, we&amp;rsquo;ll move the FSM into Active state including the state data of &lt;code&gt;ItemsToBeDeleted&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;updating-data-state-in-a-fsm&#34;&gt;Updating Data State in a FSM&lt;/h2&gt;
+
+&lt;p&gt;&lt;code&gt;ItemCensor&lt;/code&gt; actor needs to wait until Items service finishes deleting the items. Items service will publish some events into Kafka, and our Event Bus will be subscribed to that topic. &lt;code&gt;ItemCensor&lt;/code&gt; is subscribed to only the items that it&amp;rsquo;s interested in, and the Event Bus will send messages of type &lt;code&gt;ItemDeleted&lt;/code&gt; to the actor.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;when(Active) {
+case Event(ItemDeleted(item), currentItemsToBeDeleted@ItemsToBeDeleted(items)) =&amp;gt;
+  val newItemsToBeDeleted = items.filterNot(_ == item)
+  newItemsToBeDeleted.size match {
+    case 0 =&amp;gt; finishWorkWith(CensorResult(Right()))
+    case _ =&amp;gt; stay using currentItemsToBeDeleted.copy(items = newItemsToBeDeleted)
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As soon as we get &lt;code&gt;ItemDeleted&lt;/code&gt; messaged from the Event Bus we update the state data &lt;code&gt;ItemsToBeDeleted&lt;/code&gt;. If we exhaust the items, then we can finish successfully with a &lt;a href=&#34;http://www.scala-lang.org/api/rc2/scala/Either.html&#34;&gt;Right&lt;/a&gt; message. Otherwise we &lt;code&gt;stay&lt;/code&gt; in the same state with the new state data, waiting until new messages arrive.&lt;/p&gt;
+
+&lt;h2 id=&#34;dealing-with-failure&#34;&gt;Dealing with failure&lt;/h2&gt;
+
+&lt;p&gt;FSM in Akka allows you to capture messages that the actor received but no partial function matched it properly.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;whenUnhandled {
+case Event(CensorTimeout, _) =&amp;gt;
+  finishWorkWith(CensorResult(Left(CensorTimeout(&amp;quot;Censor timed out&amp;quot;))))
+
+case Event(failure: Failure, _) =&amp;gt;
+  finishWorkWith(CensorResult(Left(CensorException(failure.cause.getMessage))))
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;whenUnhandled&lt;/code&gt; will try to match every unhandled message. If after 10 seconds the actor is still around a &lt;code&gt;CensorTimeout&lt;/code&gt; message will be sent by &lt;code&gt;CensorTimer&lt;/code&gt; so we can finish the work with the proper error case. If &lt;code&gt;itemReportedProducer&lt;/code&gt; fails publishing an item to Kafka, this code will receive a &lt;code&gt;Failure&lt;/code&gt; message as we piped that future into &lt;code&gt;self&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;finishing-the-fsm&#34;&gt;Finishing the FSM&lt;/h2&gt;
+
+&lt;p&gt;The lifecycle of the FSM will be controlled by an outside actor, called coordinator. Whenever we want to finish the work of this FSM, we&amp;rsquo;ll have to send a message to the coordinator:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;private def finishWorkWith(message: Any) = {
+    coordinator ! message
+    goto(Idle)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We don&amp;rsquo;t need to go to &lt;code&gt;Idle&lt;/code&gt; status, but doing it makes it clearer to the reader that that actor is not on duty anymore.&lt;/p&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;FSM is in the core of our solution. In next posts we&amp;rsquo;ll see how we integrate, coordinate, and supervise those FSMs so they can serve its purpose of bridging sync clients with async systems. At the same time we&amp;rsquo;ll see how Kafka and Akka Event Bus implement its own versions of pub-sub philosophy, so they can react asynchronously to changes in our system.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://codurance.com/2016/04/28/async-systems-with-sync-clients/&#34;&gt;Part 1&lt;/a&gt; | &lt;a href=&#34;http://codurance.com/2016/04/30/akka-basics/&#34;&gt;Part 2&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

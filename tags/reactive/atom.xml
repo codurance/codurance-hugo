@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Reactive on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/reactive/</link>
+    <description>Recent content in Reactive on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Thu, 28 Apr 2016 00:20:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/reactive/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Async systems with sync clients</title>
+      <link>http://codurance.com/blog/Async-systems-with-sync-clients/</link>
+      <pubDate>Thu, 28 Apr 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/Async-systems-with-sync-clients/</guid>
+      <description>
+
+&lt;p&gt;As the &lt;a href=&#34;http://www.reactivemanifesto.org/&#34;&gt;Reactive Manifesto&lt;/a&gt; says Reactive systems are:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Responsive&lt;/li&gt;
+&lt;li&gt;Resilient&lt;/li&gt;
+&lt;li&gt;Elastic&lt;/li&gt;
+&lt;li&gt;Message Driven&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The last principle often goes together with non-blocking async protocols. This style of communication &amp;ldquo;allows recipients to only consume resources while staying active, leading to less system overhead&amp;rdquo;. This fits perfectly with new demands of efficiency derived from the elastic model of cloud providers. However not every system is async and integrating an async system with a sync client could be tricky.&lt;/p&gt;
+
+&lt;h2 id=&#34;integration-strategies&#34;&gt;Integration Strategies&lt;/h2&gt;
+
+&lt;p&gt;We can fix the mismatch of communication styles through a couple of strategies.&lt;/p&gt;
+
+&lt;h3 id=&#34;polling&#34;&gt;Polling&lt;/h3&gt;
+
+&lt;p&gt;This involves work for both parties. First round trip of this protocol involves client sending some request to the server with an outcome of ACK/NACK. This is called fire and forget. Assuming HTTP, the server will return status code 202 (Accepted). The async process will eventually succeed or fail and that result will be exposed by the server via a different endpoint. The client will have to periodically poll that endpoint to figure out the status of the operation.&lt;/p&gt;
+
+&lt;p&gt;Polling is by nature inefficient but could be a good solution when the technological stack doesn&amp;rsquo;t allow bidirectional protocols like &lt;a href=&#34;https://www.wikiwand.com/en/WebSocket&#34;&gt;Web Sockets&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;hiding-asynchronicity&#34;&gt;Hiding asynchronicity&lt;/h3&gt;
+
+&lt;p&gt;If we don&amp;rsquo;t have control over those clients, we&amp;rsquo;ll probably have to hide our async nature under some sync layer. That layer will implement a polling or pub/sub mechanism bounded by a timeout.&lt;/p&gt;
+
+&lt;h2 id=&#34;learning-by-example&#34;&gt;Learning by example&lt;/h2&gt;
+
+&lt;p&gt;In this series of posts we&amp;rsquo;ll implement last strategy with a pub/sub mechanism. We&amp;rsquo;ll add some essential complexities to our domain to make the exercise more juicy.&lt;/p&gt;
+
+&lt;p&gt;We&amp;rsquo;ll be working on something similar to &lt;a href=&#34;https://craigslist.org&#34;&gt;Craiglist&lt;/a&gt;, a website with classified advertisements. However our platform will have a social focus (as everything nowadays). That means that a user can post an item into some group and/or to her followers. People can report dubious items and we will take seriously those reports as they&amp;rsquo;re threats to our reputation. So much so that the authorities have direct access to an API that can take down an item immediately.&lt;/p&gt;
+
+&lt;p&gt;Our system is formed by several microservices based on &lt;a href=&#34;http://akka.io/&#34;&gt;Akka&lt;/a&gt;, using &lt;a href=&#34;http://kafka.apache.org/&#34;&gt;Kafka&lt;/a&gt; for inter-process communication. The police platform has only sync clients and they don&amp;rsquo;t seem keen to implement a polling mechanism to verify that an item has been actually removed. We need to communicate with them synchronously and that&amp;rsquo;s not negotiable. In the next posts we&amp;rsquo;ll see the details of our solution, but as an advancement, let&amp;rsquo;s see the high level architecture. Don&amp;rsquo;t worry if you don&amp;rsquo;t understand everything yet.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/law_enforcement.png&#34; alt=&#34;Law enforcement architecture&#34; title=&#34;Law enforcement architecture&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;&lt;a href=&#34;http://codurance.com/2016/04/28/async-systems-with-sync-clients/&#34;&gt;Part 1&lt;/a&gt; | &lt;a href=&#34;http://codurance.com/2016/04/30/akka-basics/&#34;&gt;Part 2&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

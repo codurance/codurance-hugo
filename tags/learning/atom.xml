@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Learning on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/learning/</link>
+    <description>Recent content in Learning on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Sun, 22 Nov 2015 09:00:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/learning/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>My first couple of months at Codurance</title>
+      <link>http://codurance.com/blog/my-first-couple-of-months-at-codurance/</link>
+      <pubDate>Sun, 22 Nov 2015 09:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/my-first-couple-of-months-at-codurance/</guid>
+      <description>
+
+&lt;h3 id=&#34;some-background&#34;&gt;Some background&lt;/h3&gt;
+
+&lt;p&gt;Some of you may know me from the various meetups in the city, especially my attendance at a number of &lt;a href=&#34;www.meetup.com/Londonjavacommunity/&#34;&gt;LJC&lt;/a&gt; and &lt;a href=&#34;www.meetup.com/london-software-craftsmanship&#34;&gt;LSCC&lt;/a&gt; meetup events. Attending these events I learnt about various conferences like &lt;strong&gt;Devoxx&lt;/strong&gt;, &lt;strong&gt;SoCraTes&lt;/strong&gt;, &lt;strong&gt;JAX London&lt;/strong&gt;, &lt;strong&gt;Java2Days&lt;/strong&gt;, &lt;strong&gt;OpenFest&lt;/strong&gt;, and I ended up attending and later presenting on various topic including &lt;a href=&#34;https://java.net/projects/adoptopenjdk/pages/AdoptOpenJDK&#34;&gt;Adopt OpenJDK&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;During this time I met a lot of people with various levels of experience and my interest and urge to learn more about the Java/JVM platform, Code Quality, Software Design, XP Practices, Software Craftsmanship, etc&amp;hellip;, were on the rise and saw no end. And whilst attending these events I came across &lt;a href=&#34;https://twitter.com/sandromancuso&#34;&gt;Sandro&lt;/a&gt; and &lt;a href=&#34;https://twitter.com/mashooq&#34;&gt;Mash&lt;/a&gt;, who were in those days hosting &lt;a href=&#34;www.meetup.com/london-software-craftsmanship&#34;&gt;LSCC&lt;/a&gt; events. I went to many of &lt;a href=&#34;www.meetup.com/london-software-craftsmanship&#34;&gt;LSCC&lt;/a&gt; events, especially liked the hands-on sessions (which are still my favourite).&lt;/p&gt;
+
+&lt;p&gt;I also noticed that many things I learnt at such events and conferences wouldn&amp;rsquo;t always be immediately recognised or accepted at the workplace. And moving to another work environment didn&amp;rsquo;t always solve this problem fully. I found that I wasn&amp;rsquo;t learning what I wanted from my peers and the things I learnt from the community I couldn&amp;rsquo;t apply at work. Besides very few were really in tuned with what the community was about. So one fine day I decided to take charge of my career and make a serious decision and take up the Apprenticeship program offered by &lt;a href=&#34;http://codurance.com/&#34;&gt;Codurance&lt;/a&gt; and go through the process.&lt;/p&gt;
+
+&lt;p&gt;I was urged to go this way after being inspired by Sandro&amp;rsquo;s book: &lt;a href=&#34;http://www.amazon.co.uk/books/dp/0134052501&#34;&gt;The Software Craftsman&lt;/a&gt;, attending all the &lt;a href=&#34;http://socratesuk.org/&#34;&gt;SoCraTes UK&lt;/a&gt; conferences, and meeting with developers who valued and took pride of their work namely their craft.&lt;/p&gt;
+
+&lt;h3 id=&#34;where-we-are-just-now&#34;&gt;Where we are just now&lt;/h3&gt;
+
+&lt;p&gt;It&amp;rsquo;s now been nearly two months since I have been working for &lt;a href=&#34;http://codurance.com/&#34;&gt;Codurance&lt;/a&gt;, a formidable force. And so it&amp;rsquo;s also about time that I share my experiences with my fellow mates and the community around me.&lt;/p&gt;
+
+&lt;p&gt;During my first few weeks at &lt;a href=&#34;http://codurance.com/&#34;&gt;Codurance&lt;/a&gt;, I have been busy learning various things that have been chalked out for becoming a craftsman.&lt;/p&gt;
+
+&lt;p&gt;When working on a kata or learning a concept, we paired or did what is known as &amp;lsquo;mob programming&amp;rsquo; along with other apprentices and craftsmen. And most of the time used the &lt;a href=&#34;https://en.wikipedia.org/wiki/Pomodoro_Technique&#34;&gt;pomodoro technique&lt;/a&gt;. Time boxing our work in intervals is something done both in groups and working individually. We would have a lot of discussions and retrospectives after working on a problem or writing some code from scratch.&lt;/p&gt;
+
+&lt;h3 id=&#34;structure-of-my-program&#34;&gt;Structure of my program&lt;/h3&gt;
+
+&lt;p&gt;We used an internal tool based on the concept of &lt;a href=&#34;http://www.impactmapping.org/&#34;&gt;Impact Mapping&lt;/a&gt;. I soon got interested in it when I saw my colleague &lt;a href=&#34;https://twitter.com/Singsalad&#34;&gt;Franzi&lt;/a&gt; (who is now a craftswoman) had used it to plan out her Apprenticeship route. Such a tool helps map out our goals and the tasks we need to perform to achieve it. And this can differ from person-to-person, depending on what they want to work on (driven by the Apprentice).&lt;/p&gt;
+
+&lt;p&gt;My mentor and other craftsmen reviewed them to get an idea of what I wanted to achieve for myself. And then its up to me to apply my own drive and perseverance to achieve the individual stories. My mentor and I meet and talk informally on a regular basis, many times pairing on a kata or a project or on the white board trying to get my head around a concept.&lt;/p&gt;
+
+&lt;h3 id=&#34;days-in-the-life-of-an-apprentice&#34;&gt;Days in the life of an Apprentice&lt;/h3&gt;
+
+&lt;p&gt;I found the working hours quite flexible, remote working is also an option (when you are on the bench or if the client allows, if you are in a project). Our co-founders are understanding and compassionate about our individual situations.&lt;/p&gt;
+
+&lt;p&gt;Meetings are at their minimum, except for a weekly Apprentices meeting (run by an Apprentice and guided by at least one Craftsperson) and a bi-monthly company-wide catchup.&lt;/p&gt;
+
+&lt;p&gt;The Apprentices meetings are full of fun &amp;ndash; we are accompanied by at least one Craftsperson, who disperses their knowledge and experience from a wide variety of topics designed to help us in the journey and fill the gaps in our knowledge and experience.&lt;/p&gt;
+
+&lt;p&gt;A bi-monthly catchup involves sharing of knowledge via lightning talks, discussions and pairing sessions on pet projects over pizzas and beer (and of course veggies and non-alcoholic beverages for the &lt;a href=&#34;https://en.wikipedia.org/wiki/Teetotalism&#34;&gt;teetotalers&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;Katas, code reviews, mob programming and projects make up a learning week - all of these done individually or when pairing with another.&lt;/p&gt;
+
+&lt;h5 id=&#34;katas&#34;&gt;&lt;strong&gt;Katas&lt;/strong&gt;&lt;/h5&gt;
+
+&lt;p&gt;On a daily basis I have worked on different katas or try to solve the same kata in various different ways (using different testing and refactoring approaches). This in turn gave me better insights into designing and refactoring techniques. Trying to solve the same problem in different ways has a positive impact on our problem solving skills especially when writing code. In my case I also learnt how to use the different libraries and methods to write tests. I would like to cite &lt;strong&gt;Samir&lt;/strong&gt;, thanks to you, for the suggesting this approach during the first week of my Apprenticeship.&lt;/p&gt;
+
+&lt;h5 id=&#34;code-reviews&#34;&gt;&lt;strong&gt;Code reviews&lt;/strong&gt;&lt;/h5&gt;
+
+&lt;p&gt;Just last week we did a group code review and time-boxed ourselves, performed a retrospective at the end of each interval and ensured we delivered a good chunk of the feedback before close of play. Such regular code review exercises are helping all of us learn about how to code better as we are not only learning from feedback from the tools we used, but also through exchange of feedback from our peers who were involved in the group code review session.&lt;/p&gt;
+
+&lt;h5 id=&#34;software-design-specification-gathering-communication&#34;&gt;&lt;strong&gt;Software Design, Specification Gathering &amp;amp; Communication&lt;/strong&gt;&lt;/h5&gt;
+
+&lt;p&gt;Recently we had an interesting mob-programming session where we were trying to model and write a game. At the end of the session, we had a retrospective, discussing the things we did well and didn&amp;rsquo;t do well. Each of the apprentices and craftsmen were performing a specific role i.e. Developer, Domain Expert, etc&amp;hellip; We learnt in retrospective, about areas where we could have done better and should focus on. That any test written gives immediate feedback about how well we have understood the domain and if we were taking the right approach. Why a certain approach when starting a project is more advantageous than another approach. What questions to ask and why it is important to ask the right questions to the domain expert or to give the right level of information to another developer and vice-versa. Sandro has described this process in detail in his &lt;a href=&#34;http://codurance.com/2015/11/01/practicing-well-crafted-design/&#34;&gt;blog post&lt;/a&gt; recently.&lt;/p&gt;
+
+&lt;h3 id=&#34;fun-socialising-and-sharing&#34;&gt;Fun, socialising and sharing&lt;/h3&gt;
+
+&lt;p&gt;I found our office environment to be conducive to learning, sharing and collaboration. We even have a pairing rota that we use from time-to-time to record or suggest pairing sessions during the week.&lt;/p&gt;
+
+&lt;p&gt;We share links to events, conferences, tweets, interesting articles, videos, blog posts, etc&amp;hellip; via slack, document discussions and brain dumps via Google doc, huddles during lunch- and tea- breaks to talk about anything we are working on. Thanks to the library of printed and digital books to our disposal, the huge collection of &lt;a href=&#34;http://codurance.com/blog&#34;&gt;blog posts&lt;/a&gt; and &lt;a href=&#34;http://codurance.com/videos/&#34;&gt;videos&lt;/a&gt; on our site.&lt;/p&gt;
+
+&lt;p&gt;The apprentices and some craftsmen have collectively started a social event which of course happens every Friday, sometimes it&amp;rsquo;s dinner at a nearby restaurant, while at other times an indoor movie over snacks and drinks at our office premises.&lt;/p&gt;
+
+&lt;h3 id=&#34;it-is-worthwhile-and-that-s-why-we-are-here&#34;&gt;It is worthwhile and that&amp;rsquo;s why we are here&lt;/h3&gt;
+
+&lt;p&gt;It is a privilege to be able to work alongside very experienced craftsmen from our industry. We are very lucky and thankful to have the opportunity to be guided and mentored by talented and like minded developers.&lt;/p&gt;
+
+&lt;p&gt;This is my first job where the company has a completely flat hierarchy and where we share similar values.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/greatCompanyCulture.jpg&#34;  class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;h3 id=&#34;closing-note&#34;&gt;Closing note&lt;/h3&gt;
+
+&lt;p&gt;Work is fun and learning is enjoyable when we love what we do and are amongst friends with similar goals and aspirations.&lt;/p&gt;
+
+&lt;p&gt;Thank you for taking the time to read this post and I hope it was interesting. Looking forward to write more and share such experiences in future posts.&lt;/p&gt;
+
+&lt;p&gt;Many thanks to &lt;strong&gt;Sandro&lt;/strong&gt;, &lt;strong&gt;Tomaz&lt;/strong&gt;, &lt;strong&gt;Alex&lt;/strong&gt;, &lt;strong&gt;Franzi&lt;/strong&gt; and &lt;strong&gt;David&lt;/strong&gt; for all the feedback provided for this blog post.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Talk to the business</title>
+      <link>http://codurance.com/blog/Talk-to-the-business/</link>
+      <pubDate>Mon, 26 Oct 2015 09:35:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/Talk-to-the-business/</guid>
+      <description>&lt;p&gt;Almost a month ago, I did this amazing course at &lt;a href=&#34;https://skillsmatter.com/&#34;&gt;SkillsMatter&lt;/a&gt;: &lt;a href=&#34;https://skillsmatter.com/courses/202-domain-model&#34;&gt;&amp;ldquo;Eric Evans Domain Driven Design Immersion Workshop&amp;rdquo;&lt;/a&gt;. The course was very intensive and provided me with the opportunity to reinforce a lot of concepts I already knew as well as learn a few more.&lt;/p&gt;
+
+&lt;p&gt;One of this concepts was &lt;a href=&#34;http://c2.com/cgi/wiki?UbiquitousLanguage&#34;&gt;Ubiquitous Language&lt;/a&gt;. The first time I heard it from our coach &lt;a href=&#34;https://twitter.com/ziobrando&#34;&gt;Alberto Brandolini&lt;/a&gt;, I must confess I understood &amp;ldquo;Ambiguous Language&amp;rdquo;. The term &amp;ldquo;Ubiquitous&amp;rdquo; it&amp;rsquo;s not a simple one, especially for a non-native English speaker like myself. While I was listening to the coach explaining all of this concepts around the &amp;ldquo;Ubiquitous Language&amp;rdquo;, another one did make its way through: &lt;a href=&#34;https://en.wikipedia.org/wiki/Domain-driven_design#Bounded_context&#34;&gt;&amp;ldquo;Bounded Context&amp;rdquo;&lt;/a&gt;.
+&lt;a href=&#34;http://martinfowler.com/bliki/BoundedContext.html&#34;&gt;Martin Fowler&lt;/a&gt; has a really nice post where he defines it like this:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Bounded Context is a central pattern in Domain-Driven Design. It is the focus of DDD&amp;rsquo;s strategic design section which is all about dealing with large models and teams. DDD deals with large models by dividing them into different Bounded Contexts and being explicit about their interrelationships.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;One thing that Alberto told us was that we should always consider our bounded context when talking to the business expert: in the same company, different concepts may be used for the same term, whether you are talking to a sales expert or an accounting expert. So it&amp;rsquo;s up to us, developers, to define in which context we are currently working.&lt;/p&gt;
+
+&lt;p&gt;The videos that they showed to us during the course were very helpful: I definitely saw myself in previous clients doing the same mistakes and not understanding what was going on. The good thing is that now I know how to address it, and even did it twice in my current client.&lt;/p&gt;
+
+&lt;p&gt;So the next time that you hear a business expert using a different word from the ones that you&amp;rsquo;re using, go and talk to them. Make sure the words you are using are the correct ones, and if there&amp;rsquo;s a new one then you should integrate it into your model. After all, they are the ones who know the business!&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>How katas can help you learn</title>
+      <link>http://codurance.com/blog/How-katas-can-help-you-learn/</link>
+      <pubDate>Tue, 18 Aug 2015 09:35:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/How-katas-can-help-you-learn/</guid>
+      <description>&lt;p&gt;In the last couple of weeks I have spent my time doing katas to improve my Objective-C. As you may remember, I had an issue, &lt;a href=&#34;http://wp.me/p4i8Xl-7h&#34;&gt;that you can revisit here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;ve learned a lot from other katas too: for instance the RomanNumerals kata&amp;hellip; You&amp;rsquo;d may think it&amp;rsquo;s a simple task, that you wan&amp;rsquo;t learn much from. It&amp;rsquo;s a simple algorithm, a good exercise for your red -&amp;gt; green -&amp;gt; refactoring cycle. So nothing new will come from here&amp;hellip;  Wasn&amp;rsquo;t I wrong!!!!!&lt;/p&gt;
+
+&lt;p&gt;First I created some tests. Next I implemented the kata and refactored. Whilst I was refactoring, I decided to use NSDictionary to map from a decimal to a roman number. Here is an example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;NSDictionary *mapper = @{@10: @&amp;quot;X&amp;quot;, @5:@&amp;quot;V&amp;quot;, @1: @&amp;quot;I&amp;quot;};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That&amp;rsquo;s when I discovered that the NSDictionary does not guarantee insertion order. What???? So my keys were all mixed up&amp;hellip; And I needed them to maintain their order!!!! That&amp;rsquo;s ok! I decided to create a class to map between decimals and romans. That&amp;rsquo;s cool! Done! In the converter I just added a private property of type NSMutableArray. In it&amp;rsquo;s constructor I added the class to the array for all elements I needed. But now I have to do:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;[[DecimalToRomanMapper alloc] initWithDecimal: andRoman];
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;for every entry in the mapper. God!!!! So much work! Maybe that&amp;rsquo;s why developers solve problems. They definitely don&amp;rsquo;t like to do things by hand so they automate everything.
+So I decided that I could create a factory method. I really didn&amp;rsquo;t know how to create this factory method, so I just looked in Apple docs. Here is another thing i learned. Even thought I knew that it existed, I never used it because I never needed to. But as I was in learning mode, I think I was more interested in finding a different way to do it. When you are at a client, you don&amp;rsquo;t always have the opportunity to experiment with new things. Having this time to learn new ways of doing things is really rewarding. So here is my class:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;@interface DecimalToRomanMapper : NSObject
+
+@property (nonatomic, assign, readonly) NSInteger decimal;
+@property (nonatomic, copy, readonly) NSString* roman;
+
++ (instancetype)mappDecimal:(NSInteger)decimal toRoman:(NSString*)roman;
+
+@end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It&amp;rsquo;s even more readable then the initialiser. And here is how I initialised it in my converter:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;   self.mapper = @[
+                      [DecimalToRomanMapper mappDecimal:1000 toRoman:@&amp;quot;M&amp;quot;]
+                  ];
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So my class was looking pretty but then I look at my test class&amp;hellip;it wasn&amp;rsquo;t good:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;...
+
+- (void)testShouldConvertFourToIV {
+    NSString *result = [converter convert:4];
+   XCTAssertTrue([result isEqualToString:@&amp;quot;IV&amp;quot;]);
+}
+
+...
+
+- (void)testShouldConvert1000ToM {
+   NSString *result = [converter convert:1000];
+    XCTAssertTrue([result isEqualToString:@&amp;quot;M&amp;quot;]);
+}
+
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So many tests. They remind me of the DRY principle. I really don&amp;rsquo;t like to repeat myself. It&amp;rsquo;s like a broken CD that doesn&amp;rsquo;t move from the same music track&amp;hellip; I&amp;rsquo;ve done the same kata in C# and my test class was all parameterised and I really liked it. After all this is a simple kata, right? ;).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;(C# code)
+[TestCase(1, &amp;quot;I&amp;quot;)]
+[TestCase(2, &amp;quot;II&amp;quot;)]
+[TestCase(3, &amp;quot;III&amp;quot;)]
+[TestCase(4, &amp;quot;IV&amp;quot;)]
+[TestCase(5, &amp;quot;V&amp;quot;)]
+[TestCase(9, &amp;quot;IX&amp;quot;)]
+[TestCase(10, &amp;quot;X&amp;quot;)]
+[TestCase(40, &amp;quot;XL&amp;quot;)]
+[TestCase(50, &amp;quot;L&amp;quot;)]
+[TestCase(90, &amp;quot;XC&amp;quot;)]
+[TestCase(100, &amp;quot;C&amp;quot;)]
+[TestCase(400, &amp;quot;CD&amp;quot;)]
+[TestCase(900, &amp;quot;CM&amp;quot;)]
+[TestCase(1000, &amp;quot;M&amp;quot;)]
+[TestCase(2499, &amp;quot;MMCDXCIX&amp;quot;)]
+[TestCase(3949, &amp;quot;MMMCMXLIX&amp;quot;)]
+public void convertDecimalToRoman(int decimalNumber, string expectedRomanNumber)
+{
+     var converter = new DecimalToRomanConverter();
+
+      string result = converter.Convert(decimalNumber);
+
+    Assert.AreEqual(expectedRomanNumber, result);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Well wouldn&amp;rsquo;t it be nice if I could have that in Objective-C? Well, after some help from &lt;a href=&#34;https://twitter.com/singsalad&#34;&gt;Franzi&lt;/a&gt; I found a little &lt;a href=&#34;https://github.com/michalkonturek/XCParameterizedTestCase&#34;&gt;library&lt;/a&gt; that does it. You install the pod, you inherit from it and you create an array of inputs and expected values like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;+ (NSArray *)testCaseData {
+    return @[
+             [XCTestCaseData createWithInputValue:@1 withExpectedValue:@&amp;quot;I&amp;quot;]
+            ];
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And then you just have to use the properties input and expected. So my test class looks like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;@interface DecimalToRomanConverterTests : XCParameterizedTestCase
+
+@end
+
+@implementation DecimalToRomanConverterTests
+
++(NSArray *)testCaseData {
+    return @[
+             [XCTestCaseData createWithInputValue:@1 withExpectedValue:@&amp;quot;I&amp;quot;],
+             [XCTestCaseData createWithInputValue:@2 withExpectedValue:@&amp;quot;II&amp;quot;],
+             [XCTestCaseData createWithInputValue:@3 withExpectedValue:@&amp;quot;III&amp;quot;],
+             [XCTestCaseData createWithInputValue:@5 withExpectedValue:@&amp;quot;V&amp;quot;],
+             [XCTestCaseData createWithInputValue:@8 withExpectedValue:@&amp;quot;VIII&amp;quot;],
+             [XCTestCaseData createWithInputValue:@10 withExpectedValue:@&amp;quot;X&amp;quot;],
+             [XCTestCaseData createWithInputValue:@18 withExpectedValue:@&amp;quot;XVIII&amp;quot;],
+             [XCTestCaseData createWithInputValue:@4 withExpectedValue:@&amp;quot;IV&amp;quot;],
+             [XCTestCaseData createWithInputValue:@9 withExpectedValue:@&amp;quot;IX&amp;quot;],
+             [XCTestCaseData createWithInputValue:@50 withExpectedValue:@&amp;quot;L&amp;quot;],
+             [XCTestCaseData createWithInputValue:@100 withExpectedValue:@&amp;quot;C&amp;quot;],
+             [XCTestCaseData createWithInputValue:@500 withExpectedValue:@&amp;quot;D&amp;quot;],
+             [XCTestCaseData createWithInputValue:@2499 withExpectedValue:@&amp;quot;MMCDXCIX&amp;quot;],
+             [XCTestCaseData createWithInputValue:@3949 withExpectedValue:@&amp;quot;MMMCMXLIX&amp;quot;]
+             ];
+}
+
+-(void)testShouldConvertADecimalIntoARoman {
+
+    DecimalToRomanConverter *converter = [[DecimalToRomanConverter alloc]init];
+    NSString* result = [converter convert:[self.input integerValue]];
+
+    XCTAssertEqualObjects(self.expected, result);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here is my final solution: &lt;a href=&#34;https://github.com/ananogal/RomanNumeralsKata&#34;&gt;RomanNumerals&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;So please don&amp;rsquo;t underestimate what you can learn from a kata. They are a good opportunity to stretch your knowledge and add some more to it!&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>My first month as an apprentice</title>
+      <link>http://codurance.com/blog/a-month-of-apprenticeship/</link>
+      <pubDate>Wed, 29 Jul 2015 16:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/a-month-of-apprenticeship/</guid>
+      <description>
+
+&lt;p&gt;About a month ago, I started my apprenticeship at Codurance. I have learned a lot already in these few weeks, and I want to share some of it.&lt;/p&gt;
+
+&lt;h2 id=&#34;a-little-background&#34;&gt;A little background&lt;/h2&gt;
+
+&lt;p&gt;As some of you know, I moved from Germany over to London to work for Codurance. I knew the founders and some of the craftsmen from various conferences, mainly &lt;a href=&#34;https://www.socrates-conference.de/&#34;&gt;SoCraTes Germany&lt;/a&gt; and &lt;a href=&#34;http://socratesuk.org/&#34;&gt;SoCraTes UK&lt;/a&gt;.
+Apart from wanting to immerse myself into the vibrant &lt;a href=&#34;http://www.meetup.com/london-software-craftsmanship/&#34;&gt;London Software Craftsmanship Community&lt;/a&gt;, I was looking for an opportunity to learn about better software design.
+I studied computer science at university, where I learned about UML and the theoretics of design patterns. I worked as a developer and consultant for three years in Germany and got some basic training on clean code and XP techniques.&lt;/p&gt;
+
+&lt;p&gt;But going to Software Craftsmanship events, especially the international ones, made me realize there is so much more to learn. I attribute my ignorance to the &lt;a href=&#34;https://en.wikipedia.org/wiki/Dunning%E2%80%93Kruger_effect&#34;&gt;Dunning Kruger&lt;/a&gt; effect. Or the fact that there weren&amp;rsquo;t many people who understood.
+I tried to get some advice from my peers and the answers I heard were:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&amp;ldquo;You just need to spend a few years gaining more experience.&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;This is as far as you can go with learning about good design&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;The training you are looking for doesn&amp;rsquo;t exist, you can train special frameworks and technologies instead&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;Your career options are management or full time process consulting&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Needless to say, given my personality and my goals, this &amp;lsquo;advice&amp;rsquo; didn&amp;rsquo;t satisfy me. Here is what I tried instead:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;I started organizing events to improve by pairing with other motivated coders&lt;/li&gt;
+&lt;li&gt;I booked a one-on-one, advanced design training&lt;/li&gt;
+&lt;li&gt;I used my free time to participate in as many meetups and conferences as I could&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Still, for 40 hours a week, in my comfortable, reasonably agile team, I wasn&amp;rsquo;t improving much. And there weren&amp;rsquo;t enough people senior to me that I could learn from.
+One example is that we were proposing to use the same technology stack for almost every project we started. We used Spring, Hibernate and other frameworks that forced us into a particular design.
+And a lot of the new things I was trying to bring in from outside were rejected, so I couldn&amp;rsquo;t practice them in a &amp;ldquo;real&amp;rdquo; project.&lt;/p&gt;
+
+&lt;p&gt;When I heard &lt;a href=&#34;https://twitter.com/sandromancuso&#34;&gt;Sandro&lt;/a&gt; and &lt;a href=&#34;https://twitter.com/mashooq&#34;&gt;Mash&lt;/a&gt; talk about how important it is to spend your main working time somewhere you can improve, it really hit home. In &lt;a href=&#34;http://www.amazon.co.uk/books/dp/0134052501&#34;&gt;The Software Craftsman&lt;/a&gt;, I read inspiring words about what it meant to take charge of your career.
+I realized I needed to make a bigger change to get where I wanted to be.&lt;/p&gt;
+
+&lt;p&gt;I quit my job (it had three months notice) and applied in London, hoping to get accepted at Codurance. I was intrigued by the opportunity to work with &lt;a href=&#34;http://codurance.com/aboutus/ourteam/&#34;&gt;awesome craftsmen&lt;/a&gt; and to have a few months of focussed learning in my apprenticeship.
+As it turned out, I was a fit and they wanted me to start as early as possible. Organizing the move with no vacation time in between my jobs was a challenge, but I managed.&lt;/p&gt;
+
+&lt;h2 id=&#34;starting-my-apprenticeship&#34;&gt;Starting my apprenticeship&lt;/h2&gt;
+
+&lt;p&gt;Early on I understood that I was the person driving my apprenticeship. Both the company and I benefit from me graduating, but it&amp;rsquo;s my responsibility to get there.
+This is very different from studying at university, where you have a syllabus, exams and credits to collect.&lt;/p&gt;
+
+&lt;p&gt;I started by identifying what Codurance expects from their craftsmen. Some things had already been covered in the application process and in conversations I had with Codurance employees before. There was the &lt;a href=&#34;http://codurance.com/careers/craftsman/&#34;&gt;job description&lt;/a&gt; and a list of values in the Codurance wiki.
+From those, I identified I wanted to focus on improving my design and DevOps skills. Other important aspects are writing and presenting, and getting involved in the Software Craftsmanship Community.
+I made a list of tasks I wanted to do to reach my goals and got encouraging feedback from the founders.&lt;/p&gt;
+
+&lt;h2 id=&#34;mentorship&#34;&gt;Mentorship&lt;/h2&gt;
+
+&lt;p&gt;The next step was to find a mentor to guide me and help me to focus on my goal to graduate. I had a chat with the available craftsmen about how they could help me and what they expected from me.
+And from the ones that offered, I chose &lt;a href=&#34;https://twitter.com/SamirTalwar&#34;&gt;Samir&lt;/a&gt; as my mentor. We meet regularly to pair and discuss my progress. The founders are also providing advice and guidance.&lt;/p&gt;
+
+&lt;h2 id=&#34;first-challenge&#34;&gt;First challenge&lt;/h2&gt;
+
+&lt;p&gt;I was reasonably fast using my Windows laptop, Eclipse IDE and a German keyboard layout. But the first goal was to learn to be efficient using IntelliJ idea shortcuts, a Mac and the UK keyboard layout.
+Why? Because I don&amp;rsquo;t want to waste time between having an idea in my head and writing the code to try it.&lt;/p&gt;
+
+&lt;p&gt;So I practiced the &lt;a href=&#34;https://www.youtube.com/watch?v=iZjgj1S0FCY&#34;&gt;Roman Numerals&lt;/a&gt; kata a few times, to learn some basic navigation skills and other shortcuts.
+Then I moved on to refactoring the &lt;a href=&#34;https://github.com/sandromancuso/trip-service-kata&#34;&gt;Trip Service&lt;/a&gt; kata. Refactoring is one of my favorite coding activities, and it felt very rewarding to speed it up.
+One of the things I found most useful is the &lt;kbd&gt;⇧&lt;/kbd&gt; + &lt;kbd&gt;&amp;#8984;&lt;/kbd&gt; + &lt;kbd&gt;A&lt;/kbd&gt; Shortcut in IntelliJ IDEA. It allows you to search for any action available, be it a setting or a refactoring step. And it shows you the applicable shortcuts.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/findAction.png&#34; alt=&#34;Find Action&#34; title=&#34;Find Action&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;h2 id=&#34;baby-steps-for-better-design&#34;&gt;Baby steps for better design&lt;/h2&gt;
+
+&lt;p&gt;I continued with our trainings &lt;a href=&#34;http://codurance.com/services/training/crafting-code/&#34;&gt;Crafting Code&lt;/a&gt; and &lt;a href=&#34;http://codurance.com/services/training/crafted-design/&#34;&gt;Crafted Design&lt;/a&gt; and got a better understanding of Dependency inversion, Outside-In TDD and &lt;a href=&#34;http://ustre.am/:49XUG&#34;&gt;Interaction Driven Design&lt;/a&gt;.
+It&amp;rsquo;s one thing to watch videos or read blog posts, but actually implementing and practicing has always been a more sustainable way of learning for me.&lt;/p&gt;
+
+&lt;h2 id=&#34;peer-learning&#34;&gt;Peer learning&lt;/h2&gt;
+
+&lt;p&gt;Every Monday, all Codurance apprentices meet up in the office to learn together. We pair on katas, present lightning talks and have discussions.
+We also started a book club and are currently reading &lt;a href=&#34;http://www.growing-object-oriented-software.com/&#34;&gt;Growing Object-Oriented Software Guided by Tests&lt;/a&gt;. The regular meetups motivate to keep reading.
+Additionally, discussing what each of us understood and took out of the material helps to reinforce the learning and clear up any misunderstandings.&lt;/p&gt;
+
+&lt;p&gt;One of the things we discussed was how the tests help us to look at the unit we are developing from the outside. So when we are writing tests, we should always ask: What are we promising to units interacting with our unit? What can they expect our &amp;lsquo;thing&amp;rsquo; to do?
+Since all of us have different backgrounds, we can share our experiences and support each other. It&amp;rsquo;s great to be part of a group!
+One of the craftsmen will join us on the meetings and provide us with advice and guidance.&lt;/p&gt;
+
+&lt;h2 id=&#34;on-the-shoulders-of-giants&#34;&gt;On the shoulders of giants&lt;/h2&gt;
+
+&lt;p&gt;A lot of good design has already been described in length in various books and blogposts. On the advice of my mentor, I try to focus on reading one book at a time. I also try to read two blog posts a week on topics I&amp;rsquo;m interested in.
+I read blog posts on &lt;a href=&#34;https://pragprog.com/magazines/2010-12/cohesive-software-design&#34;&gt;cohesion&lt;/a&gt;, &lt;a href=&#34;http://martinfowler.com/ieeeSoftware/coupling.pdf&#34;&gt;coupling&lt;/a&gt;, &lt;a href=&#34;http://www.thoughtworks.com/insights/blog/composition-vs-inheritance-how-choose&#34;&gt;composition over inheritance&lt;/a&gt;, the four rules of &lt;a href=&#34;http://martinfowler.com/bliki/BeckDesignRules.html&#34;&gt;simple design&lt;/a&gt; and their &lt;a href=&#34;http://blog.thecodewhisperer.com/2013/12/07/putting-an-age-old-battle-to-rest/&#34;&gt;order&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Another important aspect is sharing my learnings, which is why I intend to regularly write on the &lt;a href=&#34;http://codurance.com/blog/&#34;&gt;Codurance blog&lt;/a&gt;. It&amp;rsquo;s important to timebox reading and writing though, because my learnings usually come from doing :) By advice of my mentor, I try to spend 20% of my time on it.&lt;/p&gt;
+
+&lt;p&gt;I am also sharing by presenting at various conferences. I plan to attend SoCraTes unconferences in  &lt;a href=&#34;https://www.socrates-conference.de/&#34;&gt;Germany&lt;/a&gt;, &lt;a href=&#34;http://socrates-fr.github.io/&#34;&gt;France&lt;/a&gt; and &lt;a href=&#34;http://www.socratesbe.org/&#34;&gt;Belgium&lt;/a&gt;. I am presenting at &lt;a href=&#34;http://swancon.co.uk/&#34;&gt;SWANSEACON&lt;/a&gt; and &lt;a href=&#34;http://www.xpdays.de/2015/&#34;&gt;XP Days Germany&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;working-for-codurance&#34;&gt;Working for Codurance&lt;/h2&gt;
+
+&lt;p&gt;One way I am contributing to Codurance&amp;rsquo;s success is to help out with the recruitment efforts. Be it by reaching out to possible candidates or reviewing code submissions.&lt;/p&gt;
+
+&lt;h2 id=&#34;ideal-conditions&#34;&gt;Ideal conditions&lt;/h2&gt;
+
+&lt;p&gt;Just being around the Codurance office is a blessing. Here are some highlights: Spontaneous discussions about design, pairing with &lt;a href=&#34;https://twitter.com/sandromancuso&#34;&gt;Sandro&lt;/a&gt;, developing the website with &lt;a href=&#34;http://twitter.com/anainogal&#34;&gt;Ana&lt;/a&gt;, learning consultant skills from &lt;a href=&#34;https://twitter.com/mashooq&#34;&gt;Mash&lt;/a&gt;, discussing good design with &lt;a href=&#34;http://twitter.com/lrbpx&#34;&gt;Liam&lt;/a&gt;, organizing meetups with &lt;a href=&#34;http://twitter.com/craftatheart&#34;&gt;Ana&lt;/a&gt;,..&lt;/p&gt;
+
+&lt;p&gt;Biweekly, we also have a catch up with all of Codurance. We use this to keep each other up to date about what we are working on, what our challenges are and what we learned. We have some pizza and some presentations on topics we are interested in.&lt;/p&gt;
+
+&lt;p&gt;Speaking about pizza, there are lots of interesting meetups in London! My favorites so far are the &lt;a href=&#34;http://www.meetup.com/london-software-craftsmanship/&#34;&gt;LSCC hands on&lt;/a&gt; and the &lt;a href=&#34;http://www.meetup.com/Extreme-Programmers-London/&#34;&gt;eXtreme Programmers London&lt;/a&gt;. I am definitely planning on contributing on them! They also feature great discussions afterwards at the pub, which I really enjoyed.
+I also had the honor to facilitate an &lt;a href=&#34;http://www.meetup.com/london-software-craftsmanship/&#34;&gt;LSCC talks&lt;/a&gt; meetup.&lt;/p&gt;
+
+&lt;p&gt;Another beneficial aspect is &lt;a href=&#34;http://codurance.com/2015/07/14/learning-from-our-failures/&#34;&gt;Codurance&amp;rsquo;s culture&lt;/a&gt;. I get feedback and advice and can give feedback myself. My opinion is valued and I am encouraged to be self organized and proactive. I keep my mentor updated on my progress. The founders and the mentor regularly check in on me to solve any problems that could arise.&lt;/p&gt;
+
+&lt;h2 id=&#34;future-plans&#34;&gt;Future plans&lt;/h2&gt;
+
+&lt;p&gt;One important expectation my mentor has is that I always know what to do next. Here are a few things I want to do:
+I&amp;rsquo;ll propose more conference talks and might present or host more LSCC meetings.
+I will also start working on a larger project (a journeyman&amp;rsquo;s piece, so to speak) to practice DevOps, Functional Programming and Domain Driven Design.&lt;/p&gt;
+
+&lt;p&gt;I am excited to see where it leads me!&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Learning from our failures</title>
+      <link>http://codurance.com/blog/learning-from-our-failures/</link>
+      <pubDate>Tue, 14 Jul 2015 17:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/learning-from-our-failures/</guid>
+      <description>&lt;p&gt;On my second day at Codurance, I managed to delete the repository with &lt;a href=&#34;http://codurance.com/&#34;&gt;Codurance&amp;rsquo;s GitHub Pages&lt;/a&gt; on it. This made the website unavailable for the first time in a long time, and during best business hours.
+I passed by all the checks Github does to make sure you know what you&amp;rsquo;re doing, thinking I was about to delete the fork I accidentally created. When I saw afterwards that the fork was still there, I immediately realized what I had done.&lt;/p&gt;
+
+&lt;p&gt;Now it was time to make a decision: Should I to fix the problem by myself and hope no one noticed it, or confess what I did and get help solving it?
+Fortunately, I chose the latter. Mortified, I told the founders what I had done.
+Their reaction was very calm. No shaming, no shouting, no blaming.
+They immediately started to work on getting the website back up as fast as possible and even tried to reassure me that those kind of things happen.
+According to them, everyone makes mistakes and this was an opportunity to learn.&lt;/p&gt;
+
+&lt;p&gt;And indeed it was! I found out, that you can &lt;a href=&#34;http://stackoverflow.com/a/28982367&#34;&gt;ask the GitHub support&lt;/a&gt; to restore your repository with all the pull requests, auth tokens etc. on it, which is supposed to be a very fast way to recover everything.
+Since no one really cared that the issue and pull request history was gone, and there were no open issues or pull requests, we restored the code and git history from a local machine. Together with another apprentice, I learned how to encrypt new auth tokens and configure &lt;a href=&#34;https://evansosenko.com/posts/automatic-publishing-github-pages-travis-ci/&#34;&gt;Travis&lt;/a&gt; to be able to push again. Because the auth tokens were gone from the repository, we had to create new ones.
+I reconfigured the &lt;a href=&#34;http://www.shadabahmed.com/git/2015/03/06/integrating-slack-with-github-enterprise/&#34;&gt;Slack GitHub integration&lt;/a&gt; and asked the team to have a look at other things that might need reconfiguring.
+In the end, the problems weren&amp;rsquo;t as bad as I thought they were, and we could fix the issues together.&lt;/p&gt;
+
+&lt;p&gt;Should Codurance not have given me as many rights to modify the repository as they did? It depends on what you consider a good company culture. Allowing every team member to modify the website counters micro-managing, encourages self-organization and shows the trust placed in us. And that trust didn&amp;rsquo;t waver after I made my mistake. Since then I was able and motivated to fix several issues on the website.
+Of course an important factor in dealing with the problem was the fact that the website was build in such a way that it was easily recovered. This is how it&amp;rsquo;s supposed to be to counter the fear of breaking stuff when you are changing things.&lt;/p&gt;
+
+&lt;p&gt;The reaction I got for admitting my mistake gives me the courage to admit the next failure when it occurs, allows me to move on and others to learn from it. Only through trying to remove the fear of failure, &lt;a href=&#34;http://www.forbes.com/sites/darden/2012/06/20/creating-an-innovation-culture-accepting-failure-is-necessary/&#34;&gt;innovation is possible&lt;/a&gt;. I&amp;rsquo;m glad I joined a company with this culture.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Finding the biting point with pair programming</title>
+      <link>http://codurance.com/blog/finding-the-biting-point/</link>
+      <pubDate>Wed, 17 Jun 2015 09:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/finding-the-biting-point/</guid>
+      <description>
+
+&lt;h2 id=&#34;the-inevitable-imbalance-in-pair-programming&#34;&gt;The inevitable imbalance in pair programming.&lt;/h2&gt;
+
+&lt;p&gt;At some point throughout a developers career, no matter their experience, they will most likely find themselves in a situation where they are either the Junior or the Senior of the two in a pair programming session. In this context, being the &lt;strong&gt;Junior&lt;/strong&gt; does not only mean being a less experienced developer, but it could also mean somebody that has not been introduced to the current project yet, or someone who is inexperienced with the language.&lt;/p&gt;
+
+&lt;p&gt;When you find yourself in this situation, you might notice that the junior developer of the two struggles getting to grips with the code, and the senior might feel as if they are carrying the weight of the pairing session on their back. This can certainly end up frustrating for both. As a result, the senior developer will jump in the driving seat behind the keyboard and lead the way, not much is exchanged between the two and the junior developer will simply watch until whatever task is completed, maybe trying to ask a question or provide some help here or there.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/finding-the-biting-point/picture1.png&#34;  class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;So what happens when they switch roles? All of a sudden the junior of the two is put behind the keyboard and struggles to move forward. The senior will become frustrated and impatient, and both members of the team will feel uncomfortable working together, possibly creating tension within the entire working environment. This problem will stagnate and not go away because neither parties feel there is nothing they can do and in order to get the work done &lt;strong&gt;now&lt;/strong&gt;, the senior developer must continue to carry the weight of the work on the back while the junior developer watches.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/finding-the-biting-point/picture2.png&#34;  class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;Even worse, what will happen when the junior developer will have to separate and work by themselves? This is both a cause and symptom of the junior developer sitting in the passenger seat too long. He was never able to drive for himself and as a result was never able to find the biting point of the software.&lt;/p&gt;
+
+&lt;h2 id=&#34;finding-the-biting-point&#34;&gt;Finding the biting point?&lt;/h2&gt;
+
+&lt;p&gt;When learning to drive a manual transmission car, the steps in order to move the car forward are as follows:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Push the clutch down all the way with your left foot&lt;/li&gt;
+&lt;li&gt;Put the car into first gear&lt;/li&gt;
+&lt;li&gt;Slowly begin to put your right foot on the gas pedal&lt;/li&gt;
+&lt;li&gt;Slowly lift your left foot off of the clutch until the car starts to accelerate&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/finding-the-biting-point/picture3.png&#34;  class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;Finding the sweet spot where the clutch meets the gears was taught to me as &amp;lsquo;Finding the biting point&amp;rsquo;. That biting point is a very specific feeling that you only experience once you have driven a car for yourself. You could watch someone work the pedals a thousand times but until you get behind them yourself you will never get used to their feedback or tension. To me, this intrinsic feeling also exists in software. I can remember times where I have been sitting in the back seat of a pairing session contributing sound and useful ideas and solutions. Once I was handed the keyboard I found myself stalling. This is because I was never able to find the biting point myself and gain my own understanding of the structure and feel of the code. This will most likely have to happen once, better sooner than later.&lt;/p&gt;
+
+&lt;h2 id=&#34;so-what-should-i-do&#34;&gt;So what should I do?&lt;/h2&gt;
+
+&lt;h3 id=&#34;as-a-junior-in-the-pair&#34;&gt;As a Junior in the pair&amp;hellip;&lt;/h3&gt;
+
+&lt;p&gt;I know it&amp;rsquo;s tough to admit ignorance, but everyone has to start somewhere. Ask questions often, if there&amp;rsquo;s a task you think you can handle, ask for the keyboard, request that your partner guides you and is patient with you while you get to grips with the code. Study in your own time. If possible and if you haven&amp;rsquo;t already, clone the repo on your machine and browse the code, branch off and try to add a new feature and see what will happen. Most importantly, be honest. There&amp;rsquo;s nothing wrong with not knowing something, however the same can not be said about holding yourself back.&lt;/p&gt;
+
+&lt;h3 id=&#34;as-a-senior-in-the-pair&#34;&gt;As a Senior in the pair&amp;hellip;&lt;/h3&gt;
+
+&lt;p&gt;Encourage your pair, at regular intervals pass them the keyboard and guide them. Answer their questions where possible. Most importantly, &lt;strong&gt;try to be patient&lt;/strong&gt;. Remember that if you&amp;rsquo;re teaching a less experienced developer, you&amp;rsquo;re not only doing them a favour, but also strengthening your entire team.&lt;/p&gt;
+
+&lt;h3 id=&#34;it-takes-two-to-tango&#34;&gt;It takes two to tango.&lt;/h3&gt;
+
+&lt;p&gt;If you are trying to teach someone who is clearly showing they are not interested in learning, know that you&amp;rsquo;ve tried you&amp;rsquo;re best and don&amp;rsquo;t exert further effort until they are willing. Alternatively, if you&amp;rsquo;re eager to grab the keyboard from someone who is being particularly stubborn, it&amp;rsquo;s probably best to not stir further and just wait for a better opportunity. However this isn&amp;rsquo;t an opportunity to completely switch off, continue contributing where possible.&lt;/p&gt;
+
+&lt;p&gt;Good results will require effort and good will from both sides. Providing that that can be managed, there&amp;rsquo;s no reason for you not to be strengthening your team during every pairing session.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

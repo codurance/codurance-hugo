@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Practices on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/practices/</link>
+    <description>Recent content in Practices on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Sat, 14 May 2016 00:20:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/practices/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>A Retrospective in the Park</title>
+      <link>http://codurance.com/blog/retrospective-park/</link>
+      <pubDate>Sat, 14 May 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/retrospective-park/</guid>
+      <description>
+
+&lt;p&gt;The other day, I facilitated a sprint retrospective in the park. The sun was shining, and we had all been working hard to complete our backlog, so it felt like a nice reward for everyone’s efforts. Holding a retrospective outdoors can also give it an energy and sense of enthusiasm that is harder to find in a small room.&lt;/p&gt;
+
+&lt;p&gt;I’ve run outdoor retrospectives before, and have previously followed fairly classic plans, with much arranging of index cards. This has never been a great success, as the slightest breath of a breeze can make a mess of your planning. For this retrospective, I designed a plan to avoid these problems, drawing some ideas from the &lt;a href=&#34;http://retrospectivewiki.org/index.php?title=Appreciative_Retrospective&#34;&gt;Appreciative Retrospective&lt;/a&gt; plan.&lt;/p&gt;
+
+&lt;p&gt;This retrospective took an hour for a team of nine. You’ll need a pile of index cards or sticky notes, and a pen per person. Here’s how to do it:&lt;/p&gt;
+
+&lt;h2 id=&#34;1-choose-your-location&#34;&gt;1. Choose your location&lt;/h2&gt;
+
+&lt;p&gt;Some people are sun lovers, whilst others, like me, burn easily and need some shade, so find a location that will work for everyone. Don&amp;rsquo;t worry too much about the state of the grass, as I suggest you conduct the retrospective standing up, if possible.&lt;/p&gt;
+
+&lt;p&gt;Get everyone to stand in a circle, with enough personal space for everyone, but close enough that you can hear everyone speak.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Observations&lt;/strong&gt;: It&amp;rsquo;s nice if you can find a location where there won&amp;rsquo;t be too many distractions. We weren&amp;rsquo;t entirely successful: there was a hen party in another corner of the park, whose popping of prosecco corks and parading of an anatomically exaggerated blow-up mannequin was hard to ignore; there was also a group of male models sunning themselves noisily behind us (I’m working at a fashion company, so this is less unusual than it may sound), and three young women were smoking some &lt;em&gt;interesting&lt;/em&gt; cigarettes upwind of us. Nonetheless, our retrospective was a success despite occasional distractions.&lt;/p&gt;
+
+&lt;h2 id=&#34;2-characterise-the-sprint&#34;&gt;2. Characterise the sprint&lt;/h2&gt;
+
+&lt;p&gt;Ask everyone to spend a couple of minutes coming up with three words to characterise the sprint; then go clockwise round the circle and ask each person to tell the team their three words.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Observations&lt;/strong&gt;: It&amp;rsquo;s surprising how much difficulty people have sticking to three words; the important focus of this task is not the three-word limit, but getting a concise summary of the sprint.&lt;/p&gt;
+
+&lt;h2 id=&#34;3-thank-your-neighbour&#34;&gt;3. Thank your neighbour&lt;/h2&gt;
+
+&lt;p&gt;Moving anticlockwise around the team, ask each team member to thank their neighbour for something they have done during this sprint.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Observations&lt;/strong&gt;: Our Scrum Master broke the rules by thanking the whole team for their efforts. The focus of this task is to generate a positive mood across the team, and it&amp;rsquo;s important that no one misses out on individual thanks, so I asked him to thank his neighbour for something as well.&lt;/p&gt;
+
+&lt;h2 id=&#34;4-describe-what-went-well&#34;&gt;4. Describe what went well&lt;/h2&gt;
+
+&lt;p&gt;Hand each person three cards, and give them three minutes to write down three things that went well during the sprint. Going clockwise round the circle from a different starting point, ask each person to read out their three successes.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Observations&lt;/strong&gt;: It&amp;rsquo;s useful for the facilitator to observe and comment on common themes, as this can help reinforce good practice.&lt;/p&gt;
+
+&lt;h2 id=&#34;5-describe-what-could-improve&#34;&gt;5. Describe what could improve&lt;/h2&gt;
+
+&lt;p&gt;Hand each person three more cards, and give them another three minutes to write down three things that could have gone even better during the sprint. Then go anticlockwise round the circle and ask each person to read out their three improvements.&lt;/p&gt;
+
+&lt;h2 id=&#34;6-group-the-improvements&#34;&gt;6. Group the improvements&lt;/h2&gt;
+
+&lt;p&gt;Instead of arranging the cards on a whiteboard (which isn&amp;rsquo;t practical in the park), appoint a champion for each improvement. Ask the first person to choose one of the improvements they suggested, and then get everyone else to hand this person any cards that describe a similar improvement. Keep running round the team until each team member has just one group of cards.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Observations&lt;/strong&gt;: There&amp;rsquo;s a chance that you&amp;rsquo;ll end up with more themes than team members, in which case you&amp;rsquo;ll have to make a decision to drop some of these themes; in our case we had fewer common themes than team members, so we didn&amp;rsquo;t have to do this.&lt;/p&gt;
+
+&lt;h2 id=&#34;7-select-and-discuss-the-most-common-themes&#34;&gt;7. Select and discuss the most common themes&lt;/h2&gt;
+
+&lt;p&gt;Rather than dot-voting, which again is impractical in the park, select the commonest themes. Ask everyone with any cards to take a step into the circle. Then ask everyone with just one card to take a step out again; then everyone with just two cards; then three, and so on until just three people are left in the inner circle.&lt;/p&gt;
+
+&lt;p&gt;Then have a three-minute discussion of each of these suggested improvements, with the focus of identifying at least one action per theme for the next sprint. Ensure someone is assigned to each action.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Observations&lt;/strong&gt;: We ran slightly over the three minutes assigned to each theme, but this wasn&amp;rsquo;t a problem; if we hadn&amp;rsquo;t had a time limit, I suspect the conversation would have been much less focused.&lt;/p&gt;
+
+&lt;h2 id=&#34;8-round-off-the-retrospective&#34;&gt;8. Round off the retrospective&lt;/h2&gt;
+
+&lt;p&gt;Finally, going round the circle clockwise, ask everyone to describe how they felt about the retrospective itself.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Observations&lt;/strong&gt;: The feedback was very positive. The team had clearly enjoyed the opportunity to get out of the office, and they felt that the session had been successful: everyone was engaged and we came up with some good actions.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Multiple projects in Visual Studio solutions considered harmful</title>
+      <link>http://codurance.com/blog/visual-studio-projects/</link>
+      <pubDate>Mon, 23 Mar 2015 22:49:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/visual-studio-projects/</guid>
+      <description>
+
+&lt;h1 id=&#34;multiple-projects-in-visual-studio-solutions-considered-harmful&#34;&gt;Multiple projects in Visual Studio solutions considered harmful&lt;/h1&gt;
+
+&lt;p&gt;I agree with &lt;a href=&#34;https://lostechies.com/chadmyers/author/chadmyers/&#34;&gt;Chad Myers&lt;/a&gt; when he defines a common project anti-pattern &lt;a href=&#34;https://lostechies.com/chadmyers/2008/07/16/project-anti-pattern-many-projects-in-a-visual-studio-solution-file/&#34;&gt;“Many projects in a Visual Studio Solution”&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;fast-feedback-loop&#34;&gt;Fast feedback loop&lt;/h2&gt;
+
+&lt;p&gt;Too many projects increase both the load and build time of your solution. Also a solution will take longer to start executing in debug due the overhead of loading/resolving multiple assemblies with associated PDB’s and symbols. This has an impact on the fast feedback loop we should strive to achieve. When I write code I want feedback as fast as possible. This includes compiling, and executing tests. Solutions with multiple projects affect the fast feedback loop.&lt;/p&gt;
+
+&lt;h2 id=&#34;logical-boundary-physical-boundary&#34;&gt;Logical boundary != Physical boundary&lt;/h2&gt;
+
+&lt;p&gt;An assembly is a unit of deployment in .Net. A Visual Studio project has a 1 on 1 relation with an assembly. We should have boundaries in our solutions, but we should not confuse logical boundaries with physical boundaries. A project in Visual Studio creates a physical boundary; this is often needed, but also open to abuse. Physical boundaries are all about deployment and versioning. If you are not deploying and versioning a part of your code independently, there is no reason to create a physical boundary. Multiple layers != multiple assemblies.&lt;/p&gt;
+
+&lt;h2 id=&#34;dependency-management&#34;&gt;Dependency management&lt;/h2&gt;
+
+&lt;p&gt;I don&amp;rsquo;t want to reference System.Web across all code, so I create a separate assembly where I &amp;ldquo;isolate&amp;rdquo; the code that depends on that assembly. When I hear this argument, most of the time it equates to distrust among team members. Or, I don&amp;rsquo;t trust other developers, so to avoid them referencing System.Web on business classes, I segregate them in another project that does not reference System.Web. Can you hear yourself? There may be a compelling reason to isolate a dependency in a separate assembly, but the reason should not be: to avoid other developers making a mess.&lt;/p&gt;
+
+&lt;h2 id=&#34;how-do-i-do-it&#34;&gt;How do I do it?&lt;/h2&gt;
+
+&lt;p&gt;My solutions start with two projects one for production code and one for tests. The question to ask before creating a project is: Do I need to deploy and version this part of the code independently? Only if the answer is yes do I create a new project.&lt;/p&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;This subject has been discussed in the community for a long time but I still don’t see any change. I’m continuously faced with solutions with dozens even hundreds of projects. In fact I would say this is the norm, unfortunately. I still see shocked faces, when I propose rearranging a solution using folders and namespaces instead of projects. So I’m adding my voice to other voices.&lt;/p&gt;
+
+&lt;p&gt;Some authors propose a number between 15-20 maximum projects in a Visual Studio Solution to be a good compromise. I disagree; my proposal is one for production code and a separate project for tests. Adding any other project to a solution should be considered very carefully.&lt;/p&gt;
+
+&lt;p&gt;Thanks to Tom Male and Eric Li Koo for reading drafts of this.&lt;/p&gt;
+
+&lt;h4 id=&#34;references&#34;&gt;References&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://ayende.com/blog/3158/the-two-project-solution&#34;&gt;http://ayende.com/blog/3158/the-two-project-solution&lt;/a&gt;
+&lt;a href=&#34;http://geekswithblogs.net/FrostRed/archive/2008/10/03/125628.aspx&#34;&gt;http://geekswithblogs.net/FrostRed/archive/2008/10/03/125628.aspx&lt;/a&gt;
+&lt;a href=&#34;http://codebetter.com/jeremymiller/2008/09/30/separate-assemblies-loose-coupling/&#34;&gt;http://codebetter.com/jeremymiller/2008/09/30/separate-assemblies-loose-coupling/&lt;/a&gt;
+&lt;a href=&#34;http://www.hanselman.com/blog/AssemblyFiefdomsWhatsTheRightNumberOfAssembliesLibraries.aspx&#34;&gt;http://www.hanselman.com/blog/AssemblyFiefdomsWhatsTheRightNumberOfAssembliesLibraries.aspx &lt;/a&gt;
+&lt;a href=&#34;https://lostechies.com/chadmyers/2008/07/16/project-anti-pattern-many-projects-in-a-visual-studio-solution-file/&#34;&gt;https://lostechies.com/chadmyers/2008/07/16/project-anti-pattern-many-projects-in-a-visual-studio-solution-file/&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

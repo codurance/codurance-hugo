@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Correctness on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/correctness/</link>
+    <description>Recent content in Correctness on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Thu, 02 Oct 2014 13:00:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/correctness/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Highly Strung</title>
+      <link>http://codurance.com/blog/highly-strung/</link>
+      <pubDate>Thu, 02 Oct 2014 13:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/highly-strung/</guid>
+      <description>&lt;p&gt;This blog post is way overdue.&lt;/p&gt;
+
+&lt;p&gt;A couple of months ago, I wrote a talk entitled &lt;a href=&#34;http://samirtalwar.github.io/talks/highly-strung.html&#34;&gt;Highly Strung&lt;/a&gt; for the &lt;a href=&#34;http://virtualjug.com/&#34;&gt;Virtual Java User Group (vJUG)&lt;/a&gt; on when and how to use strings in your code.&lt;/p&gt;
+
+&lt;p&gt;Spoiler: don&amp;rsquo;t.&lt;/p&gt;
+
+&lt;p&gt;So this blog post is really just to ask you to check it out if you&amp;rsquo;re interested. The link&amp;rsquo;s up top, and has the talk in essay form, the slides &lt;em&gt;and&lt;/em&gt; the video, lovingly recorded by the folks who run the vJUG.&lt;/p&gt;
+
+&lt;p&gt;Go on, &lt;a href=&#34;http://samirtalwar.github.io/talks/highly-strung.html&#34;&gt;check it out&lt;/a&gt;. I want to tell you something else, but afterwards.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;OK, now the cool bit. Go back to that page and click on the &amp;ldquo;Presentation&amp;rdquo; link in the top-right corner, and watch as the page &lt;em&gt;doesn&amp;rsquo;t&lt;/em&gt; reload.&lt;/p&gt;
+
+&lt;p&gt;OK, funky JavaScript. Who cares?&lt;/p&gt;
+
+&lt;p&gt;Well, that&amp;rsquo;s because the essay and the slides are the same HTML document (give or take). It&amp;rsquo;s just markup and a little bit of JavaScript to get the ball rolling.&lt;/p&gt;
+
+&lt;p&gt;If you look at the HTML source of the document, you&amp;rsquo;ll see that there are lots of &lt;code&gt;&amp;lt;section&amp;gt;&lt;/code&gt; blocks. Each one is a slide in the presentation. Inside those are lots of &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt; blocks with a class of &lt;code&gt;notes&lt;/code&gt;. In presentation mode, these are hidden. And it&amp;rsquo;s &lt;a href=&#34;https://github.com/SamirTalwar/talks/blob/gh-pages/index.md&#34;&gt;all Markdown&lt;/a&gt; under the hood, rendered by GitHub Pages, so it&amp;rsquo;s just a static site.&lt;/p&gt;
+
+&lt;p&gt;And, well, that&amp;rsquo;s about it. All that &amp;ldquo;Presentation&amp;rdquo; link does is change the CSS class on the &lt;code&gt;&amp;lt;body&amp;gt;&lt;/code&gt; to tell the document to hide the notes (and show a few extra things), and load up &lt;a href=&#34;https://github.com/hakimel/reveal.js&#34;&gt;reveal.js&lt;/a&gt;. Shiny, huh?&lt;/p&gt;
+
+&lt;p&gt;The only thing I&amp;rsquo;m missing is a way to get back to the essay form. Currently I reload the page, because there seems to be no way to unload reveal.js once it&amp;rsquo;s loaded, but that&amp;rsquo;s not so bad, y&amp;rsquo;know.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

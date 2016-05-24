@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Messaging on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/messaging/</link>
+    <description>Recent content in Messaging on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Mon, 16 May 2016 00:20:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/messaging/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Publish-subscribe model in Kafka</title>
+      <link>http://codurance.com/blog/Publish-subscribe-model-in-Kafka/</link>
+      <pubDate>Mon, 16 May 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/Publish-subscribe-model-in-Kafka/</guid>
+      <description>
+
+&lt;p&gt;This is the fourth post in the series about integrating sync clients with async systems (&lt;a href=&#34;http://codurance.com/2016/04/28/async-systems-with-sync-clients/&#34;&gt;1, &lt;/a&gt;&lt;a href=&#34;http://codurance.com/2016/04/30/akka-basics/&#34;&gt;2, &lt;/a&gt;&lt;a href=&#34;http://codurance.com/2016/05/10/finite-state-machines-with-akka/&#34;&gt;3&lt;/a&gt;). Here we&amp;rsquo;ll try to understand how &lt;a href=&#34;http://kafka.apache.org/&#34;&gt;Kafka&lt;/a&gt; works in order to correctly leverage its publish-subscribe implementation.&lt;/p&gt;
+
+&lt;h2 id=&#34;kafka-concepts&#34;&gt;Kafka concepts&lt;/h2&gt;
+
+&lt;p&gt;According to the &lt;a href=&#34;http://kafka.apache.org/documentation.html#introduction&#34;&gt;official documentation&lt;/a&gt;:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Kafka is a distributed, partitioned, replicated commit log service. It provides the functionality of a messaging system, but with a unique design.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Kafka runs as a cluster and the nodes are called brokers. Brokers can be leaders or replicas to provide high-availability and fault tolerance. Brokers are in charge of partitions, being the distribution unit where messages are stored. Those messages are ordered and they&amp;rsquo;re accessible by an index called offset. A set of partitions forms a topic, being a feed of messages. A partition can have different consumers, and they access to the messages using its own offset. Producers publish messages into Kafka topics. This diagram from &lt;a href=&#34;http://kafka.apache.org/documentation.html#intro_topics&#34;&gt;Kafka&amp;rsquo;s documentation&lt;/a&gt; could help to understand this:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/topic.png&#34; alt=&#34;Kafka&amp;#39;s topic&#34; title=&#34;Kafka&amp;#39;s topic&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;h2 id=&#34;queuing-vs-publish-subscribe&#34;&gt;Queuing vs publish-subscribe&lt;/h2&gt;
+
+&lt;p&gt;Consumer groups is another key concept and helps to explain why Kafka is more flexible and powerful than other messaging solutions like &lt;a href=&#34;https://www.rabbitmq.com/&#34;&gt;RabbitMQ&lt;/a&gt;. Consumers are associated to consumer groups. If every consumer belongs to the same consumer group, the topic&amp;rsquo;s messages will be evenly load balanced between consumers; that&amp;rsquo;s called a &amp;lsquo;queuing model&amp;rsquo;. By contrast, if every consumer belongs to different consumer group, all the messages will be consumed in every client; that&amp;rsquo;s called a &amp;lsquo;publish-subscribe&amp;rsquo; model.&lt;/p&gt;
+
+&lt;p&gt;You can have a mix of both approaches, having different logical consumer groups, for different needs, and several consumers inside of every group to increase throughput through parallelism. Again, another diagram from &lt;a href=&#34;http://kafka.apache.org/documentation.html#intro_topics&#34;&gt;Kafka&amp;rsquo;s documentation&lt;/a&gt;:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/consumer-groups.png&#34; alt=&#34;Kafka&amp;#39;s consumer groups&#34; title=&#34;Kafka&amp;#39;s consumer groups&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;h2 id=&#34;understanding-our-needs&#34;&gt;Understanding our needs&lt;/h2&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/law_enforcement.png&#34; alt=&#34;Law enforcement architecture&#34; title=&#34;Law enforcement architecture&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;As we saw in previous posts (&lt;a href=&#34;http://codurance.com/2016/04/28/async-systems-with-sync-clients/&#34;&gt;1, &lt;/a&gt;&lt;a href=&#34;http://codurance.com/2016/04/30/akka-basics/&#34;&gt;2, &lt;/a&gt;&lt;a href=&#34;http://codurance.com/2016/05/10/finite-state-machines-with-akka/&#34;&gt;3&lt;/a&gt;) the Items service publishes messages into a Kafka topic called &lt;code&gt;item_deleted&lt;/code&gt;. This message will live in one partition of the topic. To define in which partition the message will live, Kafka provides &lt;a href=&#34;https://kafka.apache.org/090/javadoc/org/apache/kafka/clients/producer/Partitioner.html&#34;&gt;three alternatives&lt;/a&gt;:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;If a partition is specified in the record, use it&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;If no partition is specified but a key is present choose a partition based on a hash of the key&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;If no partition or key is present choose a partition in a round-robin fashion&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;We&amp;rsquo;ll use &lt;code&gt;item_id&lt;/code&gt; as a key. Consumers contained in different instances of the Law Enforcement service are only interested in particular partitions, as they&amp;rsquo;re keeping internal state for some items. Let&amp;rsquo;s inspect different Kafka consumer implementations to see which is the most convenient for our use case.&lt;/p&gt;
+
+&lt;h2 id=&#34;kafka-consumers&#34;&gt;Kafka Consumers&lt;/h2&gt;
+
+&lt;p&gt;There are three consumers in Kafka: &lt;a href=&#34;https://cwiki.apache.org/confluence/display/KAFKA/Consumer+Group+Example&#34;&gt;High level consumer&lt;/a&gt;, &lt;a href=&#34;https://cwiki.apache.org/confluence/display/KAFKA/0.8.0+SimpleConsumer+Example&#34;&gt;Simple Consumer&lt;/a&gt; and &lt;a href=&#34;http://kafka.apache.org/090/javadoc/index.html?org/apache/kafka/clients/consumer/KafkaConsumer.html&#34;&gt;New Consumer&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Out of the three consumers, &lt;strong&gt;Simple Consumer&lt;/strong&gt; operates at the lowest-level. It meets our requirements as allows the consumer to &amp;ldquo;consume only a subset of the partitions in a topic in a process&amp;rdquo;. However, as the documentation says:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The SimpleConsumer does require a significant amount of work not needed in the Consumer Groups:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;You must keep track of the offsets in your application to know where you left off consuming&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;You must figure out which Broker is the lead Broker for a topic and partition&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;You must handle Broker leader changes&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;If you read the code suggested for handling those concerns, you&amp;rsquo;ll be quickly discouraged to use this consumer.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;New Consumer&lt;/strong&gt; offers the right level of abstraction and allows us to subscribe to specific partitions. They suggest the following use case in the documentation:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The first case is if the process is maintaining some kind of local state associated with that partition (like a local on-disk key-value store) and hence it should only get records for the partition it is maintaining on disk.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Unfortunately our system is using Kafka 0.8, and this consumer is only available from 0.9. We don&amp;rsquo;t have the resources to migrate to that version, so we&amp;rsquo;ll need to stick with &lt;strong&gt;High level consumer&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;That consumer offers a nice API, but it doesn&amp;rsquo;t allow us to subscribe to specific partitions. That means that every instance of the Law Enforcement service will consume every message, even those that are not pertinent. We can achieve that by defining different consumer groups per instance.&lt;/p&gt;
+
+&lt;h2 id=&#34;leveraging-akka-event-bus&#34;&gt;Leveraging Akka Event Bus&lt;/h2&gt;
+
+&lt;p&gt;In the &lt;a href=&#34;http://codurance.com/2016/05/10/finite-state-machines-with-akka/&#34;&gt;previous post&lt;/a&gt; we have defined some Finite State Machine actor that is waiting for &lt;code&gt;ItemDeleted&lt;/code&gt; messages.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;  when(Active) {
+    case Event(ItemDeleted(item), currentItemsToBeDeleted@ItemsToBeDeleted(items)) =&amp;gt;
+      val newItemsToBeDeleted = items.filterNot(_ == item)
+      newItemsToBeDeleted.size match {
+        case 0 =&amp;gt; finishWorkWith(CensorResult(Right()))
+        case _ =&amp;gt; stay using currentItemsToBeDeleted.copy(items = newItemsToBeDeleted)
+      }
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Our Kafka Consumer could forward every message to those actors and let them to discard/filter irrelevant items. However we don&amp;rsquo;t want to overwhelm our actors with redundant and inefficient work, so we&amp;rsquo;ll add a layer of abstraction that will let them discard the proper messages in a really efficient way.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;final case class MsgEnvelope(partitionKey: String, payload: ItemDeleted)
+
+class ItemDeletedBus extends EventBus with LookupClassification {
+  override type Event = MsgEnvelope
+  override type Classifier = String
+  override type Subscriber = ActorRef
+
+  override protected def mapSize(): Int = 128
+
+  override protected def publish(event: Event, subscriber: Subscriber): Unit = subscriber ! event.payload
+
+  override protected def classify(event: Event): Classifier = event.partitionKey
+
+  override protected def compareSubscribers(a: Subscriber, b: Subscriber): Int = a.compareTo(b)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://doc.akka.io/docs/akka/2.4.4/scala/event-bus.html&#34;&gt;Akka Event Bus&lt;/a&gt; offers us subscription by partition that we&amp;rsquo;re missing in our Kafka High Level Consumer. From our Kafka Consumer we&amp;rsquo;ll publish every message into the bus:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;    itemDeletedBus.publish(MsgEnvelope(item.partitionKey, ItemDeleted(item)))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In the previous post we showed how to subscribe to messages using that partition key:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;  itemDeletedBus.subscribe(self, item.partitionKey)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;LookupClassification&lt;/code&gt; will filter unwanted messages, so our actors won&amp;rsquo;t be overloaded.&lt;/p&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;Thanks to the flexibility that Kafka provides, we were able to design our system understanding different trade-offs. In the next posts we&amp;rsquo;ll see how to coordinate the outcome of those FSMs to provide a sync response to the client.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://codurance.com/2016/04/28/async-systems-with-sync-clients/&#34;&gt;Part 1&lt;/a&gt; | &lt;a href=&#34;http://codurance.com/2016/04/30/akka-basics/&#34;&gt;Part 2&lt;/a&gt; | &lt;a href=&#34;http://codurance.com/2016/05/10/finite-state-machines-with-akka/&#34;&gt;Part 3&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

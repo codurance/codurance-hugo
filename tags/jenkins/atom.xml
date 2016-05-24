@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Jenkins on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/jenkins/</link>
+    <description>Recent content in Jenkins on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Fri, 03 Oct 2014 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/jenkins/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>A Very Quick Guide to Deploying Artifacts With Jenkins</title>
+      <link>http://codurance.com/blog/quick-guide-to-deploying-artifacts-with-Jenkins/</link>
+      <pubDate>Fri, 03 Oct 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/quick-guide-to-deploying-artifacts-with-Jenkins/</guid>
+      <description>
+
+&lt;p&gt;&lt;a href=&#34;http://jenkins-ci.org/&#34;&gt;Jenkins&lt;/a&gt; is an open-source continuous integration server. At Codurance, we use Jenkins to build and test projects to make sure everything is in order before handing over to the client.&lt;/p&gt;
+
+&lt;p&gt;Both Amir and I have just recently started at Codurance as apprentices.&lt;/p&gt;
+
+&lt;p&gt;This week, one of our tasks was to set up Jenkins on a new server then add a client’s project for building and testing. Thanks to an &lt;a href=&#34;http://www.youtube.com/watch?v=zojMg2c6k3Q&#34;&gt;excellent tutorial from Jeff Shantz&lt;/a&gt;, it ended up being a relatively straight forward task. We then wanted to create a way for the client to be able to download their tested application. However we got more than a little stumped when it came to deploying those assets to a new location on the server. Frantic Googling had us going around in circles.&lt;/p&gt;
+
+&lt;p&gt;Luckily, a pairing session with Codurance Craftsman Samir pointed us in the right direction we thought we would set out our process below in case any other Jenkins newbies got stuck like we did.&lt;/p&gt;
+
+&lt;p&gt;Note: I&amp;rsquo;ll assume you have a client project set up on Jenkins, and it is connected to your version control system. If you have not got this far then checking out the link to the tutorial earlier will help.&lt;/p&gt;
+
+&lt;h4 id=&#34;step-1-create-a-new-jenkins-item&#34;&gt;Step 1: Create a new Jenkins Item&lt;/h4&gt;
+
+&lt;p&gt;Select &amp;lsquo;New item&amp;rsquo; from the main menu and call it something like &amp;ldquo;[ENTER-PROJECT-NAME]-Output&amp;rdquo;. Its purpose will be solely export the files from your client project to a folder of your choosing on the server.&lt;/p&gt;
+
+&lt;h4 id=&#34;step-2-create-a-post-build-action&#34;&gt;Step 2: Create a post-build action&lt;/h4&gt;
+
+&lt;p&gt;Go to your client project and select configure. Create a post-build action and select ‘archive artififacts’ from the drop down menu. Add the type of files you want to archive (and eventually, copy and export). Next add another post-build action ‘Build other project’ and enter the name of the build item you created earlier.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/jenkinsPost/archiveArtifacts.png&#34; alt=&#34;Archive artifacts build step&#34; title=&#34;Archive artifacts build step&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;h4 id=&#34;step-3-install-the-copy-artifact-plugin&#34;&gt;Step 3: Install the Copy Artifact plugin&lt;/h4&gt;
+
+&lt;p&gt;Next you need to install the &lt;a href=&#34;https://wiki.jenkins-ci.org/display/JENKINS/Copy+Artifact+Plugin&#34;&gt;Copy Artifact plugin&lt;/a&gt; in the Manage Plugins section of Jenkins. Go to &amp;ldquo;[PROJECT-NAME]-Output&amp;rdquo; &amp;gt; configure and add a new build step. Because you have installed the Copy Artifact plugin you should see an option called ‘copy artifacts from another project’ in the drop down menu. Specify the folder or files you want copied and set the location path. Notice that we set set our location to &amp;ldquo;var/www/clients/…&amp;rdquo;. This leads to a new folder on the server (we were using an Apache server on an Amazon EC2 instance). Don&amp;rsquo;t do what we did and set the path using an http address(!).&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/jenkinsPost/copyArtifacts.png&#34; alt=&#34;Archive artifacts build step&#34; title=&#34;Archive artifacts build step&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;h4 id=&#34;step-4-test-it-out&#34;&gt;Step 4: Test it Out&lt;/h4&gt;
+
+&lt;p&gt;Trigger a build from your client-project. This should then trigger a new build in [PROJECT-NAME]-Output. Check the deployment folder you set up on the server. Hopefully you will see the newly-deployed files but&amp;hellip;&lt;/p&gt;
+
+&lt;h4 id=&#34;wait-the-build-failed-i-got-a-fileexception-error&#34;&gt;&amp;hellip;Wait, the build failed! I got a FileException error&amp;hellip;&lt;/h4&gt;
+
+&lt;p&gt;It may mean that Jenkins does not have the right permissions to write to the folder and cannot deploy the files.&lt;/p&gt;
+
+&lt;p&gt;SSH into your server and check the permissions of you output folder. As you might have guessed we ran into this problem and manage to fix this by:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;adding Jenkins to a group, in our case, the www-data group.&lt;/li&gt;
+&lt;li&gt;changing ownership of the output folder to the www-data group with the command &lt;code&gt;sudo chown -R :www-data clients&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;enabling write access on the folder with the command &lt;code&gt;sudo chmod -R g+w clients&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Don’t forget to restart your server to finalise the changes!&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/jenkinsPost/console.png&#34; alt=&#34;Archive artifacts build step&#34; title=&#34;Archive artifacts build step&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,1586 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Craftsmanship on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/craftsmanship/</link>
+    <description>Recent content in Craftsmanship on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Sun, 15 May 2016 00:01:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/craftsmanship/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Bowling Kata in Clojure, F# and Scala</title>
+      <link>http://codurance.com/blog/bowling-kata-in-clojure-fsharp-scala/</link>
+      <pubDate>Sun, 15 May 2016 00:01:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/bowling-kata-in-clojure-fsharp-scala/</guid>
+      <description>
+
+&lt;p&gt;In one of our evening apprenticeship meetings, a pair was doing the &lt;a href=&#34;http://codingdojo.org/cgi-bin/index.pl?KataBowling&#34;&gt;Bowling Kata&lt;/a&gt; in Java. After reviewing their code, I thought that it would be a good idea to do it myself.&lt;/p&gt;
+
+&lt;p&gt;Every craftsman at Codurance is a polyglot developer and, although we have very similar values, we all have our own preferences when it comes to programming languages and coding styles. As you can imagine, we cannot always avoid cracking a joke or two about all the languages we don’t like so much but other craftsmen in the company do. So, just for fun, quite a few of us decided to do the same kata using our language of choice. It was great to see the same problem solved with different languages. Although there are still a few craftsmen and apprentices working on solving the kata in different languages, here are 3 of my favourite solutions so far (in no particular order):&lt;/p&gt;
+
+&lt;h2 id=&#34;clojure-by-mashooq&#34;&gt;Clojure (by Mashooq)&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;(ns bowling.core-test
+  (:require [clojure.test :refer :all]
+            [bowling.core :refer :all]))
+
+(deftest bowling 
+  (testing &amp;quot;strikes for all rolls&amp;quot;
+    (is (= 300 (score &amp;quot;XXXXXXXXXXXX&amp;quot;))))
+
+  (testing &amp;quot;normal scores&amp;quot;
+    (is (= 99 (score &amp;quot;91919393929291219191&amp;quot;))))
+
+  (testing &amp;quot;normal scores or misses&amp;quot;
+    (is (= 90 (score &amp;quot;9-9-9-9-9-9-9-9-9-9-&amp;quot;)))
+    (is (= 93 (score &amp;quot;919-9-9-9-9-929-9-9-&amp;quot;))))
+  
+  (testing &amp;quot;mixture of stikes and normals&amp;quot;
+    (is (= 98 (score &amp;quot;9-X8-9-9-9-9-9-9-9-&amp;quot;)))
+    (is (= 104 (score &amp;quot;9-X8-9-9-9-9-9-9-X23&amp;quot;)))
+    (is (= 28 (score &amp;quot;--X81--------------&amp;quot;)))
+    (is (= 27 (score &amp;quot;--X8-1-------------&amp;quot;))))
+  
+  (testing &amp;quot;spares for all rolls&amp;quot;
+    (is (= 150 (score &amp;quot;5/5/5/5/5/5/5/5/5/5/5&amp;quot;))))
+
+  (testing &amp;quot;mixture of spares and normals&amp;quot;
+    (is (= 82 (score &amp;quot;9-8/--9-9-9-9-9-9-9-&amp;quot;)))
+    (is (= 84 (score &amp;quot;9-8/--9-9-9-9-9-9-9/1&amp;quot;)))
+    (is (= 12 (score &amp;quot;--8/1---------------&amp;quot;)))
+    (is (= 11 (score &amp;quot;--8/-1--------------&amp;quot;)))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;(ns bowling.core)
+
+(defn- spare?[s] (= \/ s))
+(defn- strike? [s] (= \X s))
+(defn- spare-or-strike? [s] (or (spare? s) (strike? s)))
+(defn- miss? [s] (or (= nil s) (= \- s)))
+
+(defn- score-for [s] 
+  (cond 
+     (spare-or-strike? s)  10
+     (miss? s)  0 
+     :else (read-string (str s))))
+
+(defn- score-roll [this-roll rem-rolls]
+  (cond 
+    (strike? this-roll) (+ 10 (score-for (first rem-rolls)) (score-for (first (rest rem-rolls))))
+    (spare? this-roll) (+ 10 (score-for (first rem-rolls)))
+    (spare? (first rem-rolls)) 0
+    :else (score-for this-roll)))
+
+(defn- score-rolls [acc rolls]
+  (if (seq rolls)  
+    (let [running-score (+ acc (score-roll (first rolls) (rest rolls)))]
+      (score-rolls running-score (rest rolls)))
+    acc))
+
+(defn- expand-strikes [rolls]
+  (seq (reduce str  (map #(if  (strike? %) &amp;quot;X-&amp;quot;  (str %)) (seq rolls)))))
+
+(defn- deduct-extra-rolls [score rolls]
+  (- score  (score-rolls 0 (drop 20 (expand-strikes rolls)))))
+
+(defn score [rolls] 
+  (deduct-extra-rolls (score-rolls 0 (seq rolls)) rolls))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;See on &lt;a href=&#34;https://github.com/mashooq/katas/tree/master/clojure/bowling&#34;&gt;Mash&amp;rsquo;s GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;f-by-pedro&#34;&gt;F# (by Pedro)&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fs&#34;&gt;namespace BowlingV2.FSharpKatas
+
+    module Bowling = 
+        open System
+
+        type private Rolls = Strike | Spare | Roll
+        type private Pins = Pins of int
+        type private Roll = Rolls * Pins
+        
+        let private maxRolls = 20
+        let private maxPins = 10
+        let private noPins = 0
+        
+        let private pinCountForRoll roll =
+            let (Pins pins) = snd roll
+            pins
+            
+        let private pinsFromRawRoll rawRoll =
+            Pins (Int32.Parse(rawRoll.ToString()))
+            
+        let private sparePinsFromRawRoll rawRoll = 
+            Pins (maxPins - Int32.Parse(rawRoll.ToString()))
+
+        let private parse roll index rolls =
+            let previousRoll = fun () -&amp;gt; Seq.item (index - 1) rolls
+            match roll with
+            | &#39;-&#39; -&amp;gt; Roll, Pins noPins
+            | &#39;/&#39; -&amp;gt; Spare, sparePinsFromRawRoll(previousRoll())
+            | &#39;X&#39; -&amp;gt; Strike, Pins maxPins
+            | r -&amp;gt; Roll, pinsFromRawRoll r
+
+        let private scoreRoll index rolls =
+            let bonusRoll = fun(lookAhead) -&amp;gt;  
+                if index + lookAhead &amp;lt; Seq.length rolls 
+                then pinCountForRoll (Seq.item (index + lookAhead) rolls) 
+                else noPins       
+
+            let exceedsMaxRolls = fun() -&amp;gt;
+                rolls 
+                |&amp;gt; Seq.take index
+                |&amp;gt; Seq.map (fun r -&amp;gt; match r with | (Strike, _) -&amp;gt; 2 | _ -&amp;gt; 1)
+                |&amp;gt; Seq.sum &amp;gt;= maxRolls
+
+            match Seq.item index rolls with
+                | (_, _) when exceedsMaxRolls() -&amp;gt; noPins
+                | (Spare, Pins pins) -&amp;gt; pins + bonusRoll 1
+                | (Strike, Pins pins) -&amp;gt; pins + bonusRoll 1 + bonusRoll 2
+                | (Roll, Pins pins) -&amp;gt; pins
+
+        let scoreGame rolls =
+            let parsedRolls = rolls |&amp;gt; Seq.mapi (fun index roll -&amp;gt; 
+                                                    parse roll index rolls)
+
+            parsedRolls
+            |&amp;gt; Seq.mapi (fun index _ -&amp;gt; scoreRoll index parsedRolls)
+            |&amp;gt; Seq.sum
+                     
+    module BowlingTests =
+        open NUnit.Framework
+        open Swensen.Unquote
+        open Bowling
+
+        [&amp;lt;Test&amp;gt;]
+        let ``calculate scores with no strikes or spares``() =
+            test &amp;lt;@ scoreGame &amp;quot;--&amp;quot; = 0 @&amp;gt; 
+            test &amp;lt;@ scoreGame &amp;quot;1&amp;quot; = 1 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;13&amp;quot; = 4 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;13521&amp;quot; = 12 @&amp;gt;
+            
+        [&amp;lt;Test&amp;gt;]
+        let ``calculate scores containing a miss``() =
+            test &amp;lt;@ scoreGame &amp;quot;1-5-&amp;quot; = 6 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;9-9-9-9-9-9-9-9-9-9-&amp;quot; = 90 @&amp;gt;
+            
+        [&amp;lt;Test&amp;gt;]
+        let ``calculate scores containing spares``() =
+            test &amp;lt;@ scoreGame &amp;quot;1/&amp;quot; = 10 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/--&amp;quot; = 10 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/-5&amp;quot; = 15 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/35-&amp;quot; = 21 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/3/23&amp;quot; = 30 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;5/5/5/5/5/5/5/5/5/5/5&amp;quot; = 150 @&amp;gt;
+        
+        [&amp;lt;Test&amp;gt;]
+        let ``calculate scores containing strikes``() =
+            test &amp;lt;@ scoreGame &amp;quot;X&amp;quot; = 10 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;X--&amp;quot; = 10 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;X--51&amp;quot; = 16 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;X51&amp;quot; = 22 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;XXXXXXXXXXXX&amp;quot; = 300 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;XXXXXXXXXX12&amp;quot; = 274 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/35XXX45&amp;quot; = 103 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/35XXX458/X35&amp;quot; = 149 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/35XXX458/X3/&amp;quot; = 153 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/35XXX458/X3/23&amp;quot; = 160 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/35XXX458/X3/X&amp;quot; = 173 @&amp;gt;
+            test &amp;lt;@ scoreGame &amp;quot;1/35XXX458/X3/XX6&amp;quot; = 189 @&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;See on &lt;a href=&#34;https://github.com/pedromsantos/FSharpKatas/blob/master/BowlingV2.fs&#34;&gt;Pedro&amp;rsquo;s GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;scala-by-sandro&#34;&gt;Scala (by Sandro)&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;package com.codurance.bowlingkata.full_scoring
+
+import com.codurance.UnitSpec
+import com.codurance.bowlingkata.full_scoring.BowlingFullScoreCalculator.scoreFor
+
+class BowlingFullScoreCalculatorShould extends UnitSpec {
+
+	&amp;quot;calculate scores with no strikes or spares&amp;quot; in {
+		scoreFor(&amp;quot;11111111112222222222&amp;quot;) should be (30)
+	}
+
+	&amp;quot;calculate scores containing a miss&amp;quot; in {
+		scoreFor(&amp;quot;--------------------&amp;quot;) should be (0)
+		scoreFor(&amp;quot;1-1----------------1&amp;quot;) should be (3)
+		scoreFor(&amp;quot;9-9-9-9-9-9-9-9-9-9-&amp;quot;) should be (90)
+	}
+
+	&amp;quot;calculate scores containing spares&amp;quot; in {
+		scoreFor(&amp;quot;5/11------------3/11&amp;quot;) should be (26)
+		scoreFor(&amp;quot;5/5/5/5/5/5/5/5/5/5/5&amp;quot;) should be (150)
+	}
+
+	&amp;quot;calculate scores containing strikes&amp;quot; in {
+		scoreFor(&amp;quot;XXXXXXXXXXXX&amp;quot;) should be(300)
+		scoreFor(&amp;quot;XXXXXXXXXX12&amp;quot;) should be(274)
+		scoreFor(&amp;quot;1/35XXX458/X3/23&amp;quot;) should be(160)
+		scoreFor(&amp;quot;1/35XXX458/X3/XX6&amp;quot;) should be(189)
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;package com.codurance.bowlingkata.full_scoring
+
+object BowlingFullScoreCalculator {
+
+	def scoreFor(rolls: String): Int = totalScore(rolls.split(&amp;quot;&amp;quot;).toList)
+
+	private def totalScore(rolls: List[String], index: Int = 0, score: Int = 0): Int = {
+		lazy val MISS  = &amp;quot;-&amp;quot;
+		lazy val SPARE = (&amp;quot;/&amp;quot;, () =&amp;gt; 10 - rollScoreAt(index - 1) + if_(index &amp;lt; 19, rollScoreAt(index + 1)))
+		lazy val STRIKE = (&amp;quot;X&amp;quot;, () =&amp;gt; 10 + if_(index + numberOfPreviousStrikes() &amp;lt; 18,
+                                               rollScoreAt(index + 1) + rollScoreAt(index + 2)))
+
+		def numberOfPreviousStrikes() = rolls.mkString.take(index).count(_ == &#39;X&#39;)
+
+		def rollScoreAt(index: Int): Int =
+			rolls(index) match {
+				case STRIKE._1 =&amp;gt; 10
+				case SPARE._1  =&amp;gt; 10 - rolls(index - 1).toInt
+				case MISS      =&amp;gt; 0
+				case pins      =&amp;gt; pins.toInt
+			}
+
+		rolls.drop(index) match {
+			case STRIKE._1 :: _ =&amp;gt; totalScore(rolls, index + 1, score + STRIKE._2())
+			case SPARE._1 :: _  =&amp;gt; totalScore(rolls, index + 1, score + SPARE._2())
+			case MISS :: _      =&amp;gt; totalScore(rolls, index + 1, score)
+			case n :: _         =&amp;gt; totalScore(rolls, index + 1, score + n.toInt)
+			case List()         =&amp;gt; score
+		}
+	}
+
+	private def if_(condition: Boolean, ifTrue: =&amp;gt; Int): Int = if (condition) ifTrue else 0
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;See on &lt;a href=&#34;https://github.com/sandromancuso/bowling_kata_scala&#34;&gt;Sandro&amp;rsquo;s GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;fun-passion-and-respect&#34;&gt;Fun, passion, and respect&lt;/h2&gt;
+
+&lt;p&gt;Having fun at work, be surrounded by passionate and talented craftsmen, the respect we have for each other, and the willingness to learn and share, are some of the things I love the most about the Codurance’s culture. What started as apprentices practicing with a kata transformed into a great way to learn and share knowledge among craftsmen and apprentices. Some of our craftsmen and apprentices are also working on their solutions in Kotlin, Haskell, Java, and C#.&lt;/p&gt;
+
+&lt;p&gt;As among ourselves we will probably never agree which one we prefer, we will let you choose which one you like the most. :)&lt;/p&gt;
+
+&lt;p&gt;Thanks &lt;a href=&#34;https://twitter.com/mashooq&#34;&gt;Mash&lt;/a&gt; and &lt;a href=&#34;https://twitter.com/pedromsantos&#34;&gt;Pedro&lt;/a&gt; for the Clojure and F# implementations.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>We did it wrong, but not all was in vain</title>
+      <link>http://codurance.com/blog/we-did-it-wrong-but-not-in-vain/</link>
+      <pubDate>Tue, 12 Apr 2016 00:24:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/we-did-it-wrong-but-not-in-vain/</guid>
+      <description>&lt;p&gt;Yes, there was over engineering. Loads of it. Back in the mid 90s, when I started my career as a developer, the goal was to become an architect. No serious developer would dare writing a single line of code before selecting our preferred design patterns—we would then decide how the business requirements would fit into them. Yes, we would first come up with our architecture, then our macro design (layers) and domain model (including UML diagrams), and then we would think about the business requirements and detailed use cases. Yes, user stories were not really a thing back then. We had long use cases with a basic flow and many alternative flows.&lt;/p&gt;
+
+&lt;p&gt;The 90s were an interesting period to be a developer. We finally had the Internet and a few academic papers on structured design from 70s and 80s became available to us. We also had a few books focusing on Object-Oriented Programming, still a novelty in many places.&lt;/p&gt;
+
+&lt;p&gt;I still remember the countless months we spent drawing class, sequence, component, deployment, and many other diagrams, trying to come up with the best design for the software that one day we would build. We built some prototypes as well, so I can’t say we were not coding or experimenting during the &lt;em&gt;elaboration phase&lt;/em&gt;. All the learnings from the prototypes would be fed back into our diagrams, of course.&lt;/p&gt;
+
+&lt;p&gt;Besides the internal design, in the 90s we had an explosion of distributed systems as well. We had CORBA and DCOM. We had client/server and multi-tier architecture. We learnt about single point of failure when using databases as a communication point between applications. Yes, we had nasty problems with that. We learnt how to create “services”—SOA was emerging as an architectural concept. We learnt how to think about scalability and security. Many projects outside governments and banks were also becoming very large and complex.&lt;/p&gt;
+
+&lt;p&gt;Creating a great design was the goal for most passionate software developers; it was also the path to become an architect and career evolution. We had to study and be good at software design. We had to understand in depth principles of structured and object-oriented design. We had to understand principles of distributed system. We had to understand in depth all levels of cohesion and coupling. We had to understand covariance and contravariance. We had to learn how to design components boundaries including their contracts and invariant. We had to learn to how to understand verbs and nouns, the language of the business, and map them into software. We would never pass a job interview without knowing how to model data in our relational databases, and mostly important, how to make our queries perform well. We had to define our proprietary protocols in the right granularity in order to make it easier for other systems to consume them and at the same time address I/O and bandwidth concerns. Yes, we spent a lot of time doing that.&lt;/p&gt;
+
+&lt;p&gt;Software development in the 90s was all about design and architecture. And yes, it had to be done with UML.&lt;/p&gt;
+
+&lt;p&gt;But although we learnt how to design, we failed in many other aspects. We didn’t deliver fast enough. In fact, in some projects we didn’t deliver anything at all. Most of the times, all the thinking we did trying to create a perfect design was completely wasted due to lack of quick feedback and our inability to cope with rapid business evolution. I still remember the huge spreadsheets we used to control change requests even before we had any code written. Yes, we screwed up big time. Many times.&lt;/p&gt;
+
+&lt;p&gt;Fast-forwarding 20 years, some of us understood what we were doing was wrong. We then incorporated Agile, Lean, and many other principles and practices into the way we work. We incorporated many new design and architecture techniques into our tool kit. We incorporated new technologies. We incorporated different ways to collaborate with the business and also how to structure our teams. We learned that although design was important, nothing was more important than continuously delivering software. We learnt how to get feedback and iterate. We learnt we were responsible to test our own code. We learnt we had to support our software in production. We learnt the value of creating prototypes and throwing them away. We learnt the value of experimentation. But we also learnt we didn’t need to throw away all the design skills we acquired over the years in order to work in a better way. We didn’t need to discard all the great work done before and during our time, mainly around software design during the 70s, 80s and 90s. But the most important lesson we learnt was that context is king and that software design is all about trade offs. Design is pointless without delivery. But can we keep delivering code without a solid design foundation? I don’t think so.&lt;/p&gt;
+
+&lt;p&gt;One of the biggest problems I see today in software design is binary thinking. If X is bad, than Y must be good. If X worked for company A, than it will also work for us. If a well-known person said something in a 45-minute talk in a conference or we found something written in a blog, it must be true. Always.&lt;/p&gt;
+
+&lt;p&gt;Another common mistake caused by binary thinking is the belief that all features in a software project have the same degree of complexity and a single design choice will fit them all. But the truth is, some features are quite simple, others very complex, and many others are somewhere in between. Sometimes the complexity is found in the implementation; other times it is found on understanding and modelling the domain. Sometimes the complexity is in understanding what we should be building. Other times the complexity is in the integration with other systems. Parts of the same feature can also vary a lot in complexity: some parts may be trivial and quickly implemented while others can be extremely complex and demand a lot thinking up front. Some features are shallow (very few lines of code) while others are deep (thousands of lines of code spread through different modules). Non-functional requirements can also make the implementation of simple features (business-wise) very complex. And the interesting thing is that all of that can be found within the same software project. So, if we agree that different features in a software project have different degrees of complexity and size, there is no way we can apply binary thinking into software design—no single design approach will ever work in a reasonably complex software project.&lt;/p&gt;
+
+&lt;p&gt;We live in a world where information is easily and quickly accessible. One search on Google and we can find many ready-made solutions to our problems. My fear is that, as an industry, we are losing the ability to think. We are losing the ability to research and make our own choices. More and more we are looking for a ready-made recipe. A shortcut. I call them a “Stack Overflow solution.”&lt;/p&gt;
+
+&lt;p&gt;It makes me sad that, to some people, software design is synonymous of over-engineering. It also makes me sad to see that &amp;ldquo;no design at all” is becoming synonymous of Agile, Lean Startup, and fast delivery. I don’t think the originators and main proponents of good software design, Agile, and Lean principles ever meant that. Over-engineering is bad, but so is no design at all. Simple doesn’t mean crap. Simple means just enough design for what we know today, but not less. Paraphrasing Einstein, software design should be made as simple as possible, but not simpler. Or another way of putting it: code must be well-designed but not over-designed.&lt;/p&gt;
+
+&lt;p&gt;After interviewing a lot of developers and reviewing a lot of code in the past few years, my main concern is that we are developing a hacker culture. Many developers I met who have been in the industry for less than a decade, have very little knowledge of good software design. They will claim otherwise, of course. If you think I’m exaggerating, ask developers in your team to explain cohesion and its different levels. Ask them about connascence, covariance and contravariance. Ask them about different degrees and types of coupling. Ask them about design by contract and invariant. For those that have heard about SOLID principles ask them where the SOLID principles came from. Many developers today say design patterns are bad. Ask them to describe some patterns, their differences, and when they should or should not be applied. Ask them about the different pattern classifications. Ask them about the difference between a Bridge, Adapter, and Mediator. What problem a Visitor is supposed to solve? Ask them what is a Memento? If they can’t explain that, how can they say patterns are bad?&lt;/p&gt;
+
+&lt;p&gt;Many developers today are not aware of the software design foundation laid during the 70s, 80s, and 90s. Others prefer to ignore it: &lt;em&gt;That is over-engineering and they don’t need that.&lt;/em&gt; That’s fine, I can respect that. But why do we still have software that sucks then? Is the software being produced today really better than the software being produced 20 years ago? Why developers still struggle to design code with TDD? Why are we still talking about legacy code? For me, legacy code is synonymous of code that is badly designed, hence difficult to test and maintain.&lt;/p&gt;
+
+&lt;p&gt;By no means I’m defending over-engineering or wasting time drawing diagrams in UML. What I’m trying to say is that at the same time I would never spend hours to design classes inside my core domain up front, I would also not try to build an enterprise application, one test at a time, without thinking about its overall design before start coding. Design is essential for software development. If I’m building an application that will live in an ecosystem alongside many applications, or with heavy non-functional requirements, or that needs to comply to regulations, yes, of course I would put a lot of thought about its overall structure (macro-design) before I start coding but I would still develop its features (“micro-level”) one test at a time. Design happens at all levels: from up-front at the architectural level to just-in-time at micro level as part of my TDD flow. Decide how much to design is a skill—it&amp;rsquo;s all about finding the &lt;a href=&#34;http://codurance.com/2015/06/17/inflection-point/&#34;&gt;inflection point&lt;/a&gt;, subject I covered on a &lt;a href=&#34;http://codurance.com/2015/06/17/inflection-point/&#34;&gt;previous blog&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Software design is one of the most important skills in software development. Good design enables developers to collaborate, business features to be added and changed frequently, and reliable test automation to be done. With experience, we learn how to quickly identify problems and decide the amount of time we should spend on it. We also learn that most design decisions should be made in the last responsible moment, that means, we try not to commit to a design too early, while we don’t know enough about the problem.&lt;/p&gt;
+
+&lt;p&gt;And that’s why I say that not everything we did in the 90s was in vain. Although we over-engineered every thing and didn’t deliver too much, we learnt how to design. We learnt how to think for ourselves. We learnt how research. We learnt how to reason about trade offs. It took us a while but we also learnt how to avoid binary thinking and refrain our excitement with new trends. The combination of a strong software design foundation with Agile and Lean principles and practices, put us in a much better position today not only to deliver software fast but also to deliver software continuously.&lt;/p&gt;
+
+&lt;p&gt;Our goal is to enable business agility and that can be achieved through software that can be continuously deployed into production. Deploy software to production once is not that hard but to deploy software to production multiple times a day and keep this rhythm for months if not years, well, that’s not so simple. We need a lot of discipline and engineering to achieve continuous delivery, which makes software design and TDD two of the most important technical disciplines we have to master.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Cohesion - The cornerstone of Software Design</title>
+      <link>http://codurance.com/blog/cohesion-cornerstone-software-design/</link>
+      <pubDate>Thu, 03 Mar 2016 12:10:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/cohesion-cornerstone-software-design/</guid>
+      <description>
+
+&lt;p&gt;Cohesion is one of the most important concepts in software design. Cohesion is at the core of the vast majority of good design principles and patterns out there, guiding separation of concerns and maintainability. The term cohesion (alongside coupling) was first introduced by Larry Constantine in the late 60s as part of Structured Design and later published in more details by W. Stevens, G. Myers, and L. Constantine in 1974. Due to the growing complexity and cost of software back in the 60s, 70s, and 80s, loads of studies and research around software design and maintainability were done. Although we can still find some of these papers and research online today, they were done in a pre-Internet era and most of the work done during that period is either lost or not easily available.&lt;/p&gt;
+
+&lt;p&gt;But before we dive into the details, let’s see some definitions.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Definition&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Cohesion (noun) : when the members of a group or society are united.&lt;/p&gt;
+
+&lt;p&gt;Cohesive (adjective) : united and working together effectively.
+&lt;footer&gt;&lt;cite&gt;&lt;em&gt;Cambridge Dictionary&lt;/em&gt;&lt;/cite&gt;&lt;/footer&gt;&lt;/p&gt;
+
+&lt;p&gt;In computer programming, cohesion is a measure of how strongly related and focused the various responsibilities of a software module are.
+&lt;footer&gt;&lt;cite&gt;&lt;em&gt;Wikipedia&lt;/em&gt;&lt;/cite&gt;&lt;/footer&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;cohesion-is-a-sliding-scale-metric&#34;&gt;Cohesion is a sliding scale metric&lt;/h3&gt;
+
+&lt;p&gt;A common mistake is to treat cohesion as a binary attribute instead of a sliding scale. In the original work by Stevens, Myers, and Constantine in the early 70s, they defined seven levels of cohesion, which later became known as SMC Cohesion.&lt;/p&gt;
+
+&lt;p&gt;As the original papers were written quite a while back and were very academic, let’s agree that when we say &lt;em&gt;module&lt;/em&gt; we are actually talking about a class or a group of functions and when we say &lt;em&gt;processing elements&lt;/em&gt; we are actually talking about methods or functions.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Coincidental (worst)&lt;/strong&gt;: Processing elements are grouped arbitrarily and have no significant relationship. There is no relationship between the processing elements. E.g.: update a customer record, calculate a loan payment, print a report. Coincidental cohesion is quite common in modules called &lt;code&gt;Utils&lt;/code&gt; or &lt;code&gt;Helpers&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Logical&lt;/strong&gt;: At a module level, processing elements are grouped because they belong to the same logical class of related functions. At each invocation of the module one of the processing elements is invoked. E.g.: grouping all I/O operations, all database operations, etc. At a processing element level, the calling module passes a control flag and that flag decides which piece of behaviour will be invoked by the processing element. E.g: A flag indicating if a discount should be calculated, a piece of behaviour should be skipped, etc.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Temporal&lt;/strong&gt;: Processing elements are related in time. They are grouped together because they are invoked together at a particular time in a program execution but in fact they are unrelated to each other. A different business requirement may require a difference sequence or combination of processing elements. E.g.: data persistence / validation, audit trail, notifications via email, etc.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Procedural&lt;/strong&gt;: Processing elements are sequentially part of the same business unit but do not share data. They are grouped because they always follow a certain sequence of execution. E.g.: validate user, process a payment, trigger stock inventory system to send purchase orders to suppliers, write logs.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Communicational&lt;/strong&gt;: Processing elements contribute to activities that use the same inputs or outputs. E.g.: processing elements that would take a shopping basket and calculate discounts, promotions, money saved, delivery costs, and return the total price.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Sequential&lt;/strong&gt;: Processing elements are grouped when the output of one processing element can be used as input for another processing element. E.g.: formatting and validating data.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Functional (best)&lt;/strong&gt;:  All processing elements of a module are essential to the performance of a single and well-defined task. E.g.: parsing an XML, calculating the cost for an insurance policy according to the data provided.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If we adapt some of the ideas published by Meilir Page-Jones on The Practical Guide To Structured System Design (1980), we could have a guideline to identify levels of cohesion.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2016-03-03-cohesion/cohesion_test.jpg&#34; alt=&#34;Cohesion test&#34; title=&#34;Cohesion test&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;h3 id=&#34;chasing-metrics&#34;&gt;Chasing metrics&lt;/h3&gt;
+
+&lt;p&gt;The SMC Cohesion model was a great step forward in the 70s and many software professionals and academics tried to create software metrics that could measure degrees of cohesion so that they could design their systems in a way that they were more maintainable. The problem with the SMC Cohesion model (levels) is that it can be quite subjective and requires personal judgement. I can think of a few code examples that could fit in more than one level of cohesion in the SMC Cohesion scale. If we start digging into the details of the examples I gave above you will see how easy you will be in doubt about which level the example belong. Because of its subjectiveness, SMC Cohesion could not be used efficiently to derive reliable metrics.&lt;/p&gt;
+
+&lt;p&gt;Many papers and a few books were published from late 70s to late 90s exploring and expanding the notion of cohesion and coupling defined by SMC Cohesion. One model that got some acceptance was the Design-Level Cohesion (DLC) Measure. DLC is very similar to SMC but with only 6 levels and a small variation in definition and names. The main advantage of DLC is that it is more suitable for deriving metrics tools.&lt;/p&gt;
+
+&lt;p&gt;Before we dive into the DLC levels, let’s define a vocabulary:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;condition-control: a variable &lt;code&gt;v2&lt;/code&gt; has condition-control dependence on a variable &lt;code&gt;v1&lt;/code&gt; when &lt;code&gt;v1&lt;/code&gt; is used in the predicate of a decision (if/then/else) which affects &lt;code&gt;v2&lt;/code&gt;’s value.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;iteration-control: Same as above but in a loop (while/for/etc.)&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Here are the DLC levels:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Coincidental relation (R1)&lt;/strong&gt;: Two outputs &lt;code&gt;o1&lt;/code&gt; and &lt;code&gt;o2&lt;/code&gt; of a module have neither dependence relationship with each other, nor dependence on a common input.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Conditional relation (R2)&lt;/strong&gt;: Two outputs are condition-control dependent on a common input, or one of the two outputs has condition-control dependence on the input and the other has iteration-control dependence on the input.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Iterative relation (R3)&lt;/strong&gt;: Two outputs are iteration-control dependent on a common input.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Communication relation (R4)&lt;/strong&gt;: Two outputs are dependent on a common input. One of the two inputs has data dependence on the input and the other can have a control or a data dependence.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Sequential relation (R5)&lt;/strong&gt;: One output is dependent on the other output.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Functional (R6)&lt;/strong&gt;: There is only one output in a module.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;These six relations are in ordinal scale where R1 is the weakest for of cohesion and R6 the strongest. In DLC Measure Definition, the cohesion level is determined by the relationship between outputs of a module and processing elements.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2016-03-03-cohesion/IODG_DLC_2.jpg&#34; alt=&#34;DLC&#34; title=&#34;DLC&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;And here is how SMC and DLC relate to each other:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2016-03-03-cohesion/SMC_DLC_relation.jpg&#34; alt=&#34;SMC vs. DLC&#34; title=&#34;SMC vs. DLC&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;h3 id=&#34;applying-cohesion&#34;&gt;Applying cohesion&lt;/h3&gt;
+
+&lt;p&gt;Depending on the type of software you are writing, you will may need to compromise a bit. Although we should always strive to have our code at the highest level of cohesion, sometimes that may make the code look &lt;em&gt;unnatural&lt;/em&gt;. There is a difference between being unaware of design principles and consciously not following a design principle in a given context. I don&amp;rsquo;t write my code with the goal that it should satisfy every single design principle out there but I always try to have a good reason every time I decide not to follow certain principles. Having said that, cohesion is one of the most important building blocks of software design and understanding it well is essential for writing well-crafted code.&lt;/p&gt;
+
+&lt;p&gt;If you are building a framework, a very generic part of your code, or data transformation, chances are that the majority of your modules and processing elements will be at sequential and functional levels. However, when writing business rules in a commercial application, i.e. an application where there are business logic, user journeys, database access, etc., there is a good chance that some of your modules and processing elements will be at communicational level and some even at a lower level of cohesion. And that&amp;rsquo;s OK as long as it was a conscious decision and the right thing to do in that context.&lt;/p&gt;
+
+&lt;p&gt;Some people compare cohesion to the &lt;a href=&#34;http://codurance.com/2011/07/26/srp-simplicity-and-complexity/&#34;&gt;Single Responsibility Principle (SRP)&lt;/a&gt;. Although SRP is a great software principle and entirely based on cohesion, it has a quite narrow and subjective scope.&lt;/p&gt;
+
+&lt;p&gt;Identifying responsibilities is not always an easy thing. We need to develop a keen eye to detect minor variations in behaviour. Unit tests for a module can potentially help us to identify the different behaviours, if the code was really test-driven, of course.&lt;/p&gt;
+
+&lt;p&gt;The more cohesive your code is, the more reusable, robust and easy to maintain it will be.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;References:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://dl.acm.org/citation.cfm?id=257586&#34;&gt;Rule-based approach to computing module cohesion&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&#34;http://misrc.umn.edu/workshops/2002/spring/darcy_020802.pdf&#34;&gt;Software Complexity: Toward a Unified Theory of Coupling and Cohesion&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&#34;http://www.cs.colostate.edu/~bieman/JSM99/KangBieman99.pdf&#34;&gt;A Quantitative Framework for Software Restructuring&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&#34;http://www.cs.colostate.edu/~bieman/Pubs/seke96.pdf&#34;&gt;Using Design Cohesion to Visualize, Quantify, and Restructure Software&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&#34;https://books.google.co.uk/books/about/The_practical_guide_to_structured_system.html?id=nq60AAAAIAAJ&amp;amp;redir_esc=y&#34;&gt;The practical guide to structured systems design&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&#34;http://www.amazon.co.uk/Systems-Analysis-Design-David-Tegarden/dp/1118092368/ref=sr_1_1?ie=UTF8&amp;amp;qid=1456999093&amp;amp;sr=8-1&amp;amp;keywords=systems+analysis+and+design+uml&#34;&gt;Systems Analysis and Design with UML&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Cohesion_%28computer_science%29&#34;&gt;Cohesion - Wikipedia&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&#34;http://codurance.com/2011/07/26/srp-simplicity-and-complexity/&#34;&gt;Single Responsibility Principle&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GitHubAnimator</title>
+      <link>http://codurance.com/blog/GitHubAnimator/</link>
+      <pubDate>Fri, 15 Jan 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/GitHubAnimator/</guid>
+      <description>
+
+&lt;h3 id=&#34;the-beginning&#34;&gt;The Beginning&lt;/h3&gt;
+
+&lt;p&gt;Inspired by my friend &lt;a href=&#34;https://twitter.com/SamirTalwar&#34;&gt;@SamirTalwar&lt;/a&gt; and the initiative he set upon himself to &lt;a href=&#34;http://monospacedmonologues.com/post/136667358499/automating-the-world&#34;&gt;automate the world&lt;/a&gt; I picked up on an idea I had many months ago. Automating the generation of presentations using GitHub commits.&lt;/p&gt;
+
+&lt;h3 id=&#34;what-problem-am-i-trying-to-solve&#34;&gt;What Problem am I Trying to Solve?&lt;/h3&gt;
+
+&lt;p&gt;Often I need to do a software related session and I have to present the code in small steps showing how I approached a problem. This usually involves a lot of copy and pasting code from a repository, one commit at a time, into PowerPoint or KeyNote or some other presentation application or framework. This is a very manual and error-prone process. Also, presentation applications usually know nothing about code, so I also need to hand format the copied code.&lt;/p&gt;
+
+&lt;p&gt;I have had the idea of automating this process but kept delaying it for some reason or another. After reading Samir&amp;rsquo;s posts I finally decided to get it done.&lt;/p&gt;
+
+&lt;h3 id=&#34;implementation&#34;&gt;Implementation&lt;/h3&gt;
+
+&lt;h4 id=&#34;the-language&#34;&gt;THE LANGUAGE&lt;/h4&gt;
+
+&lt;p&gt;I&amp;rsquo;ve been learning F# and I decided this would be a perfect opportunity to do something useful with my new F# skills. Also this problem seemed well-suited to a functional approach.&lt;/p&gt;
+
+&lt;h4 id=&#34;interfacing-with-github&#34;&gt;INTERFACING WITH GITHUB&lt;/h4&gt;
+
+&lt;p&gt;GitHub has published a library to simplify calling their API. It&amp;rsquo;s called &lt;a href=&#34;https://github.com/octokit&#34;&gt;OctoKit&lt;/a&gt; and it&amp;rsquo;s available for numerous languages and platforms. Since I was using .Net I applied &lt;a href=&#34;https://github.com/octokit/octokit.net&#34;&gt;OctoKit.net&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h4 id=&#34;creating-the-presentation&#34;&gt;CREATING THE PRESENTATION&lt;/h4&gt;
+
+&lt;p&gt;Initially I used Office automation frameworks by Microsoft to generate a PowerPoint presentation, but decided that going with a specific application could be too restrictive. So I started looking for a presentation framework with HTML5 and came across  &lt;a href=&#34;http://lab.hakim.se/reveal-js/#/&#34;&gt;Reveal.js&lt;/a&gt; that proved a good match for what I wanted to build.&lt;/p&gt;
+
+&lt;h5 id=&#34;hightlighting-the-code-samples&#34;&gt;Hightlighting the Code Samples&lt;/h5&gt;
+
+&lt;p&gt;After playing around with Reveal.js I found out that the code highlight features, out of the box, were a bit limited for what I wanted. So I searched for a framework that would work with Reveal.js. I found &lt;a href=&#34;http://prismjs.com/&#34;&gt;Prism.js&lt;/a&gt; did all I wanted and a bit more. I set out to integrate Prism.js with Reveal.js and finally had something that would meet my requirements.&lt;/p&gt;
+
+&lt;h5 id=&#34;fiddling-with-css&#34;&gt;Fiddling With CSS&lt;/h5&gt;
+
+&lt;p&gt;The last part was to make some changes to Reveal.js and Prism.js CSS&amp;rsquo;s to get the desired visual effect. This is an area I&amp;rsquo;m a bit out of my comfort zone so it took me a while to get something half decent.&lt;/p&gt;
+
+&lt;h3 id=&#34;the-end-result&#34;&gt;The End Result&lt;/h3&gt;
+
+&lt;p&gt;The code, as it stands now, is still very crude but it&amp;rsquo;s capable of retrieving all commits for a file in a given repository and generating a presentation with Reveal.js. The presentation has a slide for each commit that changed the specified file. The slides use Prism.js to highlight the code.&lt;/p&gt;
+
+&lt;p&gt;There are still a few things hardcoded in the F# code, so it&amp;rsquo;s not a &amp;ldquo;consumer&amp;rdquo; ready product, but some developers might be able to use it as is. You can find the code &lt;a href=&#34;https://github.com/pedromsantos/GitHubAnimator&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Premature Microservices</title>
+      <link>http://codurance.com/blog/premature-microservices/</link>
+      <pubDate>Fri, 15 Jan 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/premature-microservices/</guid>
+      <description>
+
+&lt;p&gt;Building your app from the very start as microservices is not a great idea! Their deployment is complex - regardless of how good your microservices infra is. They create boundaries in your application that resist change. Software applications are complex systems and complex systems are grown not designed. In order to grow an efficient system - we must allow it to grow in directions that it needs to. Boundaries designed at the start will stunt that growth at certain axis when direction of growth is at its most unpredictable.&lt;/p&gt;
+
+&lt;p&gt;Also testing the system as a whole is very cumbersome. One can argue that the services should be decoupled enough that testing the application where all the services need to run is kept to a minimum. Sure, but in my experience even that minimal testing is a pain. Pain that should be lessened or altogether avoided for as long as possible.&lt;/p&gt;
+
+&lt;p&gt;So why do we do it? Why are microservices such a compelling idea? The premise of isolating change is extremely attractive. We have all been stung with “the monolith”. We look at the system and see the change hotspots and wonder, “if only I had those hotspots isolated so that I didn’t have to redeploy the whole thing when they change” or “if only I could re-engineer this part without having to worry about the rest” etc. Yes microservices based architecture may help you achieve that (Remember! I said they are a bad idea at the start of a project, not a bad idea altogether.) but by this time you understand the hotspots in the application and your understanding of the domain has matured. My problem is with creating strong boundaries between different aspects of our application. These resist change if the understanding changes and some of the boundaries are no longer valid. It discourages people to question the already drawn boundaries because they are not easy to change.&lt;/p&gt;
+
+&lt;h3 id=&#34;an-idea&#34;&gt;An Idea&lt;/h3&gt;
+
+&lt;p&gt;So can we do microservices without having to draw strong boundaries, at least at the start? Like anything in life it is not so simple. From weak-to-strong -  we can use classes/modules, interfaces/protocols, package/namespaces, sub-projects, libraries and processes to draw these boundaries. The problem with the conventional microservices is that we go straight to the processes level to draw the boundary which is the strongest level at which you can separate the system. However, the weaker the boundary the bigger the chance that you’ll have to do extra work to strengthen that boundary because dependencies will have leaked through. But at the same time weaker boundaries are easier to redefine.&lt;/p&gt;
+
+&lt;p&gt;What if we keep the boundaries in process but make them explicit? For example we segregate the system into components that are only allowed to speak to each other over a well defined interface just like our microservices but they’re all running in the same process. This could be serialised into something specific like JSON or a more abstract interchange format. Code could be divided into top level packages ensuring that there is no direct binary dependency between modules. So that modules are truly passing messages to each other - like good old fashioned Object Oriented Programming. We must ensure that there is no direct dependency between modules e.g. shared code, shared memory or shared database tables. Code can be reused using versioned libraries. This will allow us to keep explicit boundaries between the modules in our codebase that are strong enough that individual modules can be extracted into their own microservices when required but also weak enough that they can be easily changed when needed. Even this level of division my not be ideal at the start and we may start with a single component to the point where a division into at least two parts becomes apparent.&lt;/p&gt;
+
+&lt;h3 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;So the advice, if you haven’t guessed, is that we should start our system with minimal assumptions and restrictions and then sense the system to see where it needs to go. Microservices could be the vision of the destination but we shouldn’t try to second guess the destination or even preplan our journey. We should sense and adapt. Premature abstractions and boundaries will drown out this sense in certain areas resulting in a system that is not as fully evolved as it could’ve been.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Clojure VIM Environment</title>
+      <link>http://codurance.com/blog/clojure-vim-environment/</link>
+      <pubDate>Sun, 10 Jan 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/clojure-vim-environment/</guid>
+      <description>&lt;p&gt;The &lt;a href=&#34;https://cursive-ide.com/&#34;&gt;Cursive&lt;/a&gt; plugin for Clojure is now out of its beta testing phase. I have been using it throughout its beta program and, I must say, it is pretty good. Sure, the refactoring capabilities are not quite on a par with those of IntelliJ for Java, but then Clojure is dynamic and asking for that kind of power is asking for the impossible.&lt;/p&gt;
+
+&lt;p&gt;I, on the other hand, have found myself going back to vim more often when I am working with Clojure. I have always found the vim shortcuts more powerful. I even use the vim plugin in IntelliJ IDEA / Cursive. Luckily there are couple of plugins available that make Clojure development in vim a joy. These are &lt;a href=&#34;https://github.com/vim-scripts/VimClojure&#34;&gt;Vim Clojure&lt;/a&gt; and &lt;a href=&#34;https://github.com/tpope/vim-fireplace&#34;&gt;Fireplace&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The basics I ask from a development environment are:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Syntax Highlighting&lt;/li&gt;
+&lt;li&gt;Fast keyboard based navigation through source code&lt;/li&gt;
+&lt;li&gt;Jump to source and docs for third-party libs&lt;/li&gt;
+&lt;li&gt;Fast test execution&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Vim with Fireplace satisfies the basic and goes beyond that. My favourite is the block editing feature that allows me to manipulate blocks of code (e.g. replace everything within function call, copy all declarations inside a let block etc.). The plugin also automatically connects to a running repl and allows me to execute any Clojure code directly through vim. I find these features much more useful then the rudimentary refactoring such as “change function name”, although I do miss it sometimes. Note that Cursive also has an integreated repl. There is a very good tutorial for Fireplace &lt;a href=&#34;http://clojure-doc.org/articles/tutorials/vim_fireplace.html&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Here’s what my vim Clojure dev environment looks like:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/vimenv.png&#34;  class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;I have found that some investment into learning better vim usage has allowed me to become more productive than I was with Cursive, although it will not suit everyones taste. The codebases I work on are relatively small and I may still prefer Cursive for larger codebases. Having said that, I like the argument that we should never have a single large codebase. At least for now vim is my new favourite editor for Clojure. Then again! I have not tried Emacs … yet!&lt;/p&gt;
+
+&lt;p&gt;EDIT: &lt;a href=&#34;https://twitter.com/tomphp&#34;&gt;Tom Oram&lt;/a&gt; pointed out a couple more plugins that I neglected to mention. These are &lt;a href=&#34;https://github.com/kien/rainbow_parentheses.vim&#34;&gt;Rainbow Parentheses&lt;/a&gt; and &lt;a href=&#34;https://github.com/vim-scripts/paredit.vim&#34;&gt;Paredit&lt;/a&gt;. The former is invaluable for keeping track of those parentheses, and adds a little colour to your life. The later allows structured editing of s-expressions -  it is not easy to get use to but once you do you cannot do without,&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Changing Scalatra and sbt default directories</title>
+      <link>http://codurance.com/blog/changing-scalatra-and-sbt-default-directories/</link>
+      <pubDate>Sun, 22 Nov 2015 23:54:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/changing-scalatra-and-sbt-default-directories/</guid>
+      <description>&lt;p&gt;Conventions are not always good. I recently started a new internal web project
+at Codurance and I decided to use Scala. As I&amp;rsquo;m not a fan of big
+frameworks, I chose &lt;a href=&#34;http://www.scalatra.org/&#34;&gt;Scalatra&lt;/a&gt; as a micro web framework.&lt;/p&gt;
+
+&lt;p&gt;The first challenge was that I wanted to organise my application with a
+different directory structure. By default, &lt;a href=&#34;http://www.scala-sbt.org/&#34;&gt;sbt&lt;/a&gt; and Scalatra use the same convention used by &lt;a href=&#34;https://maven.apache.org/&#34;&gt;maven&lt;/a&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; /src/main/scala       // source code
+&amp;gt; /src/main/resources   // production resources
+&amp;gt; /scr/test/scala       // tests
+&amp;gt; /scr/test/resouces    // test resources
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For the past few years I&amp;rsquo;ve been experimenting with different directory structure for my projects. I want my directories to be more meaningful when it comes to explain the business domain. The new directory structure is part of what I call &lt;em&gt;Interaction Driven Design (IDD)&lt;/em&gt; and a full talk on it can be found in our &lt;a href=&#34;http://codurance.com/videos/&#34;&gt;videos area&lt;/a&gt;. I give a lot of details about the rational behind the new directory structure on that talk.&lt;/p&gt;
+
+&lt;p&gt;The directory structure I would like to use for this new project is:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; /src/core/scala          // source code for my core domain
+&amp;gt; /src/core-test/scala     // tests for my core domain
+
+&amp;gt; /src/data/resources      // resources for data migration and test data
+&amp;gt; /src/data/scala          // code for data migration and test data
+
+&amp;gt; /src/web/resources       // delivery mechanism resources
+&amp;gt; /src/web/scala           // delivery mechanism code (controllers, API, etc)
+&amp;gt; /src/web/webapp          // web files (WEB-INF folder, css, javascript, Jade templates, etc)
+&amp;gt; /src/web-test/scala      // tests for my delivery mechanism
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Once again, the directory structure above will make more sense if you watch the &lt;a href=&#34;http://codurance.com/videos/&#34;&gt;Interaction Driven Design (IDD) talk&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The biggest challenge was to rename the default directory &lt;em&gt;main&lt;/em&gt; to &lt;em&gt;web&lt;/em&gt;. That broke the whole world. Here are the changes I had to make to fix it all:&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;build.sbt&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;unmanagedSourceDirectories in Compile := Seq((baseDirectory.value / &amp;quot;src/core/scala&amp;quot;),
+                                     (baseDirectory.value / &amp;quot;src/data/scala&amp;quot;),
+                                     (baseDirectory.value / &amp;quot;src/web/scala&amp;quot;))
+
+unmanagedResourceDirectories in Compile += baseDirectory.value / &amp;quot;src/data/resources&amp;quot;
+
+unmanagedSourceDirectories in Test := Seq((baseDirectory.value / &amp;quot;src/core-test/scala&amp;quot;),
+                                      (baseDirectory.value / &amp;quot;src/web-test/scala&amp;quot;))
+
+webappSrc in webapp &amp;lt;&amp;lt;= (baseDirectory in Compile) map { _ / &amp;quot;src/web/webapp&amp;quot; }
+
+webappDest in webapp &amp;lt;&amp;lt;= (baseDirectory in Compile) map { _ / &amp;quot;src/web/webapp&amp;quot; }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The last two lines &lt;em&gt;webappSrc&lt;/em&gt; and &lt;em&gt;webappDest&lt;/em&gt; were needed because I also use a class that starts &lt;a href=&#34;http://www.eclipse.org/jetty/&#34;&gt;Jetty&lt;/a&gt; by hand where I hook the Scalatra listener.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;JettyLauncher.scala&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;import org.eclipse.jetty.server.Server
+import org.eclipse.jetty.servlet.DefaultServlet
+import org.eclipse.jetty.webapp.WebAppContext
+import org.scalatra.servlet.ScalatraListener
+
+object JettyLauncher {
+
+    def main(args: Array[String]) {
+        val port = if(System.getenv(&amp;quot;PORT&amp;quot;) != null) System.getenv(&amp;quot;PORT&amp;quot;).toInt else 8089
+    
+        val server = new Server(port)
+        val context = new WebAppContext()
+        context.setClassLoader(JettyLauncher.getClass.getClassLoader)
+        context setContextPath &amp;quot;/&amp;quot;
+        context.setResourceBase(&amp;quot;src/web/webapp&amp;quot;)
+        context.addEventListener(new ScalatraListener)
+        context.addServlet(classOf[DefaultServlet], &amp;quot;/&amp;quot;)
+    
+        server.setHandler(context)
+    
+        server.start
+        server.join
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;When executing this class, the &lt;em&gt;ScalatraBootstrap&lt;/em&gt; could not be found and that&amp;rsquo;s why I had to add the following line to my &lt;em&gt;JettyLauncher&lt;/em&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;&amp;gt; context.setClassLoader(JettyLauncher.getClass.getClassLoader)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Scalatra relies on the default directory &lt;em&gt;main&lt;/em&gt; to find &lt;em&gt;ScalatraBootstrap&lt;/em&gt; and this is how I managed to make sure the &lt;em&gt;ScalatraBootstrap&lt;/em&gt; could be found.&lt;/p&gt;
+
+&lt;p&gt;Note that I also had to change the resource base, pointing to the &lt;em&gt;web&lt;/em&gt; folder instead of &lt;em&gt;main&lt;/em&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;&amp;gt; context.setResourceBase(&amp;quot;src/web/webapp&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As I use &lt;a href=&#34;http://scalate.github.io/scalate/documentation/jade.html&#34;&gt;Jade&lt;/a&gt; templates via &lt;a href=&#34;http://scalate.github.io/scalate/&#34;&gt;Scalate&lt;/a&gt;, I had to change the Scalate template configuration on &lt;strong&gt;build.scala&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;build.scala&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;object MonitorBuild extends Build {
+    val Organization = &amp;quot;com.codurance&amp;quot;
+    val Name = &amp;quot;monitor&amp;quot;
+    val Version = &amp;quot;0.1.0-SNAPSHOT&amp;quot;
+    val ScalaVersion = &amp;quot;2.11.6&amp;quot;
+    val ScalatraVersion = &amp;quot;2.4.0.RC1&amp;quot;
+    
+    lazy val project = Project(
+        &amp;quot;monitor&amp;quot;,
+        file(&amp;quot;.&amp;quot;),
+        settings = ScalatraPlugin.scalatraSettings ++ scalateSettings ++ Seq(
+    
+            // dependencies and some other stuff here
+    
+            scalateTemplateConfig in Compile &amp;lt;&amp;lt;= (sourceDirectory in Compile) { base =&amp;gt;
+                Seq(
+                    TemplateConfig(
+                        new RichFile(new File(&amp;quot;src&amp;quot;)) / &amp;quot;web&amp;quot; / &amp;quot;webapp&amp;quot; / &amp;quot;WEB-INF&amp;quot; / &amp;quot;templates&amp;quot;,
+                        Seq.empty, 
+                        Seq(
+                            Binding(&amp;quot;context&amp;quot;, &amp;quot;_root_.org.scalatra.scalate.ScalatraRenderContext&amp;quot;, importMembers = true, isImplicit = true)
+                        ), 
+                        Some(&amp;quot;templates&amp;quot;)
+                    )
+                )
+            }
+        )
+    )
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The important line above is:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;&amp;gt; new RichFile(new File(&amp;quot;src&amp;quot;)) / &amp;quot;web&amp;quot; / &amp;quot;webapp&amp;quot; / &amp;quot;WEB-INF&amp;quot; / &amp;quot;templates&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Which makes Scalate find the templates in the &lt;em&gt;web&lt;/em&gt; directory instead of &lt;em&gt;main&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Make sure you have these lines in the &lt;strong&gt;plugins.sbt&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;&amp;gt; addSbtPlugin(&amp;quot;com.mojolly.scalate&amp;quot; % &amp;quot;xsbt-scalate-generator&amp;quot; % &amp;quot;0.5.0&amp;quot;)
+&amp;gt;
+&amp;gt; addSbtPlugin(&amp;quot;org.scalatra.sbt&amp;quot; % &amp;quot;scalatra-sbt&amp;quot; % &amp;quot;0.4.0&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I didn&amp;rsquo;t need to change anything on my &lt;strong&gt;web.xml&lt;/strong&gt; and &lt;strong&gt;ScalatraBootstrap&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;The configuration described above allows me to run the application via&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; ./sbt container:start
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;that is how I normally run the application locally and also allows me to create a fat jar file and execute the &lt;em&gt;JettyLauncher&lt;/em&gt; class that is how I run in production:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; java -cp &amp;lt;myapplication&amp;gt;.jar com.codurance.JettyLauncher
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The fat jar file is created via:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; ./sbt assembly
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This is how the collapsed directory structure looks on &lt;a href=&#34;https://www.jetbrains.com/idea/&#34;&gt;IntelliJ IDEA&lt;/a&gt;:&lt;/p&gt;
+
+&lt;p&gt;
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-11-21-folder-structure-collapsed.jpg&#34;  class=&#34;img img-responsive style-screengrab&#34; style=&#34;max-height: 98px;&#34;/&gt;
+
+and this is how it looks when expanded:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-11-21-folder-structure-expanded.jpg&#34;  class=&#34;img img-responsive style-screengrab&#34; style=&#34;max-height: 500px;&#34;/&gt;
+
+
+&lt;p&gt;Although it took me a while to figure all this out, I&amp;rsquo;m happy to be able to structure my project the way it makes sense to us.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>My first couple of months at Codurance</title>
+      <link>http://codurance.com/blog/my-first-couple-of-months-at-codurance/</link>
+      <pubDate>Sun, 22 Nov 2015 09:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/my-first-couple-of-months-at-codurance/</guid>
+      <description>
+
+&lt;h3 id=&#34;some-background&#34;&gt;Some background&lt;/h3&gt;
+
+&lt;p&gt;Some of you may know me from the various meetups in the city, especially my attendance at a number of &lt;a href=&#34;www.meetup.com/Londonjavacommunity/&#34;&gt;LJC&lt;/a&gt; and &lt;a href=&#34;www.meetup.com/london-software-craftsmanship&#34;&gt;LSCC&lt;/a&gt; meetup events. Attending these events I learnt about various conferences like &lt;strong&gt;Devoxx&lt;/strong&gt;, &lt;strong&gt;SoCraTes&lt;/strong&gt;, &lt;strong&gt;JAX London&lt;/strong&gt;, &lt;strong&gt;Java2Days&lt;/strong&gt;, &lt;strong&gt;OpenFest&lt;/strong&gt;, and I ended up attending and later presenting on various topic including &lt;a href=&#34;https://java.net/projects/adoptopenjdk/pages/AdoptOpenJDK&#34;&gt;Adopt OpenJDK&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;During this time I met a lot of people with various levels of experience and my interest and urge to learn more about the Java/JVM platform, Code Quality, Software Design, XP Practices, Software Craftsmanship, etc&amp;hellip;, were on the rise and saw no end. And whilst attending these events I came across &lt;a href=&#34;https://twitter.com/sandromancuso&#34;&gt;Sandro&lt;/a&gt; and &lt;a href=&#34;https://twitter.com/mashooq&#34;&gt;Mash&lt;/a&gt;, who were in those days hosting &lt;a href=&#34;www.meetup.com/london-software-craftsmanship&#34;&gt;LSCC&lt;/a&gt; events. I went to many of &lt;a href=&#34;www.meetup.com/london-software-craftsmanship&#34;&gt;LSCC&lt;/a&gt; events, especially liked the hands-on sessions (which are still my favourite).&lt;/p&gt;
+
+&lt;p&gt;I also noticed that many things I learnt at such events and conferences wouldn&amp;rsquo;t always be immediately recognised or accepted at the workplace. And moving to another work environment didn&amp;rsquo;t always solve this problem fully. I found that I wasn&amp;rsquo;t learning what I wanted from my peers and the things I learnt from the community I couldn&amp;rsquo;t apply at work. Besides very few were really in tuned with what the community was about. So one fine day I decided to take charge of my career and make a serious decision and take up the Apprenticeship program offered by &lt;a href=&#34;http://codurance.com/&#34;&gt;Codurance&lt;/a&gt; and go through the process.&lt;/p&gt;
+
+&lt;p&gt;I was urged to go this way after being inspired by Sandro&amp;rsquo;s book: &lt;a href=&#34;http://www.amazon.co.uk/books/dp/0134052501&#34;&gt;The Software Craftsman&lt;/a&gt;, attending all the &lt;a href=&#34;http://socratesuk.org/&#34;&gt;SoCraTes UK&lt;/a&gt; conferences, and meeting with developers who valued and took pride of their work namely their craft.&lt;/p&gt;
+
+&lt;h3 id=&#34;where-we-are-just-now&#34;&gt;Where we are just now&lt;/h3&gt;
+
+&lt;p&gt;It&amp;rsquo;s now been nearly two months since I have been working for &lt;a href=&#34;http://codurance.com/&#34;&gt;Codurance&lt;/a&gt;, a formidable force. And so it&amp;rsquo;s also about time that I share my experiences with my fellow mates and the community around me.&lt;/p&gt;
+
+&lt;p&gt;During my first few weeks at &lt;a href=&#34;http://codurance.com/&#34;&gt;Codurance&lt;/a&gt;, I have been busy learning various things that have been chalked out for becoming a craftsman.&lt;/p&gt;
+
+&lt;p&gt;When working on a kata or learning a concept, we paired or did what is known as &amp;lsquo;mob programming&amp;rsquo; along with other apprentices and craftsmen. And most of the time used the &lt;a href=&#34;https://en.wikipedia.org/wiki/Pomodoro_Technique&#34;&gt;pomodoro technique&lt;/a&gt;. Time boxing our work in intervals is something done both in groups and working individually. We would have a lot of discussions and retrospectives after working on a problem or writing some code from scratch.&lt;/p&gt;
+
+&lt;h3 id=&#34;structure-of-my-program&#34;&gt;Structure of my program&lt;/h3&gt;
+
+&lt;p&gt;We used an internal tool based on the concept of &lt;a href=&#34;http://www.impactmapping.org/&#34;&gt;Impact Mapping&lt;/a&gt;. I soon got interested in it when I saw my colleague &lt;a href=&#34;https://twitter.com/Singsalad&#34;&gt;Franzi&lt;/a&gt; (who is now a craftswoman) had used it to plan out her Apprenticeship route. Such a tool helps map out our goals and the tasks we need to perform to achieve it. And this can differ from person-to-person, depending on what they want to work on (driven by the Apprentice).&lt;/p&gt;
+
+&lt;p&gt;My mentor and other craftsmen reviewed them to get an idea of what I wanted to achieve for myself. And then its up to me to apply my own drive and perseverance to achieve the individual stories. My mentor and I meet and talk informally on a regular basis, many times pairing on a kata or a project or on the white board trying to get my head around a concept.&lt;/p&gt;
+
+&lt;h3 id=&#34;days-in-the-life-of-an-apprentice&#34;&gt;Days in the life of an Apprentice&lt;/h3&gt;
+
+&lt;p&gt;I found the working hours quite flexible, remote working is also an option (when you are on the bench or if the client allows, if you are in a project). Our co-founders are understanding and compassionate about our individual situations.&lt;/p&gt;
+
+&lt;p&gt;Meetings are at their minimum, except for a weekly Apprentices meeting (run by an Apprentice and guided by at least one Craftsperson) and a bi-monthly company-wide catchup.&lt;/p&gt;
+
+&lt;p&gt;The Apprentices meetings are full of fun &amp;ndash; we are accompanied by at least one Craftsperson, who disperses their knowledge and experience from a wide variety of topics designed to help us in the journey and fill the gaps in our knowledge and experience.&lt;/p&gt;
+
+&lt;p&gt;A bi-monthly catchup involves sharing of knowledge via lightning talks, discussions and pairing sessions on pet projects over pizzas and beer (and of course veggies and non-alcoholic beverages for the &lt;a href=&#34;https://en.wikipedia.org/wiki/Teetotalism&#34;&gt;teetotalers&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;Katas, code reviews, mob programming and projects make up a learning week - all of these done individually or when pairing with another.&lt;/p&gt;
+
+&lt;h5 id=&#34;katas&#34;&gt;&lt;strong&gt;Katas&lt;/strong&gt;&lt;/h5&gt;
+
+&lt;p&gt;On a daily basis I have worked on different katas or try to solve the same kata in various different ways (using different testing and refactoring approaches). This in turn gave me better insights into designing and refactoring techniques. Trying to solve the same problem in different ways has a positive impact on our problem solving skills especially when writing code. In my case I also learnt how to use the different libraries and methods to write tests. I would like to cite &lt;strong&gt;Samir&lt;/strong&gt;, thanks to you, for the suggesting this approach during the first week of my Apprenticeship.&lt;/p&gt;
+
+&lt;h5 id=&#34;code-reviews&#34;&gt;&lt;strong&gt;Code reviews&lt;/strong&gt;&lt;/h5&gt;
+
+&lt;p&gt;Just last week we did a group code review and time-boxed ourselves, performed a retrospective at the end of each interval and ensured we delivered a good chunk of the feedback before close of play. Such regular code review exercises are helping all of us learn about how to code better as we are not only learning from feedback from the tools we used, but also through exchange of feedback from our peers who were involved in the group code review session.&lt;/p&gt;
+
+&lt;h5 id=&#34;software-design-specification-gathering-communication&#34;&gt;&lt;strong&gt;Software Design, Specification Gathering &amp;amp; Communication&lt;/strong&gt;&lt;/h5&gt;
+
+&lt;p&gt;Recently we had an interesting mob-programming session where we were trying to model and write a game. At the end of the session, we had a retrospective, discussing the things we did well and didn&amp;rsquo;t do well. Each of the apprentices and craftsmen were performing a specific role i.e. Developer, Domain Expert, etc&amp;hellip; We learnt in retrospective, about areas where we could have done better and should focus on. That any test written gives immediate feedback about how well we have understood the domain and if we were taking the right approach. Why a certain approach when starting a project is more advantageous than another approach. What questions to ask and why it is important to ask the right questions to the domain expert or to give the right level of information to another developer and vice-versa. Sandro has described this process in detail in his &lt;a href=&#34;http://codurance.com/2015/11/01/practicing-well-crafted-design/&#34;&gt;blog post&lt;/a&gt; recently.&lt;/p&gt;
+
+&lt;h3 id=&#34;fun-socialising-and-sharing&#34;&gt;Fun, socialising and sharing&lt;/h3&gt;
+
+&lt;p&gt;I found our office environment to be conducive to learning, sharing and collaboration. We even have a pairing rota that we use from time-to-time to record or suggest pairing sessions during the week.&lt;/p&gt;
+
+&lt;p&gt;We share links to events, conferences, tweets, interesting articles, videos, blog posts, etc&amp;hellip; via slack, document discussions and brain dumps via Google doc, huddles during lunch- and tea- breaks to talk about anything we are working on. Thanks to the library of printed and digital books to our disposal, the huge collection of &lt;a href=&#34;http://codurance.com/blog&#34;&gt;blog posts&lt;/a&gt; and &lt;a href=&#34;http://codurance.com/videos/&#34;&gt;videos&lt;/a&gt; on our site.&lt;/p&gt;
+
+&lt;p&gt;The apprentices and some craftsmen have collectively started a social event which of course happens every Friday, sometimes it&amp;rsquo;s dinner at a nearby restaurant, while at other times an indoor movie over snacks and drinks at our office premises.&lt;/p&gt;
+
+&lt;h3 id=&#34;it-is-worthwhile-and-that-s-why-we-are-here&#34;&gt;It is worthwhile and that&amp;rsquo;s why we are here&lt;/h3&gt;
+
+&lt;p&gt;It is a privilege to be able to work alongside very experienced craftsmen from our industry. We are very lucky and thankful to have the opportunity to be guided and mentored by talented and like minded developers.&lt;/p&gt;
+
+&lt;p&gt;This is my first job where the company has a completely flat hierarchy and where we share similar values.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/greatCompanyCulture.jpg&#34;  class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;h3 id=&#34;closing-note&#34;&gt;Closing note&lt;/h3&gt;
+
+&lt;p&gt;Work is fun and learning is enjoyable when we love what we do and are amongst friends with similar goals and aspirations.&lt;/p&gt;
+
+&lt;p&gt;Thank you for taking the time to read this post and I hope it was interesting. Looking forward to write more and share such experiences in future posts.&lt;/p&gt;
+
+&lt;p&gt;Many thanks to &lt;strong&gt;Sandro&lt;/strong&gt;, &lt;strong&gt;Tomaz&lt;/strong&gt;, &lt;strong&gt;Alex&lt;/strong&gt;, &lt;strong&gt;Franzi&lt;/strong&gt; and &lt;strong&gt;David&lt;/strong&gt; for all the feedback provided for this blog post.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Practicing Well-Crafted Design</title>
+      <link>http://codurance.com/blog/practicing-well-crafted-design/</link>
+      <pubDate>Sun, 01 Nov 2015 18:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/practicing-well-crafted-design/</guid>
+      <description>
+
+&lt;p&gt;Katas are great, but not enough. In the past year I’ve been trying to find ways to teach our craftsmen and apprentices how to design software. Although we could discuss good design principles, it was very difficult to find a way to practice them. Katas are great for learning TDD, micro design, working in baby steps, and a few techniques for dealing with legacy code but we need more. We would like to practice requirements gathering, domain modelling, and well-crafted code all together, with the same fast feedback loop we get when we do katas. The problem is that we need a far bigger problem with overlapping rules so that we can experience incremental software design. Inspired by a session we had a &lt;a href=&#34;https://www.socrates-conference.de/&#34;&gt;SoCraTes Germany 2015&lt;/a&gt;, we are evolving a deliberate practice session that allows us to achieve that.&lt;/p&gt;
+
+&lt;h1 id=&#34;the-session&#34;&gt;The Session&lt;/h1&gt;
+
+&lt;p&gt;The objective is to pick a game (card, board, dice) and implement the code in a way where the code clearly describes the rules of the game. Any person not part of the group that wrote the code should be able to look at the code and very quickly understand how the game works.&lt;/p&gt;
+
+&lt;h3 id=&#34;setup&#34;&gt;Setup&lt;/h3&gt;
+
+&lt;p&gt;The session is run using mob programming. Make sure you have a projector and a whiteboard or flip chart.&lt;/p&gt;
+
+&lt;h3 id=&#34;format&#34;&gt;Format&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;First step&lt;/strong&gt;: People in the mob choose a game and elect a domain expert, who is someone that either knows the game well or will be responsible to figure out how the game works in case no one knows the game.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Second step&lt;/strong&gt;: The mob chooses a driver to be the hands of the mob.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Third step&lt;/strong&gt;: The domain expert gives a very brief description of the game. 5 minutes maximum. Whiteboard/flipchart can be used.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Fourth step&lt;/strong&gt;: Developers start coding and will need to rely on their ability to ask the right questions in order to extract the information they need from the domain expert.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Fifth step&lt;/strong&gt;: Run a retrospective to discuss what was learnt during the session.&lt;/p&gt;
+
+&lt;p&gt;Set aside &lt;em&gt;at least&lt;/em&gt; two hours for the session — 100 minutes for the coding part and 20 minutes for the retrospective. The majority of the sessions I ran took significantly longer: 2.5 to 5 hours.&lt;/p&gt;
+
+&lt;h3 id=&#34;ground-rules&#34;&gt;Ground rules&lt;/h3&gt;
+
+&lt;p&gt;In order to mitigate emotional aspects (debates can become quite heated), we created some ground rules for the session.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Give preference&lt;/strong&gt;: Don’t force your idea. Always give preference to someone else’s idea. You know how you code and you can always do the exercise on your own later.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Don’t shout or interrupt&lt;/strong&gt;: Let other people speak. The session is meant to be a pleasant learning experience. If things are not going your way, calm down, sit back and try to learn a different way of doing things.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Don’t discuss for too long&lt;/strong&gt;: Pick an idea and run with it. We can always refactor later. Avoid analysis paralysis.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Constantly move forward&lt;/strong&gt;: If the mob doesn’t decide, the driver should start typing and move forward.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;One idea for at least 10 minutes&lt;/strong&gt;: It’s OK to change directions but once the majority decided on one approach, avoid throwing many different ideas at the driver. We need some time for an idea to mature before we move to another one.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Objections are noted&lt;/strong&gt;: Objections to the current idea are noted in the code or whiteboard if someone is really frustrated, but the team still moves on.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Write the ground rules on a flip chart or whiteboard &lt;em&gt;before&lt;/em&gt; the session starts and keep them visible at all times. Point at them if the debate becomes heated or someone is misbehaving.&lt;/p&gt;
+
+&lt;h1 id=&#34;tips-for-running-the-session&#34;&gt;Tips for running the session&lt;/h1&gt;
+
+&lt;p&gt;I’ve run this session quite a few times and I’ve learnt different things each time, including how to run the session in a better way. Here are some tips.&lt;/p&gt;
+
+&lt;h3 id=&#34;size-of-the-mob&#34;&gt;Size of the mob&lt;/h3&gt;
+
+&lt;p&gt;The smaller the mob is, the better. I recommend a mob of 3 to 5 developers.&lt;/p&gt;
+
+&lt;h3 id=&#34;driver&#34;&gt;Driver&lt;/h3&gt;
+
+&lt;p&gt;Should be someone who is quite fast on the keyboard in order to capture the thoughts of the mob. The faster the driver types, the faster the mob gets feedback and decides on next steps. As the mob will be constantly changing their minds about the implementation (different people, different ideas), it is important that they get fast feedback on how the code would look like.&lt;/p&gt;
+
+&lt;p&gt;I recommend that only one person should type. We don’t want to waste time with people trying to get familiar with a different computer, tools, keyboard, shortcuts, etc.&lt;/p&gt;
+
+&lt;h3 id=&#34;domain-expert&#34;&gt;Domain expert&lt;/h3&gt;
+
+&lt;p&gt;The role of the domain expert is simply to clarify the rules of the game and they can be a referee in terms of the domain language to be used. They have the last say on names of verbs and nouns. The domain expert is not a Product Owner; they don’t dictate which features to build or the order they should be built. The domain expert can contribute to the code as well but not overrule the design decisions made by the mob.&lt;/p&gt;
+
+&lt;h3 id=&#34;facilitator&#34;&gt;Facilitator&lt;/h3&gt;
+
+&lt;p&gt;Having a facilitator could be a very good idea. The facilitator would be responsible to make sure the discussions remain civilised and that everyone has a say.&lt;/p&gt;
+
+&lt;h3 id=&#34;games-we-tried&#34;&gt;Games we tried&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/Mia_(game)&#34;&gt;Mia&lt;/a&gt;, &lt;a href=&#34;https://en.wikipedia.org/wiki/Oh_Hell&#34;&gt;Oh Hell!&lt;/a&gt;, &lt;a href=&#34;https://en.wikipedia.org/wiki/The_Great_Dalmuti&#34;&gt;The Great Dalmuti&lt;/a&gt;, &lt;a href=&#34;https://en.wikipedia.org/wiki/Monopoly_(game)&#34;&gt;Monopoly&lt;/a&gt;, and a few others I don’t remember the name of.&lt;/p&gt;
+
+&lt;h3 id=&#34;boundaries-of-the-games&#34;&gt;Boundaries of the games&lt;/h3&gt;
+
+&lt;p&gt;Make sure the boundaries of the game are defined. For example, use the console as an interface to the game. Maybe some players could be AI players while others could be humans playing through the console. Defining the boundaries will help developers to understand at which level they need to test and how to build the engine of the game.&lt;/p&gt;
+
+&lt;h1 id=&#34;variations-and-challenges&#34;&gt;Variations and challenges&lt;/h1&gt;
+
+&lt;p&gt;Below is a list of things we also tried at &lt;a href=&#34;http://codurance.com&#34;&gt;Codurance&lt;/a&gt;, during &lt;a href=&#34;https://www.socrates-conference.de/&#34;&gt;SoCraTes Germany&lt;/a&gt;, and &lt;a href=&#34;http://www.socratesbe.org/&#34;&gt;SoCraTes Belgium&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;constraints&#34;&gt;Constraints&lt;/h3&gt;
+
+&lt;p&gt;If the developers in the mob are very experienced, feel free to add &lt;a href=&#34;https://www.google.com/webhp?sourceid=chrome-instant&amp;amp;ion=1&amp;amp;espv=2&amp;amp;ie=UTF-8#q=code%20retreat%20constraints&#34;&gt;constraints&lt;/a&gt; to the session. Just be aware that this is already quite a difficult session and constraints may impede you to practice incremental design.&lt;/p&gt;
+
+&lt;h3 id=&#34;larger-number-of-developers&#34;&gt;Larger number of developers&lt;/h3&gt;
+
+&lt;p&gt;If running this session with many developers (community events), you can split them in small mobs (3 to 5 people each mob). Each mob will pick a game and spend around 90 minutes coding it. Once the time is up, each mob individually will put their code in a projector and let the other groups try to guess what game they coded and what the rules were. Mobs should avoid naming their projects or main classes after the name of the chosen game, of course.&lt;/p&gt;
+
+&lt;h3 id=&#34;pick-a-game-no-one-knows-how-to-play&#34;&gt;Pick a game no one knows how to play&lt;/h3&gt;
+
+&lt;p&gt;This was a very interesting session. We had to read the instructions of the game on Wikipedia, understand it, and code it in a very short period of time. This approach forced us to exercise our ability to understand requirements and model them quickly. Quite often, as we discovered new requirements, we had to change the code significantly, which gave us many interesting design insights.&lt;/p&gt;
+
+&lt;h3 id=&#34;play-the-game-before-implementing-it&#34;&gt;Play the game before implementing it&lt;/h3&gt;
+
+&lt;p&gt;Some developers mentioned that we should play the game for a few minutes before trying to implement it. This is a very sensible thing to do: we would all understand the game better and hopefully produce a better code. This can be done to make the session easier. However, in our day-to-day job, it’s not always possible to “play&amp;rdquo; requirements we get from Product Owners (or whoever is in charge of the requirements). Not playing the game before coding will keep the session closer to reality, that means, we will need to rely on our ability to ask the right questions to the domain expert in order to get the information we need. Figuring out what to code and when is also a good skill to practice.&lt;/p&gt;
+
+&lt;h3 id=&#34;trying-with-a-real-team-and-domain-expert-product-owner&#34;&gt;Trying with a real team and domain expert / product owner&lt;/h3&gt;
+
+&lt;p&gt;We haven’t done this yet but we think it could be a very interesting idea to run this exercise with a real team. The product owner (or whoever is in charge of the requirements) would play the role of domain expert. I believe that this would help the team to gel and also help product owners have a better appreciation for the effort that goes into taking requirements and coding them.&lt;/p&gt;
+
+&lt;p&gt;As the domain expert (played by the product owner) introduces new rules, developers will need to refactor the code or even throw a big chunk of their code away. The product owner will see the impact that new features have in the code and what developers have to go through to make things work. The language used by the domain expert can also significantly influence the complexity of the code.&lt;/p&gt;
+
+&lt;p&gt;The problem we foresee here is that the domain expert will get bored quickly if the team is not very experienced and fast. It’s very important that developers keep discussions focused and keep making process.&lt;/p&gt;
+
+&lt;p&gt;If anyone tries this session with a real team and a real product owner, please drop me a line at sandro at codurance dot com. I would love to know more about your experience.&lt;/p&gt;
+
+&lt;h3 id=&#34;why-games&#34;&gt;Why games?&lt;/h3&gt;
+
+&lt;p&gt;Board, card, and dice games normally have their rules very closely related to each other, providing us with a very rich domain. Implementing new rules will always force us to refactor or completely rewrite something that is already in there. The rules are normally quite easy to understand but quite complex to implement, which means that we can focus on the modelling/coding side instead of wasting time trying to understand a complex domain before writing any code.&lt;/p&gt;
+
+&lt;h1 id=&#34;summary&#34;&gt;Summary&lt;/h1&gt;
+
+&lt;p&gt;This is an advanced hands-on session. It’s not a session that should be used to learn basics of TDD, a new language, or software design. This is not a session for everyone to have a bit of play on the keyboard either. Developers in the mob must be very familiar with different TDD styles and many design principles in order for this session to work well.&lt;/p&gt;
+
+&lt;p&gt;This session was created so we can practice how to design software quickly and well, which includes constantly talking to the business, understanding requirements, defining a ubiquitous language, and of course, write well-crafted code that represents the problem domain.&lt;/p&gt;
+
+&lt;p&gt;Thanks to everyone at &lt;a href=&#34;http://codurance.com&#34;&gt;Codurance&lt;/a&gt;, &lt;a href=&#34;https://www.socrates-conference.de/&#34;&gt;SoCraTes Germany&lt;/a&gt;, and &lt;a href=&#34;http://www.socratesbe.org/&#34;&gt;SoCraTes Belgium&lt;/a&gt; who participated in the mob sessions and contributed with ideas to evolve the session.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Code review: Why are we doing it?</title>
+      <link>http://codurance.com/blog/codereview/</link>
+      <pubDate>Tue, 29 Sep 2015 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/codereview/</guid>
+      <description>
+
+&lt;p&gt;Developers across many organisations adopted code reviews as one of their core practices. Although that sounds like a very reasonable thing to do, over time the goal that led to the adoption of the practice is forgotten and the only thing left is the mindless application of the practice itself.&lt;/p&gt;
+
+&lt;h3 id=&#34;why-do-we-need-code-reviews&#34;&gt;Why do we need code reviews?&lt;/h3&gt;
+
+&lt;p&gt;Maintain quality. Disseminate knowledge. Avoid serious bugs in production. Maintain consistence in the design and architecture of the software. All very compelling and logical answers, no doubt, but if those are the goals, is code review the most efficient way to achieve them?&lt;/p&gt;
+
+&lt;p&gt;It’s difficult to discuss a practice like code review without understanding more about the context in which it is applied. How often is it done? Before or after the code is merged? How many people are involved? What’s the size of the team? Do you have distributed teams? What’s the average size of the code being reviewed? A couple of classes with a few lines each or a few classes with hundreds of lines each? Is the code only related to a small part of the domain or it touches multiple areas of your application? Do people have the power to reject the code being reviewed? How many people have this power? Team leads? Architects? Whole team, including junior developers? What happens when the code is rejected? Is the code base being changed by developers from the same organisation or is an open source project that may accept contributions from developers all over the world, who don’t know each other, and have little accountability for their changes? What do you look for in a code review? Finding bugs? Lack of consistency? Small details like variable names? Big architectural violations? Compliance with non-functional requirements? Bad design? Does the team even agree on what bad/good design means?&lt;/p&gt;
+
+&lt;p&gt;Knowing the answers to these questions are extremely important in order to decide if code review (and how it is done) is actually the best way to achieve our goals.&lt;/p&gt;
+
+&lt;h3 id=&#34;code-reviews-are-painful&#34;&gt;Code reviews are painful&lt;/h3&gt;
+
+&lt;p&gt;Well, code review is a practice and can’t be blamed if the code being reviewed sucks completely. Code review cannot be blamed if you have chosen to review a huge chunk of code weeks after it was merged. What may be painful is the way you decided to do code reviews and not the practice itself.&lt;/p&gt;
+
+&lt;h3 id=&#34;when-and-why-do-i-use-code-reviews&#34;&gt;When and why do I use code reviews?&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Before it is merged into production: We work in pairs and with very short-lived small branches (approximately 2 hours of coding and very few classes changed). Pairs raise a pull requests (an average of 2 to 5 per day) and another pair reviews their code. Since we work in very small increments, reviews, although often, are very easy and quick to do. Code is rarely rejected and when it is, it is very easy and quick to fix. This way we avoid a lot of re-work and decrease the chances of accumulating technical debt.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Disseminate knowledge and avoid unnecessary work: Having pairs reviewing each other’s code helps to disseminate knowledge of different parts of the system and also avoid that certain pairs do unnecessary work.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Review code submissions during an interview process: Code doesn’t lie. CVs do. In the first phase of our interview process, we ask candidates to submit a code assignment. We then review it and give them a comprehensive feedback. This is our opportunity to evaluate exactly where candidates are in terms of their basic skills as developers.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Mentoring apprentices: Our craftsmen regularly review all katas and pet projects developed by their apprentices. We find code reviews an extremely valuable teaching technique since the apprentices first try to solve the exercises to the best of their abilities and then they are shown better ways of doing it, if there are.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Reviewing different approaches / experiments: Sometimes we don’t easily agree in how a piece of code should be written. When that happens, we normally work a bit in isolation to experiment and then have the code reviewed by the rest of team. It’s easier to debate over something concrete than having hypothetical conversations with endless “but what if… “ questions.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;when-do-i-not-use-code-reviews&#34;&gt;When do I not use code reviews?&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Verify if there are bugs: I find this pointless. We have tests for it. Code is only reviewed after all tests pass. Tests are part of the code review though.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;After the code is merged into production: That is too late. What do we do if we find that the code is not good enough? If the code is already written, it’s working, it’s in production, and won’t be changed anytime soon, why review it and change it? I would wait to change it if I ever need to work on it.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;When the code being reviewed is too large: Reviewing large changes are painful and disrespectful. In my last company, we decided as a team that we would reject large changes. The pair of developers would need to break that change in smaller changes and commit them bit by bit so the reviewer could make sense of it. That was also used to teach them a lesson. Only small commits would be reviewed and merged into production. Period.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Check for code standards: I normally use Java and we have plenty of static analysis tools that are executed during our builds. If the code doesn’t comply with the bare minimum of quality defined (by the team) in these tools, the build fails. No code is reviewed if the branch build is failing.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;There are other situations where I would or wouldn’t use code reviews but those are the most important ones.&lt;/p&gt;
+
+&lt;h3 id=&#34;pair-programming-vs-code-reviews&#34;&gt;Pair programming vs. Code reviews&lt;/h3&gt;
+
+&lt;p&gt;Code reviews are quick and cheap to do when you work in small increments, in pairs, and constantly rotate pairs. As domain and technical knowledge are quickly spread across the team, code reviews become more a mechanism of knowledge sharing than actually a quality gate. Pairing give us a much quicker feedback loop and helps to minimise many mistakes. In our experience, code written by a pair has a much higher chance to be accepted in a code review than when it is written by a single developer.&lt;/p&gt;
+
+&lt;h3 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;Many problems during code reviews can be avoided when we have a good team culture. Practices without goals are pointless. Before choosing a practice, figure out exactly what you want to achieve and only then choose practices that will help you with that. Practices can not be blindly adopted. In order for them to work, you need to have the right context and mindset. Otherwise you run into the risk of blaming the practices for your own deficiencies.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Interview with Sandro Mancuso - Software Craftsmanship</title>
+      <link>http://codurance.com/blog/interview-for-jaxenter/</link>
+      <pubDate>Thu, 10 Sep 2015 16:36:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/interview-for-jaxenter/</guid>
+      <description>
+
+&lt;blockquote&gt;
+&lt;p&gt;Thinking of code as a beautiful work of art is a mistake. But at the same time we need to start seeing coding as a genuine skill that deserves professional recognition, says leading Software Craftsmanship advocate and JAX London speaker Sandro Mancuso.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p style=&#34;font-size: 85%;&#34;&gt;
+&lt;em&gt;This interview was originally published on the &lt;a href=&#34;https://jaxenter.com/software-craftsmanship-why-you-should-be-proud-to-be-a-developer-119970.html&#34;&gt;JAXenter webiste&lt;/a&gt;&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;h3 id=&#34;so-in-your-jax-london-workshop-https-jaxlondon-com-session-workshop-crafting-code-you-ll-be-helping-developers-to-write-better-more-crafted-code-speaking-as-the-founder-of-the-london-software-craftsmanship-community-what-kind-of-an-impact-do-you-think-the-craftsmanship-movement-is-making-to-improve-the-level-of-code&#34;&gt;So in your &lt;a href=&#34;https://jaxlondon.com/session/workshop-crafting-code/&#34;&gt;JAX London workshop&lt;/a&gt; you’ll be helping developers to write better, more crafted code. Speaking as the founder of the London Software Craftsmanship Community, what kind of an impact do you think the craftsmanship movement is making to improve the level of code?&lt;/h3&gt;
+
+&lt;p&gt;Craftsmanship is still a young movement and its impact is still small when we take into consideration the whole software industry. Agile took more than 10 years to become mainstream and I believe that Software Craftsmanship is a natural complement to Agile.&lt;/p&gt;
+
+&lt;p&gt;Agile changed completely the way we run and deliver software projects and it has been a massive step forward in our industry. Unfortunately, part of the original Agile message was lost, mainly when it comes to delivering quality software. Methodologies and practices that were more focused on the process side of Agile became far more important than the ones that focused on the technical side. For many organisations Agile is synonymous of Scrum and XP practices and well-crafted software are nowhere to be seen. Software Craftsmanship not only brings the balance back to Agile but also brings a massive focus on professionalism in software development.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;SEE ALSO:&lt;/strong&gt; &lt;a href=&#34;https://jaxenter.com/crafted-design-an-introduction-to-interaction-driven-design-117563.html&#34;&gt;An introduction to Interaction-Driven Design with Sandro Mancuso&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Software Craftsmanship is helping developers to understand that they are highly skilled professionals and that they should be proud of being developers. Just saying you are a great professional doesn’t make you a great professional—you need to be recognized as such. The professional recognition comes from customers and peers according to their satisfaction and how skilled you are. As developers start seeing themselves as professional software developers, the more they will pursue excellence. As they pursue excellence, the better they will become and the bigger will be their positive impact in the software industry. And this is what Software Craftsmanship is really about.&lt;/p&gt;
+
+&lt;h3 id=&#34;why-did-it-take-so-long-for-the-it-community-to-begin-thinking-of-software-as-a-craft-and-was-agile-s-goal-of-working-software-not-enough&#34;&gt;Why did it take so long for the IT community to begin thinking of software as a craft? And was Agile’s goal of “working software” not enough?&lt;/h3&gt;
+
+&lt;p&gt;According to the history, as some of the first software projects were mission critical, long, and very expensive, people approached these projects as they approached similar projects in other areas, and in the 1960s, that was engineering. Companies had also inherited the knowledge acquired during the industrial revolution and had very hierarchical structures where the factory workers were at the bottom. It took a few decades of massive hardware and software evolution for our industry to see things in a different way.&lt;/p&gt;
+
+&lt;p&gt;Agile’s &lt;em&gt;working software&lt;/em&gt; is a bit weak on its own. We need to look at some of the &lt;a href=&#34;http://www.agilemanifesto.org/principles.html&#34;&gt;12 Agile principles&lt;/a&gt; to understand what working software means. There we can find things like &amp;ldquo;&lt;em&gt;valuable software&lt;/em&gt;&amp;rdquo;, &amp;ldquo;&lt;em&gt;deliver working software frequently&lt;/em&gt;&amp;rdquo;, and most importantly &amp;ldquo;&lt;em&gt;continuous attention to technical excellence and good design enhances agility.&lt;/em&gt;&amp;ldquo;&lt;/p&gt;
+
+&lt;p&gt;The 17 Agile originators understood that &lt;em&gt;working software&lt;/em&gt; actually meant &lt;em&gt;high-quality working software.&lt;/em&gt; The problem I see with Agile today is that many Agile coaches out there have never been a software developer or at least have never been a good one. For this reason, they prefer not to talk too much about software and XP practices when advising companies. Very few Agile coaches today would be able to sit down with developers and help them to test-drive their code, configure their build pipeline, or suggest better design approaches. They prefer to restrict themselves to regurgitate a few things they read in the Scrum guide and, every now and again, with a superiority attitude, tell developers that they should do this TDD thing, as if they actually knew how.&lt;/p&gt;
+
+&lt;h3 id=&#34;i-ve-often-heard-that-programmers-are-treated-like-handymen-in-south-east-asia-like-a-plumber-hired-to-do-a-specific-job-do-you-ever-wonder-if-the-craftsmanship-movement-could-limit-the-notion-of-the-software-programmer-to-being-a-simple-craftsman&#34;&gt;I’ve often heard that programmers are treated like handymen in South East Asia – like a plumber hired to do a specific job. Do you ever wonder if the craftsmanship movement could limit the notion of the software programmer to being a simple craftsman?&lt;/h3&gt;
+
+&lt;p&gt;The simple answer is no. Firstly because I don’t think that the way programmers are treated in South East Asia will change how programmers are treated in Europe or US. In fact, I believe it’s the other way round. Europe and US are changing how programmers are treated in South East Asia.&lt;/p&gt;
+
+&lt;p&gt;I’ve worked in quite a few places where we had offshore teams and, according to my experience, more and more companies in South East Asia are adopting Agile and Craftsmanship. I personally visited some of them to introduce these practices and I know of many other European and American professionals that did the same. We are also seeing more and more big Agile conferences in that region, a sign that things are changing over there.&lt;/p&gt;
+
+&lt;h3 id=&#34;considering-the-increasing-business-importance-of-the-programmer-in-all-technologically-reliant-enterprises-is-software-craftsmanship-becoming-a-more-important-concept-especially-considering-its-ambition-for-steadily-adding-value&#34;&gt;Considering the increasing business importance of the programmer in all technologically reliant enterprises, is software craftsmanship becoming a more important concept – especially considering its ambition for “steadily adding value”?&lt;/h3&gt;
+
+&lt;p&gt;Absolutely. Large companies are finally learning how inefficient they are and are heavily investing in Agile and Craftsmanship. I’ve personally seen it happening at investment banks, media and telecom companies, and most recently, the in UK government, which is an example of Agile and Craftsmanship adoption when it comes to governments. Still a long way to go but it is definitely happening.&lt;/p&gt;
+
+&lt;h3 id=&#34;the-craftsmanship-debate-often-lends-itself-to-discussions-of-code-as-an-art-do-you-believe-it-helps-to-think-of-and-discuss-code-as-something-beautiful&#34;&gt;The craftsmanship debate often lends itself to discussions of code as an ‘art’. Do you believe it helps to think of and discuss code as something beautiful?&lt;/h3&gt;
+
+&lt;p&gt;No. The more I think about it, the more I’m convinced that it is a mistake. And unfortunately I was guilty of that myself. Thinking that code is an art or something beautiful is a very erroneous, romantic and simplistic view of software development. And the same goes for engineering, craft, trade, etc. The software industry is far more complex than that and software development involves a multitude of skills. Some times it feels good to call it an art but that is far more related to our egos than anything else.&lt;/p&gt;
+
+&lt;p&gt;A single software project may contain elements of engineering, craft and even art. Certain pieces of code are a work of genius and beautifully crafted. Others are a piece of boring and mechanical shit but that do the job very well. When it comes to being a trade, it may be true for some but for many of us, being a software craftsman is far more than that. It’s commitment to excellence. It’s a lifestyle.&lt;/p&gt;
+
+&lt;p&gt;At the end of the day, as professionals we are expected to deliver high-quality services to our clients, which is normally achieved via well-crafted software. It’s not important if we call it art, craft, engineering, or trade. That wouldn’t change anything for me. I prefer craft because that is the metaphor I like the most but as with any metaphor, we can always find cases where it doesn’t apply or is just wrong. On a personal level, what I really care about is that I love what I do and that I’m lucky enough to be paid for it.&lt;/p&gt;
+
+&lt;p style=&#34;font-size: 85%;&#34;&gt;
+&lt;em&gt;This interview was originally published on the &lt;a href=&#34;https://jaxenter.com/software-craftsmanship-why-you-should-be-proud-to-be-a-developer-119970.html&#34;&gt;JAXenter webiste&lt;/a&gt;&lt;/em&gt;
+&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Increasing complexity one entity at a time</title>
+      <link>http://codurance.com/blog/increasing-complexity-one-entity-at-a-time/</link>
+      <pubDate>Mon, 17 Aug 2015 09:35:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/increasing-complexity-one-entity-at-a-time/</guid>
+      <description>
+
+&lt;p&gt;While working on one of our internal tools, I decided to make a small comprise and not follow my own advice. We are building a mini CRM tool and the initial requirements were:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Maintain information about the companies we are dealing with;&lt;/li&gt;
+&lt;li&gt;Maintain a list of contacts per company;&lt;/li&gt;
+&lt;li&gt;Maintain a list of engagements (projects, training, consultancy) per company.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;em&gt;NOTE: I’ll omit details of the code, attributes, etc in order to keep this post simple.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Starting small, while building the CRUD for Company, I ended up with a Company entity that looked like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;class Company {
+     + id: CompanyId
+     + name: String
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That was all well and good. Then I needed to write code in order to maintain a list of contacts for each company. I ended up with the following:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;class Contact {
+     + id: ContactId;
+     + companyId: CompanyId;
+     + name: String
+     + email: String;
+}
+ 
+class Company {
+     + id: CompanyId;
+     + name: String;
+     + contacts: List[Contact];
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That was the beginning of the problems. For the “View Company” page, I needed to display data related to the Company and all its contacts. For the pages that were only dealing with Company data (a page that listed all companies, page for edit/delete company), I didn’t need the contacts information. Should I load the contacts every time I loaded a company? Should I not load them? The problem of not loading the contacts in certain occasions is that, as the code evolves, I would not know if the list of contacts inside Company was empty because the company doesn’t have contacts or because they were not loaded. That’s confusing. Since performance is not a concern in this application, I decided to load the list of contacts every time I needed a company. Problem solved.&lt;/p&gt;
+
+&lt;p&gt;In the next feature I had to maintain engagements (CRUD) for a company. Following the same approach I used for contacts, I ended up with the following entities:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;class Engagement {
+     + id: EngagementId;
+     + companyId: CompanyId;
+     + name: String
+     + startDate: Date;
+     + endDate: Date;
+     + description: String;
+}
+
+class Company {
+     + id: CompanyId;
+     + name: String;
+     + contacts: List[Contact];
+     + engagements: List[Engagement];
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;At this point, things got very confusing. I had pages that needed Company and its contacts and engagements. Pages that only needed Company and Engagements, pages that only needed Company and Contacts. But the problems were not only related to what to load and where. I had loads of code that was relying on the Company structure.&lt;/p&gt;
+
+&lt;p&gt;The application is a web app using AngularJS in the front with JSON going to the browser and back into the application. For that, I had JSON converters that would convert JSON to and from objects. I also had quite a lot of tests for my API and inner layers which would use builders to assemble data. In summary, there was quite a lot of code that, in order to satisfy all the features, would rely on the structure of the Company entity. This code “had to know” when contacts and engagements were loaded or not. And of course, that was constantly changing while we were deciding how much information we needed on each page.&lt;/p&gt;
+
+&lt;p&gt;As features stabilised and I made a few more changes in the code, everything was working.&lt;/p&gt;
+
+&lt;h3 id=&#34;the-ripple-effect&#34;&gt;The ripple effect&lt;/h3&gt;
+
+&lt;p&gt;As we thought we were ready to start building other features (dashboard, financial information, forecasts, notes, reminders, follow up actions, etc), we realised we missed something important.&lt;/p&gt;
+
+&lt;p&gt;Some of our projects come through partners (other companies). That means that an engagement may have more than one company involved. This could make the relationship between Company and Engagements a bit different. Maybe the relationship between Company and Engagements wouldn’t be a &lt;em&gt;one to many&lt;/em&gt; anymore. It would probably be a &lt;em&gt;many to many&lt;/em&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;class Engagement {
+     + id: EngagementId;
+     + companies: List[Company];
+     + name: String
+     + startDate: Date;
+     + endDate: Date;
+     + description: String;
+}
+
+class Company {
+     + id: CompanyId;
+     + name: String;
+     + contacts: List[Contact];
+     + engagements: List[Engagement];
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I thought that it would be an easy change but I was surprised to see the massive ripple effect that it had in my code. Loads of test data, builders, JSON parsers, and API structure would be impacted and that was not a good feeling. I was really disappointed with myself and quite pissed off to be honest.&lt;/p&gt;
+
+&lt;h3 id=&#34;following-my-own-advice&#34;&gt;Following my own advice&lt;/h3&gt;
+
+&lt;p&gt;A few years ago I came across &lt;a href=&#34;https://en.wikipedia.org/wiki/Command%E2%80%93query_separation&#34;&gt;CQS&lt;/a&gt; and later on &lt;a href=&#34;http://www.cqrsinfo.com/&#34;&gt;CQRS&lt;/a&gt;. At the beginning I didn’t give CQS much attention and it was only with CQRS that I actually understood a different way to design software. Since then, I’ve been a strong advocate of separating the data structures (and yes, I treat entities as data structures) I use to write from the ones I use to read. I’m not talking about independently deployable read/write models, different databases, events, messages, etc. I’m only talking about using different objects to write and read data.&lt;/p&gt;
+
+&lt;h3 id=&#34;fixing-the-problem-1st-solution&#34;&gt;Fixing the problem (1st solution)&lt;/h3&gt;
+
+&lt;p&gt;After another discussion, we decided that an Engagement would always be for a Company but it may have come to us through a partner. That changed things again. So, I decided to do the following: remove all the dependencies (attributes containing other entities or list of entities) from all the entities. Then ended up like that:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;class Company {
+     + id: CompanyId
+     + name: String
+}
+
+class Contact {
+     + id: ContactId;
+     + companyId: CompanyId;
+     + name: String
+     + email: String;
+}
+
+class Engagement {
+     + id: EngagementId;
+     + companyId: CompanyId;
+     + partnerId: Optional[CompanyId];
+     + name: String
+     + startDate: Date;
+     + endDate: Date;
+     + description: String;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With this approach, the entities would contain just the data they needed to be persisted.&lt;/p&gt;
+
+&lt;p&gt;But I still had the queries to fix, where many of them would need a combination of these entities. For that, I created “read” objects that would contain exactly the data needed for each query. Some of them looked like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;class CompanyWithContacts {
+     + company: Company;
+     + contacts: List[Contacts]
+}
+
+class CompanyWithContactsAndEngagements {
+     + company: Company;
+     + contacts: List[Contacts];
+     + engagements: List[Engagements];
+}
+
+class EngagementWithCompanies {
+     + engagement: Engagement;
+     + client: Company;
+     + partner: Optional[Company];
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With this approach, each query would return the combination of data that was requested by the delivery mechanism (pages on the website). Changes in how my entities relate to each other didn’t cause a ripple effect of changes any more since just specific queries would break. There were no problems with lazy-load / eager fetch anymore. There were no doubts about empty attributes since there were no attributes anymore. The optional ones could easily be marked as optional (thanks Java 8).&lt;/p&gt;
+
+&lt;h3 id=&#34;fixing-the-problem-2nd-solution&#34;&gt;Fixing the problem (2nd solution)&lt;/h3&gt;
+
+&lt;p&gt;After the fix above, I was reasonably happy since I was able to localise changes when entity relationships changed. But there was a bit more to it. On the positive side, they allowed me to make a single call from a page that needed a combination of data. On the negative side, performance was not a real concern for me and I didn’t want these extra objects with weird names hanging around. I still had to write code to populate them and convert them to JSON.&lt;/p&gt;
+
+&lt;p&gt;I then decided to make multiple calls from my pages. If a page needed a company, a list of contacts and a list of engagements related to that company, I would make three calls from the page. This decision made all the  “read” objects go away and still kept my code very simple.&lt;/p&gt;
+
+&lt;h3 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;Keep your entities detached from each other and focus on implementing simple queries from the client. Just move to a single query if performance really proves to be an issue.&lt;/p&gt;
+
+&lt;p&gt;Don’t use ORMs. ORMs would have made my changes even worse as I would have to keep my entities and database synchronised. It’s great to have the freedom to get a record set from the database using whatever query you want and populate your objects the way you want.&lt;/p&gt;
+
+&lt;p&gt;The way we query data changes far more often than the way we persist the data and these changes can slice and dice the data in many different ways. Binding your entities together will only make it harder to satisfy all the queries and will put an unnecessary strain on the code that is only supposed run business logic and store data.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Inflection Point</title>
+      <link>http://codurance.com/blog/inflection-point/</link>
+      <pubDate>Wed, 17 Jun 2015 02:34:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/inflection-point/</guid>
+      <description>
+
+&lt;p&gt;We all say that software design is all about trade-offs but how do we actually reason about it? How do we decide how much code we are going to write for a given task? Is the easiest thing that could possibly work the right approach? The simplest? How do we know the &lt;a href=&#34;http://www.infoq.com/presentations/Simple-Made-Easy&#34;&gt;difference between simple and easy&lt;/a&gt;? Is this even the right question?&lt;/p&gt;
+
+&lt;p&gt;One way or another, subconsciously or not, we always make a decision to start implementing a new behaviour from somewhere. Some of us write just enough code to satisfy the new behaviour. Others write way more code, trying to avoid future rework in case things change or evolve. Many others are somewhere in between.&lt;/p&gt;
+
+&lt;p&gt;Let’s assume the following:&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/2015-06-17-inflection-point.jpg&#34; alt=&#34;Inflection Point&#34; title=&#34;Inflection Point&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;On the left hand side, we have the most straightforward solution for a given desired behaviour. On the right hand side, we have infinite possibilities for writing future proof code. The problem with the right side is that we could never write future proof code according to infinite future possibilities. But we can, however, pick a software capability and try to write some future proof code for that. E.g:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;We may need to scale this application&lt;/li&gt;
+&lt;li&gt;We may have multiple users with different access levels.&lt;/li&gt;
+&lt;li&gt;We will need to make it very secure&lt;/li&gt;
+&lt;li&gt;We may add more clients (mobile, web, other systems)&lt;/li&gt;
+&lt;li&gt;We may have different types of payments (or biddings, or travels, or accommodations, etc)&lt;/li&gt;
+&lt;li&gt;We may want to print this to console, generate a PDF, or call a reporting system.&lt;/li&gt;
+&lt;li&gt;We may want provide an API so we are prepared for future integrations with other systems.&lt;/li&gt;
+&lt;li&gt;etc…&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Although we could try, writing code that can remain flexible for the entire lifespan of a project is practically impossible. You will get it wrong, no matter what you do. Besides that, you will be adding complexity all over the place since there is no way we can know for sure which areas of our code base will evolve.&lt;/p&gt;
+
+&lt;p&gt;I don’t think there is a clear solution or guideline for this problem but at least there is a better way to reason about that. I call it inflection point.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;Inflection point defines the maximum amount of investment we are comfortable to make in a desired type of flexibility at a given moment in time. Beyond this point, the investment is not worth anymore.&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;There are two ways to reason about the inflection point:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Right-to-left:&lt;/strong&gt; We pick a software capability that we judge to be very important in the near future. We then think about what would be our ideal solution for that software capability. From that point, which may be quite far on the right hand side, we start thinking how we could make our solution more straightforward (probably also cheaper and faster to implement) right now without loosing site of the flexibility we would like to have in the future. We keep discussing how we can simplify the solution until we find a point where making it simpler will mean loose so much flexibility that it will be too expensive to move towards our ideal solution in the future. That is the inflection point, coming from right to left.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Left-to-right:&lt;/strong&gt; We start from the most straightforward solution for a given problem. We then think about what we currently know about the project, features that are definitely going to be implemented next, and the important software capabilities that will need to be provided in the near future. With that knowledge, we can decide how flexible we could make our code right now, moving from a straightforward solution towards a more engineered solution up to a point that the cost of the flexibility we are providing right now is just not worth the effort or it is just to speculative and risky. That’s the inflection point coming from left to right.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;inflection-point-as-a-general-guideline&#34;&gt;Inflection point as a general guideline&lt;/h2&gt;
+
+&lt;p&gt;Let’s look at some common scenarios. Take them with a pinch of salt since there are many other factors that could make them invalid or sway the inflection point to a different side. Also, the team’s experience in certain technologies and approaches will also impact on what is considered straightforward and the cost of added flexibility.&lt;/p&gt;
+
+&lt;h3 id=&#34;example-1-separating-page-structure-and-data-on-a-web-application&#34;&gt;Example 1: Separating page structure and data on a web application&lt;/h3&gt;
+
+&lt;p&gt;Should we split a web page structure (HTML) from its data or should we have our backend generate the whole page via a template engine and return the whole page in one go?&lt;/p&gt;
+
+&lt;p&gt;What are we pre-optimising for? What type of flexibility do we want to provide now and what impact would it have in our code?&lt;/p&gt;
+
+&lt;p&gt;Splitting the page structure from data can bring future benefits like a stable RESTful API for other clients (mobile, other systems). It could also make it easier to write automated tests for our application when it comes to the data it returns. Besides that, we can provide a better user experience since the page will load faster or not even reload at all, depending on the implementation (single/multi page). In order to achieve that, we need to use JavaScript in the front end and provide multiple controller methods in the back end. We may need to convert objects to JSON and comply to the REST guidelines. There will be more code in the front and back end, and a few data translation layers. We will probably need to use different programming languages in the front and back end.&lt;/p&gt;
+
+&lt;p&gt;A different approach would be to use a template engine and render the whole pages on the server. That could be “easier” since template engine libraries are quite mature in most major languages and we keep the whole application writing in a single programming language. For back end developers, that can be more straightforward. But what do we loose? Do we have a worse user experience? Well, maybe. Internet connection today is much faster than it was 10-15 years ago, when using AJAX was a must (and also pretty hard—browser wars anyone?). What about the flexibility to add new clients (mobile / other systems)? Can we really foresee what type of API they will need? What about the API granularity? Would it be the same one used for the web?&lt;/p&gt;
+
+&lt;p&gt;Then we have things like team skills set. How familiar are we with all the technologies involved? How concrete are the plans to have a mobile presence? Would it be a native app or a responsive web page would do just fine?&lt;/p&gt;
+
+&lt;p&gt;Do we have a separate web design / UX team? Which approach would be easier to make them part of the team and work on the same code base?&lt;/p&gt;
+
+&lt;p&gt;Where is the inflection point? How much complexity should we add right now? Is some extra code really a big deal for the amount of flexibly we get, even if a bit speculative? Are there any other alternatives to provide a similar flexibility without so much extra code? How much would we pay if we delay the decision to provide the flexibility right now?&lt;/p&gt;
+
+&lt;h3 id=&#34;example-2-knowing-upcoming-features&#34;&gt;Example 2: Knowing upcoming features&lt;/h3&gt;
+
+&lt;p&gt;When our work is most exploratory, I would strongly recommend looking for the most straightforward solution. However, when working in an environment where we have a Product Owner with a clear vision, a product backlog that is carefully maintained, and with big enough budget to guarantee that the project will run for many months, if not years, should we always aim for the most straightforward solution?&lt;/p&gt;
+
+&lt;p&gt;Imagine that we are working on Feature A and that we know that Feature B and C are the next features to be implemented. Also, imagine that they are closely related, that means, Feature B and C will be built on top of the implementation of Feature A.&lt;/p&gt;
+
+&lt;p&gt;In this scenario, should we aim for the most straightforward solution for Feature A and then refactor everything in order to add Feature B and C? How far do we go with the implementation of Feature A when we are 99% sure that Feature B and C are going to implemented immediately after we finish Feature A? But what if we were only 50% sure? Or 20%? Where would the inflection point be?&lt;/p&gt;
+
+&lt;h3 id=&#34;example-3-layers&#34;&gt;Example 3: Layers&lt;/h3&gt;
+
+&lt;p&gt;Many developers use some sort of layered architecture. A common layer would be the data layer that is normally defined by &lt;em&gt;repository&lt;/em&gt; classes.&lt;/p&gt;
+
+&lt;p&gt;In almost 20 years of career, I had only one application that we actually changed our persistency mechanism and the repository layer was extremely useful. Moving from one database to another had almost zero impact in the rest of the code.&lt;/p&gt;
+
+&lt;p&gt;I recently had a few discussions about the data (repository) layer. Some of my colleagues said that this added complexity not always pays off since we are probably not going to change the persistency mechanism. That is a fair comment and normally the repository layer can be seen as future proof code and not the most straightforward solution.&lt;/p&gt;
+
+&lt;p&gt;But what is the alternative? Active Record? Have persistency logic mixed with application logic? Violation of SRP? No separation of concerns? A different type of separation that will be very similar to the repositories but less explicit? Use of a framework? How does it affect transactional boundaries? Should they be in the repository layer or should they be at the entry points of your domain model?&lt;/p&gt;
+
+&lt;p&gt;This is an example where discussing what would be the straightforward solution versus what type of future proof code we want to have may differ a lot from team to team. Some would find a layer of repositories a very cheap price to pay while others would find it too expensive.&lt;/p&gt;
+
+&lt;p&gt;So, instead of discussing the repository layer, we should discuss what type of flexibility we would like to have when it comes to persistency and how much are we wiling to pay for that right now. What would the inflection point be?&lt;/p&gt;
+
+&lt;h3 id=&#34;example-4-architecture-and-high-level-design&#34;&gt;Example 4: Architecture and high-level design&lt;/h3&gt;
+
+&lt;p&gt;Should we start an application with a monolith or with a bunch of micro-services? Or somewhere in between? Normal services? Application modules? Well-defined package/namespace structure? This is not a simple question and the inflection point will change significantly according to the context. Are we working for a small startup with two developers? Are we working with a large company with budget for a multi-year project, which will start with 50 developers from day one? How much do we know about the domain? Are we exploring an idea? Or is it a well-defined domain?&lt;/p&gt;
+
+&lt;p&gt;What are we optimising for? How much does it cost? How complex is the solution? What are the trade offs? Should we pre-optimise for scalability or should we focus on the most straightforward? What do we loose or gain with a given solution? Can we defer this decision to a later stage? Would it be too chaotic to have all the developers working on the same code base? Which software capabilities do we want to have in the first release? What would be the cost to make some architectural decisions in the future?&lt;/p&gt;
+
+&lt;p&gt;I worked in projects where it made sense to start small and grow the application bit-by-bit, focusing on the most straightforward solutions at the beginning. But I also worked in much larger applications where it was too risky or close to impossible to defer certain architectural decisions. The inflection point was completely different in those two contexts.&lt;/p&gt;
+
+&lt;h3 id=&#34;example-5-micro-design&#34;&gt;Example 5: Micro design&lt;/h3&gt;
+
+&lt;p&gt;Many agree that the use of primitives to represent domain concepts is bad. So, should we create types for everything? What is the cost and how much more code do we need to write? Is the amount of code the only concern? Are we trying to reduce the number of bugs in the future? What about languages without types?&lt;/p&gt;
+
+&lt;p&gt;What price do we pay when we create types for everything? Does it really improve readability? What gains do we have in the future? Should we limit type creation to our domain model? When is it OK to use primitives? What is the impact in maintainability and testing? Would we need to write more or less tests when choosing primitives over types? How easy is to create types in our chosen programming language?&lt;/p&gt;
+
+&lt;p&gt;Those are many of the considerations that may define where the inflection point will be.&lt;/p&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Over-engineering has a big cost and may cause a lot of damage. However, a long sequence of straightforward solutions may also cause of lot of pain and re-work as the system grows. Every change becomes a huge refactoring task.&lt;/p&gt;
+
+&lt;p&gt;As a general guideline, I prefer to first look at what would be the most straightforward solution and then start exploring a few possibilities to provide more flexibility for future changes given an important software capability (left to right). Also, most straightforward doesn’t mean quick and dirty.&lt;/p&gt;
+
+&lt;p&gt;However, there are times when we know that certain things are very important and considering them in the early stages of a project, or while building a new feature, may be quite beneficial. Maybe the price we pay now for some extra code may be considered a bargain when compared to the amount of flexibility we gain in the future, which will move the inflection point more towards the right.&lt;/p&gt;
+
+&lt;p&gt;Whenever you have a design discussion with your pair or team, focus the discussion on finding the inflection point. This will make the discussion more objective. Instead of “my idea versus yours” or “this approach versus that approach”, we should discuss what type of flexibility we would like to have and how we can achieve that without paying premium for it. How much are we willing to pay? Should we pay for it now, or in the future? Distant or near future? Can we pay in instalments?&lt;/p&gt;
+
+&lt;p&gt;Trying to answer the questions above will help us to reason about our decisions and find a good starting point (inflection point) for new projects or features.&lt;/p&gt;
+
+&lt;p&gt;_Thanks to &lt;a href=&#34;http://twitter.com/SamirTalwar&#34;&gt;Samir Talwar&lt;/a&gt;, &lt;a href=&#34;http://twitter.com/mashooq&#34;&gt;Mashooq Badar&lt;/a&gt;, &lt;a href=&#34;http://twitter.com/tom_b025&#34;&gt;Tom Brand&lt;/a&gt;, and &lt;a href=&#34;http://twitter.com/johan_alps&#34;&gt;Johan Martinsson&lt;/a&gt; for the conversations during &lt;a href=&#34;http://socratesuk.org&#34;&gt;Socrates UK&lt;/a&gt; that led to the clarification of the terminology and ideas described in this post._&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Does TDD really lead to good design?</title>
+      <link>http://codurance.com/blog/does-tdd-lead-to-good-design/</link>
+      <pubDate>Sat, 09 May 2015 14:32:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/does-tdd-lead-to-good-design/</guid>
+      <description>
+
+&lt;p&gt;Recently I tweeted that &lt;a href=&#34;https://twitter.com/sandromancuso/status/588503877235781632&#34;&gt;TDD can’t lead to a good design if we don’t know what good design looks like&lt;/a&gt;. I was also saying that we probably should teach design before TDD (or at least, at the same time). This tweet led to a discussions with &lt;a href=&#34;https://twitter.com/jbrains&#34;&gt;J.B. Rainsberger&lt;/a&gt;, &lt;a href=&#34;https://twitter.com/RonJeffries&#34;&gt;Ron Jeffries&lt;/a&gt;, and a few others. J.B. and I ended up having a live &lt;a href=&#34;https://www.youtube.com/watch?v=ty3p5VDcoOI&#34;&gt;discussion on Hangout on Air&lt;/a&gt; later on.&lt;/p&gt;
+
+&lt;p&gt;If you look back to many of my talks, blogs, and even my book, you will find multiple occasions where I say that TDD is a design tool. So what changed? Why I don’t say the same thing anymore?&lt;/p&gt;
+
+&lt;h3 id=&#34;why-did-i-change-my-mind&#34;&gt;Why did I change my mind?&lt;/h3&gt;
+
+&lt;p&gt;After paying more attention to how I work and how many other developers work, I realised that not many people are driving good design through TDD. Although I love the RED-GREEN-REFACTORING rhythm, having a “refactoring” step is not enough to call TDD a design tool.&lt;/p&gt;
+
+&lt;p&gt;TDD doesn’t prescribe how you should design. What it does is to annoy you constantly, asking “Are you sure about this? Is it good enough? Can you make it better?” This annoyance (or constant reminder to look at your design and thing if it can be improved) is a great thing, but not enough.&lt;/p&gt;
+
+&lt;p&gt;In my view, TDD is a software development &lt;em&gt;workflow&lt;/em&gt; which provides me with many benefits, including a constant reminder to make my code better. What it means to make my code better, is not part of TDD.&lt;/p&gt;
+
+&lt;h4 id=&#34;aren-t-you-forgetting-about-the-4-rules-of-simple-design&#34;&gt;Aren’t you forgetting about the 4 Rules of Simple Design?&lt;/h4&gt;
+
+&lt;p&gt;Ah, yes… But no. I’m not forgetting about them. &lt;a href=&#34;https://twitter.com/sandromancuso/status/589098111559213056&#34;&gt;4 Rules of Simple Design are NOT part of TDD&lt;/a&gt; and I’m purely discussing TDD here. 4 Rules of Simple Design is normally the design guidelines that many experienced TDD practitioners use (including myself, among other techniques) during the refactoring phase.&lt;/p&gt;
+
+&lt;p&gt;4 Rules of Simple Design is one of the many design guidelines we have available. &lt;a href=&#34;http://en.wikipedia.org/wiki/SOLID_%28object-oriented_design%29&#34;&gt;SOLID&lt;/a&gt; is another. &lt;a href=&#34;http://en.wikipedia.org/wiki/Domain-driven_design&#34;&gt;Domain-Driven Design&lt;/a&gt; is another. Many other design principles and patterns are also available as good guidelines. Those are the things we need to have in our mind during “refactoring” phase. Or, putting it in a different way, having a good understanding of the existing design guidelines is what will lead you to a better design.&lt;/p&gt;
+
+&lt;p&gt;TDD is a workflow (not a design tool) where during the refactoring phase you apply your existing knowledge of software design combined with design techniques that may help you to get to a better design.&lt;/p&gt;
+
+&lt;h3 id=&#34;not-all-tdds-are-the-same&#34;&gt;Not all TDDs are the same&lt;/h3&gt;
+
+&lt;p&gt;There are two main styles of TDD with significant differences between them, mainly when it comes to design.&lt;/p&gt;
+
+&lt;h4 id=&#34;classicist&#34;&gt;Classicist&lt;/h4&gt;
+
+&lt;p&gt;The Classicist approach is the original approach to TDD created by Kent Beck. It’s also known as &lt;em&gt;Detroit School&lt;/em&gt; of TDD.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Main characteristics&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Design happens during the refactoring phase.&lt;/li&gt;
+&lt;li&gt;Normally tests are state-based tests.&lt;/li&gt;
+&lt;li&gt;During the refactoring phase, the unit under test may grow to multiple classes.&lt;/li&gt;
+&lt;li&gt;Mocks are rarely used, unless when isolating external systems.&lt;/li&gt;
+&lt;li&gt;No up-front design considerations are made. Design completely emerges from code.&lt;/li&gt;
+&lt;li&gt;It’s a great way to avoid over-engineering.&lt;/li&gt;
+&lt;li&gt;Easier to understand and adopt due to state-based tests and no design up-front.&lt;/li&gt;
+&lt;li&gt;Often used in conjunction with the 4 Rules of Simple Design.&lt;/li&gt;
+&lt;li&gt;Good for exploration, when we know what the input and desired output are but we don’t really know how the implementation looks like.&lt;/li&gt;
+&lt;li&gt;Great for cases where we can’t rely on a domain expert or domain language (data transformation, algorithms, etc.)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;Problems&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Exposing state for tests purpose only.&lt;/li&gt;
+&lt;li&gt;Refactoring phase is normally bigger when compared to Outside-In approach (more on that below).&lt;/li&gt;
+&lt;li&gt;Unit under test becomes bigger than a class when classes emerge during the refactoring phase. This is fine when we look at that test in isolation but as classes emerge, they create life of their own, being reused by other parts of the application. As these other classes evolve, they may break completely unrelated tests, since the tests use their real implementation instead of a mock.&lt;/li&gt;
+&lt;li&gt;Refactoring (design improvement) step is often skipped by inexperienced practitioners, leading to a cycle that looks more like RED-GREEN-RED-GREEN-…-RED-GREEN-MASSIVE REFACTORING.&lt;/li&gt;
+&lt;li&gt;Due to its exploratory nature, some classes under test are created according to the “I think I’ll need this class with this interface (public methods)”, making them not fit well when connected to the rest of the system.&lt;/li&gt;
+&lt;li&gt;Can be slow and wasteful since quite often we already know that we cannot have so many responsibilities in the class under test. The classicist advice is to wait for the refactoring phase to fix the design, only relying on concrete evidence to extract other classes. Although this is good for novices, this is pure waste for more experienced developers.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;outside-in&#34;&gt;Outside-In&lt;/h4&gt;
+
+&lt;p&gt;Outside-In TDD, also known as &lt;em&gt;London School&lt;/em&gt; or &lt;em&gt;mockist&lt;/em&gt;, is a TDD style developed and adopted by some of the first XP practitioners in London. It later inspired the creation of BDD.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Main characteristics&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Different from the classicist, Outside-In TDD prescribes a direction in which we start test-driving our code: from outside (first class to receive an external request) to the inside (classes that will contain single pieces of behaviour that satisfy the feature being implemented).&lt;/li&gt;
+&lt;li&gt;We normally start with an acceptance test which verifies if the feature as a whole works. The acceptance test also serves as a guide for the implementation.&lt;/li&gt;
+&lt;li&gt;With a failing acceptance test informing why the feature is not yet complete (no data returned, no message sent to a queue, no data stored in a database, etc.), we start writing unit tests. The first class to be tested is the class handling an external request (a controller, queue listener, event handler, the entry point for a component, etc.)&lt;/li&gt;
+&lt;li&gt;As we already know that we won’t build the entire application in a single class, we make some assumptions of which type of collaborators the class under test will need. We then write tests that verify the collaboration between the class under test and its collaborators.&lt;/li&gt;
+&lt;li&gt;Collaborators are identified according to all the things the class under test needs to do when its public method is invoked. Collaborators names and methods should come from the domain language (nouns and verbs).&lt;/li&gt;
+&lt;li&gt;Once a class is tested, we pick the first collaborator (which was created with no implementation) and test-drive its behaviour, following the same approach we used for the previous class. This is why we call outside-in: we start from classes that are closer to the input of the system (outside) and move towards the inside of our application as more collaborators are identified.&lt;/li&gt;
+&lt;li&gt;Design starts in the &lt;em&gt;red&lt;/em&gt; phase, while writing the tests.&lt;/li&gt;
+&lt;li&gt;Tests are about collaboration and behaviour, not state.&lt;/li&gt;
+&lt;li&gt;Design is refined during the &lt;em&gt;refactoring&lt;/em&gt; phase.&lt;/li&gt;
+&lt;li&gt;Each collaborator and its public methods are always created to &lt;em&gt;serve&lt;/em&gt; an existing client class, making the code read very well.&lt;/li&gt;
+&lt;li&gt;Refactoring phases are much smaller, when compared to the classicist approach.&lt;/li&gt;
+&lt;li&gt;Promotes a better encapsulation since no state is exposed for test purposes only,&lt;/li&gt;
+&lt;li&gt;More aligned to the &lt;em&gt;tell, don’t ask&lt;/em&gt; approach.&lt;/li&gt;
+&lt;li&gt;More aligned to the original ideas of Object Oriented Programming: tests are about objects sending messages to other objects instead of checking their state.&lt;/li&gt;
+&lt;li&gt;Suitable for business applications, where names and verbs can be  extracted from user stories and acceptance criteria.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;Problems&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Much harder for novices to adopt since a higher level of design skill is necessary.&lt;/li&gt;
+&lt;li&gt;Developers don’t get feedback from code in order to create collaborators. They need to &lt;em&gt;visualise&lt;/em&gt; collaborators while writing the test.&lt;/li&gt;
+&lt;li&gt;May lead to over-engineering due to premature type (collaborators) creation.&lt;/li&gt;
+&lt;li&gt;Not suitable for exploratory work or behaviour that is not specified in a user story (data transformation, algorithms, etc).&lt;/li&gt;
+&lt;li&gt;Bad design skills may lead to an explosion of mocks.&lt;/li&gt;
+&lt;li&gt;Behavioural tests are harder to write than state tests.&lt;/li&gt;
+&lt;li&gt;Knowledge of Domain Driven Design and other design techniques, including 4 Rules of Simple Design, are required while writing tests.&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;which-tdd-style-should-we-use&#34;&gt;Which TDD style should we use?&lt;/h3&gt;
+
+&lt;p&gt;Both. All. They are just tools and as such, they should be used according to your needs. Experienced TDD practitioners jump from one style to another without ever worrying which style they are using.&lt;/p&gt;
+
+&lt;h3 id=&#34;macro-and-micro-design&#34;&gt;Macro and micro design&lt;/h3&gt;
+
+&lt;p&gt;There are two types of design: macro and micro design. Micro design is what we do while test driving code, mainly using the classicist approach. Macro design goes beyond the feature we are implementing. It’s about how we model our domain at a much higher level, how we split our application, layers, services, etc. Macro design helps us with the overall organisation of the application and provides ways for teams and developers to work in parallel without stepping on each other toes. Macro design refers to how the business sees the application and techniques like Domain-Driven Design are commonly used. Macro design also helps with consistency throughout the application. TDD won’t help you with macro design.&lt;/p&gt;
+
+&lt;p&gt;Macro design is normally taken into account when using Outside-In TDD, but Outside-In on its own is not enough to define the macro design of an application.&lt;/p&gt;
+
+&lt;h3 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;Over the years I’ve seen many applications that have been test-driven and were still a pain to work with. OK, I admit that they were significantly better than the majority of the legacy applications which had no tests that I had to maintain before that.&lt;/p&gt;
+
+&lt;p&gt;Any developer can make a mess regardless if they are writing tests or not. Developers can also test drive crap regardless of which TDD style they are using.&lt;/p&gt;
+
+&lt;p&gt;TDD is &lt;strong&gt;not&lt;/strong&gt; a design tool. It’s a software development &lt;em&gt;workflow&lt;/em&gt; that has prompts for code improvement in its lifecycle. In these prompts (writing tests and refactoring), developers need to know some design guidelines (4 Rules of Simple Design, Domain Driven Design, SOLID, Patterns, Law of Demeter, Tell, Don’t Ask, POLA/S, Design by Contract, Feature Envy, cohesion, coupling, Balanced Abstraction Principle, etc) in order to make their code better. Just saying &lt;em&gt;refactoring&lt;/em&gt; isn’t enough to call TDD a design tool.&lt;/p&gt;
+
+&lt;p&gt;Many developers blame TDD and mocks for slowing them down. They end up giving up on TDD because they struggle to get the result they want. In my opinion, no developer really struggles to understand the RED-GREEN-REFACTOR lifecycle. What they struggle with is how to design software well.&lt;/p&gt;
+
+&lt;p&gt;The great thing about TDD is that it is constantly asking us “Hey, can you make your code better? See how hard testing this class is becoming? OK, you made it work. Here’s your green bar. Now make it better.” Besides that, you are on your own.&lt;/p&gt;
+
+&lt;p&gt;TDD becomes much easier when we understand what good design looks like. Practicing and understanding the wealth of design guidelines available will make TDD much easier and useful. It will also reduce its learning curve and hopefully increase its adoption.&lt;/p&gt;
+
+&lt;p&gt;Extremes are bad. We are going from BDUF (Big Design Up Front) to &lt;em&gt;no design at all&lt;/em&gt;. Throwing away our design knowledge is a mistake. Sure, we should not go back to the dark ages and over-engineer everything but thinking that we should only focus on micro design is also a mistake. If you are working on your own, doing a few katas, or working on a small application, then yes, do whatever you like. But if you are part of bigger team developing something that is significantly bigger than a kata, you will be doing your team a favour if you paid more attention to macro design and how you structure your code.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Q&amp;A about The Software Craftsman</title>
+      <link>http://codurance.com/blog/interview-with-sandro-mancuso/</link>
+      <pubDate>Wed, 06 May 2015 01:26:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/interview-with-sandro-mancuso/</guid>
+      <description>
+
+&lt;p&gt;&lt;em&gt;Our co-founder &lt;a href=&#34;http://twitter.com/sandromancuso&#34;&gt;Sandro Mancuso&lt;/a&gt; was &lt;a href=&#34;http://www.infoq.com/articles/mancuso-software-craftsman&#34;&gt;interviewed by Ben Linders from InfoQ&lt;/a&gt;. Below is the full transcript.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;In the book &lt;a href=&#34;http://goo.gl/KgxKaw&#34;&gt;The Software Craftsman&lt;/a&gt;, Professionalism, Pragmatism, Pride Sandro Mancuso explores how craftmanship plays a role in agile software development. The book contains stories, examples and practical advice for software developers and other professionals involved in software projects to achieve technical excellence and customer satisfaction.&lt;/p&gt;
+
+&lt;p&gt;InfoQ readers can download a &lt;a href=&#34;http://ptgmedia.pearsoncmg.com/images/9780134052502/samplepages/9780134052502.pdf&#34;&gt;sample of the book &amp;ldquo;The Software Craftsman&amp;rdquo;&lt;/a&gt; to get an impression of this book.&lt;/p&gt;
+
+&lt;p&gt;InfoQ interviewed Mancuso about how companies can suffer from an agile hangover, why technical excellence matters and how to convince managers of that, productive partnerships, anti patterns in candidate interviews, creating a culture of learning and his practical approach to craftsmanship and doing technical practices.&lt;/p&gt;
+
+&lt;h3 id=&#34;infoq-you-mentioned-that-with-agile-the-realization-that-the-team-as-a-whole-was-responsible-for-all-the-different-aspects-of-a-software-project-was-a-game-changer-can-you-elaborate-on-this&#34;&gt;InfoQ: You mentioned that with agile &amp;ldquo;the realization that the team as a whole was responsible for all the different aspects of a software project was a game changer&amp;rdquo;. Can you elaborate on this?&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Mancuso:&lt;/strong&gt; Before we had silos and hierarchies. “Smart” people would define the requirements and design the system for a few months, if not years. They would then pass a pile of documents to the development team and tell them how much time the team would have to build the software. After all, it was just to type some code on the keyboard following the well-defined specifications. All the “thinking” had been done already. I guess we all know what happened to the vast majority of these projects.&lt;/p&gt;
+
+&lt;p&gt;A software project is composed by many interdependent activities, ranging from a business idea to software available to be used. There are only three reasons to why software is built: make money, save money, or protect revenue. The more we delay to have software deployed to production, the more we delay to achieve one or more of these three things. If the end goal of a software project is to benefit from the value that the software will provide, anything that is done before the software goes live should be reduced to a minimum.&lt;/p&gt;
+
+&lt;p&gt;Reducing waste is one of the main focuses of Lean and Agile and one way to achieve that is to shorten the feedback loop and improve communication. Instead of waiting for months (if not years) to have some software to show to clients and validate business ideas, we can have a team composed by business and developers that, together, constantly interacting with each other, can deliver small chunks of software very often. In some organisations, very often means multiple times a day.&lt;/p&gt;
+
+&lt;p&gt;Having the whole team responsible for all the different aspects of a project reduces the feedback loop (ideas are quickly validated or invalidated) and can provide a much faster return on investment.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;infoq-your-book-talks-about-how-companies-suffer-an-agile-hangover-what-do-you-mean-with-this&#34;&gt;InfoQ: Your book talks about how companies suffer an agile hangover. What do you mean with this?&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Mancuso:&lt;/strong&gt; This is a term that &lt;a href=&#34;http://twitter.com/mashooq&#34;&gt;Mashooq Badar&lt;/a&gt; and I came up with a few years ago, almost as a joke. We were talking about companies that suddenly wake up, after a few years of Agile transformation, to realise that all those Post-Its on the wall and all the Agile coaches they hired really didn’t do much to increase the quality of their software and neither helped developers to get better. After a few years having fun in the “Post-It party”, some companies end up realising that the way they are developing software now is not really better than what it was before: they are not delivering software faster, they don’t have less bugs in production, they can’t go live as often as they wanted, they still have a QA phase at the end of each release, and there’s still no trust between business and developers. The Agile Hangover is the realisation that nothing (or at least, very little) was done to actually improve the quality of their software; it’s the realisation that in a software project the most important deliverable is the software itself and not the processes around it.&lt;/p&gt;
+
+&lt;p&gt;Agile processes bring loads of benefits to organisations, where increasing visibility and reducing the feedback loop are the main ones. A small and quick feedback loop is what enables agility. However, if you only have an improvement in the process but still keep the same old developers working in the same old way when it comes to software development practices, being surprised that things are not better seems very naive to me. More and more we are seeing companies and managers complaining about Agile and saying that this Agile thing doesn’t work. Yes, that’s also one of the symptoms of the Agile Hangover.&lt;/p&gt;
+
+&lt;p&gt;On a more positive note, Agile processes are helping companies to visualise their problems faster and putting them in a better position to fix their issues, which includes improving their technical capabilities. Companies that reach this stage of maturity (can visualise their issues and are willing to resolve them) are the ones that are in a better position to embrace Software Craftsmanship as a natural complement to their Agile adoption. It’s just a shame that some companies are taking far too long to realise that.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;infoq-in-your-opinion-why-does-technical-excellence-matter-in-agile-how-does-it-make-a-difference&#34;&gt;InfoQ: In your opinion, why does technical excellence matter in agile? How does it make a difference?&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Mancuso:&lt;/strong&gt; Agile was created to improve the way we deliver software. When we don’t focus on technical excellence, the quality of our software can drop to the point that it is very painful and slow to keep maintaining it. At this point, it doesn’t matter which Agile process you have because developers can’t go fast anymore, causing the company to loose its agility.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;infoq-what-makes-it-so-difficult-to-convince-managers-that-technical-excellence-is-important-how-do-you-do-it&#34;&gt;InfoQ: What makes it so difficult to convince managers that technical excellence is important? How do you do it?&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Mancuso:&lt;/strong&gt; There are good and bad managers. The good ones are the ones that keep themselves up-to-date with better ways of delivering a software project and also trust their teams to do the job. They are well informed, which makes conversations with the development team much easier. For the not so well informed managers, things are a bit more complicated because they don’t have enough knowledge to understand the seriousness of certain problems and the implications of certain decisions. I find Agile processes far more important when managers are not so well informed.&lt;/p&gt;
+
+&lt;p&gt;As a first step to convince managers about technical excellence, I try a soft approach, with many conversations, explanations, and education. I also try to explain the value of certain practices when compared to the current approach. There are reasons why developers want to adopt certain technical practices or improve the system, and those reasons need to be expressed in a way that managers can understand. Let’s take TDD as an example. Instead of saying that we need more time to write tests, we need to say that we want to shorten our feedback loop when it comes to testing and deploying a new release into production. Let’s say we currently have a 2-week testing phase after a few weeks of development, done by a separate QA team. Wouldn’t it be nice to only push a button and be confident, in a matter of minutes, that our software is tested and good enough to go live? Wouldn’t it be great if we could press this button at anytime, as many times we want? That’s value for the business. Now let’s take continuous integration as another example. Wouldn’t it be nice if whenever a team member adds/changes some code, we could all be immediately that our system is still working and can be deployed into production? Wouldn’t be nice if we could impede that new code is created on top of buggy code, significantly reducing re-work and unnecessary maintenance? And what about pair-programming? Wouldn’t it be nice if we had absolutely no key-person dependency? If we never needed to wait for anyone to come back from holidays, or never be desperate because someone is leaving the company? Wouldn’t it be nice if everyone had a good level of understanding of all parts of the system? This is also value to the company. And what about keeping a constant velocity, regardless how old or big the system gets? Those are only a few of the benefits of focusing on technical excellence.&lt;/p&gt;
+
+&lt;p&gt;However, we cannot ignore that certain practices may come with an initial cost and managers may refuse them because of that. In this case, I would ask them how much value our current practices are bringing when compared to the ones we are suggesting. How long is our current feedback loop? How many times in a year (or any other period of time) do we feel comfortable to go live with a new release? Are there any other practices out there that could make us better? These are the type of conversations I like to have with managers. It’s not about a specific technical practice, but about the value that a technical practice bring when compared to our current approach.&lt;/p&gt;
+
+&lt;p&gt;Another thing I always push for is to make everything very visible: have a Scrum/Kanban board showing the team’s progress (or lack of it), have build radiators showing the health of our system, and also communicate every problem to the team (and manager) straightaway. There is a thing I’ve learned from Mashooq Badar: If you internalise a problem, it is your problem. If you communicate the problem to the rest of the team, it’s everyone’s problem. Making problems visible normally would force managers care about them, or at least help us to do our job in order to solve them. Ignoring problems that were clearly highlighted by the team may be very detrimental to a manager’s position and will force them to play a more active role in finding the solution. And in the event where nothing else is working I would escalate and also make sure that all our concerns are done in writing and sent to the appropriate people.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;infoq-the-manifesto-for-craftsmanship-talks-about-productive-partnerships-can-you-explain-what-they-are-and-how-they-can-help-to-produce-better-software&#34;&gt;InfoQ: The manifesto for craftsmanship talks about productive partnerships. Can you explain what they are, and how they can help to produce better software?&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Mancuso:&lt;/strong&gt; A career of a software craftsman goes way beyond any project or company. However, every craftsman wants to build a career on top of successful projects—projects they are proud of. Every time a craftsman joins a project, he or she are putting their career and reputations on the line.&lt;/p&gt;
+
+&lt;p&gt;In order to build a successful career and a great reputation, it is paramount that we see each engagement as a partnership, regardless if we are a permanent employee, contractor, or consultant. The contractual model with our clients should not make us behave (or be treated) in a different way. Once we are in the team, we should be fully committed to the success of that project.&lt;/p&gt;
+
+&lt;p&gt;Being in a partnership with our clients means that we should do whatever it is in our power to make the project succeed, offering ideas, alternatives, and solutions. Keeping our heads down and doing what we are told is not being in a partnership. We can do far more than that. We know what technology can do to help our clients and a key part of our job is to provide them options. Successful projects mean happy clients/employers and a successful career.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;infoq-you-mentioned-that-sometimes-developers-objections-against-technical-practices-take-for-instance-pair-programming-some-love-it-and-others-hate-it-why-do-developers-object-against-working-in-pairs-any-suggestions-how-to-deal-with-it&#34;&gt;InfoQ: You mentioned that sometimes developers objections against technical practices. Take for instance pair programming, some love it, and others hate it. Why do developers object against working in pairs? Any suggestions how to deal with it?&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Mancuso:&lt;/strong&gt; I don’t think there is a single answer to this question. People are different and each person might have a very different reason to why she doesn’t like to pair. A few common ones I found over the years are: lack of confidence, shyness, lack of trust, work load, management pressure, fear of exposing their ignorance, feeling of not being productive, personality clashes, job security (not willing to share what she knows), fear that someone will find that she can’t do things on her own. The list goes on.&lt;/p&gt;
+
+&lt;p&gt;The first thing that must be addressed is management support. Developers are far less inclined to adopt XP practices when they fear that their managers will disapprove. It needs to be clear for the development team that they are free to do whatever they think is best to deliver quality software in a timely manner.&lt;/p&gt;
+
+&lt;p&gt;The second thing to be addressed is team spirit. It’s the whole team responsibility to create an environment where it is OK to expose our ignorance. In fact, exposing our ignorance should be encouraged. This should be treated as a sign that people are keen to learn. “Hey, I don’t know much about our deployment process. Can I pair with someone on this in the next task?”&lt;/p&gt;
+
+&lt;p&gt;When a developer is not so keen to pair with others, it’s the responsibility of the other developers to make this person feel comfortable pairing with them. The best trick I use is to invite someone that doesn’t like to pair to “help” me. “Hi Paul, I’m working on this part of the application but I’m struggling a bit. Would you mind to sit down with me and help me a little bit?” As soon as the person sits next to you, you are already pairing. Ask her opinion. Involve her in your thought process. If you have a better idea about how to solve something, don’t criticise the other person’s idea. Make your idea a suggestion. If the person rejects your suggestion, don’t try to force it. Ask her questions and let her figure out the shortcomings of her own ideas.&lt;/p&gt;
+
+&lt;p&gt;Last, but not least, there is the business aspect. It’s important that every developer understands that a software project is not about them. Having people working in isolation brings a big risk to the business. Pairing should be encouraged not only because of quality but also to reduce the key person dependency risk.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;infoq-your-book-contains-a-chapter-describing-interview-anti-patterns-why-did-you-decide-to-include-this&#34;&gt;InfoQ: Your book contains a chapter describing interview anti patterns. Why did you decide to include this?&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Mancuso:&lt;/strong&gt; Every company wants to hire “the best” people, but the truth is, they have no clue how. Go to any technical community, call a group of developers and ask them about their interview experiences. Grab a seat and a drink first because you are about to hear the longest rant of your life.&lt;/p&gt;
+
+&lt;p&gt;Recruitment is an essential part of any business and developers, technical leaders, and hiring managers need to learn how to interview. They need to learn what they should or shouldn’t do during an interview. Experienced developers are in extremely high-demand and very rarely looking for a job. If a company gets a chance to bring one in for an interview, they cannot screw it up. Experienced developers are not only there to be interviewed; they are there to interview the company as well, starting by the interviewers.&lt;/p&gt;
+
+&lt;p&gt;My idea with the second half of the book was to help companies to attract and retain software craftsmen and that’s why I dedicated a couple of chapters to recruitment and interviews.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;infoq-you-stated-that-creating-a-culture-of-learning-is-one-of-the-most-efficient-ways-of-injecting-passion-into-a-company-what-can-organizations-do-to-have-empowered-employees-who-want-to-learn-and-develop-themselves&#34;&gt;InfoQ: You stated that &amp;ldquo;creating a culture of learning is one of the most efficient ways of injecting passion into a company&amp;rdquo;. What can organizations do to have empowered employees who want to learn and develop themselves?&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Mancuso:&lt;/strong&gt; First they need to put their money where their mouth is. It’s quite common to hear managers saying that they want passionate people, but as soon as some employees ask for a couple hours a week to practice and share knowledge, the answer is: “Sorry guys, we need to meet this deadline and we can’t afford to miss a couple of hours per week… at least not in the next… five years.”&lt;/p&gt;
+
+&lt;p&gt;Creating a culture of learning is much simpler and cheaper than many companies think. They just need to get out of the way and let it happen. Maybe buy a few pizzas here and there. I know because we’ve done it in a global department inside an investment bank without asking for any management support. In fact, we didn’t tell them anything. When they realized, there were already quite a few of us meeting regularly, coding together, and sharing ideas.&lt;/p&gt;
+
+&lt;p&gt;We just need one or two people willing to organize something and an empty meeting room (or any other space where people can get together). Meetings can happen at lunchtime, once or twice a week. This is how we started. I told people that I was going through the “Seven Languages in Seven Weeks” book and asked if they wanted to join me. At first, just two people joined. Then, as a week or two went by, developers kept seeing us with our laptops having fun at lunchtime and also talking about the things we were learning during coffee breaks. They got more excited and decided to join in. At some point, we were running a few sessions a week (hands-on sessions, talks, discussions) about different things, with more than 20 developers.&lt;/p&gt;
+
+&lt;p&gt;When people are having fun, others will join in. Enlightened companies will appreciate the efforts made by their employees and will do whatever they can to nurture their passion, giving them time to learn.&lt;/p&gt;
+
+&lt;p&gt;Companies should never force people to get together so that they can “improve themselves.” When people are forced, it becomes work and that is not the idea. Let the people organise themselves. Let them decide what they want to learn and how often they are going to meet. The only thing the company (managers in this case) need to do is to make sure that everyone knows that they don’t need to ask authorisation to take a couple of hours here and there to meet and learn. People normally understand the urgency of their work and can plan accordingly.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;infoq-in-your-book-you-wrote-about-pragmatism-a-practical-approach-to-craftsmanship-and-doing-technical-practices-can-you-elaborate-on-that&#34;&gt;InfoQ: In your book you wrote about pragmatism, a practical approach to craftsmanship and doing technical practices. Can you elaborate on that?&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Mancuso:&lt;/strong&gt; Software Craftsmanship is becoming more and more popular. With that, more developers are calling themselves craftsmen and embracing Software Craftsmanship values. Companies are also trying to embrace Software Craftsmanship and are paying far more attention to the quality of the software they produce.  At the same time that this is a good thing, when certain ideas become popular, their core message gets diluted and often misunderstood. Agile is a great example of that. How many companies claim to be working in an Agile fashion today? If we brought some of the Agile originators into these companies, how many companies would they say that are really working according to the values they defined? My fear is that, if we are not careful, Software Craftsmanship will go towards the same direction.&lt;/p&gt;
+
+&lt;p&gt;One of the core values of Software Craftsmanship is “productive partnership” [with our customers.] In summary, that means, helping our customers to achieve whatever they want to achieve in a sustainable way, via well-crafted software. However, well-crafted software is pointless if it is not providing any value to customers. It’s pointless to have code that is beautifully written, fully tested, and designed according to the latest fad, if it can’t be delivered in time and at an affordable price. Understanding our customer’s needs is paramount for any craftsman. We also need to understand that writing software for a large investment bank is different from writing software for a small startup. Building software for an insurance company is different from creating an online store for a small business. It’s important we understand the context we are in and adapt our process accordingly. What is the cost of a bug? In certain places, a bug in production may be catastrophic while in others, it’s probably much cheaper than not going live at all.&lt;/p&gt;
+
+&lt;p&gt;Our industry loves extremes: From BDUF (Big Design Up Front) to no design at all. From long cycles of manual testing to layers and layers of automated testing. From monolith applications to hundreds of small classes being deployed as [micro]services. It seems that everyone is looking for a magical recipe and trying to apply it everywhere. Where before people were complaining about lack of quality, now they are complaining that this “quality” thing is too expensive and takes too long.&lt;/p&gt;
+
+&lt;p&gt;Yes, of course we have values. Of course we care about the quality of our work. But above all, we should be pragmatic and get things done. Good practices are good until we find better ones to replace them. Some developers are treating certain practices, tools, design styles, and programming paradigms as a religion, forgetting that they have a software to deliver and, most importantly, a customer paying for it. At the end of the day, the main judges of the quality of our work are our customers. Regardless of which tools we use or how we call ourselves, if our clients are unhappy, we cannot say we are doing a good job.&lt;/p&gt;
+
+&lt;p&gt;Mastering our tools and practices is a way to reduce the quality cost, and that can be achieved by deliberate practice. Customers should not pay more because we decided to use a certain practice or tool. Typing has never been the bottleneck in a software project, and neither should be any of the practices and tools we chose to use. Well-crafted code is a means to an end, where the end is customer satisfaction. Failing to understand that is failing to understand Software Craftsmanship.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;em&gt;Please see the &lt;a href=&#34;http://www.infoq.com/articles/mancuso-software-craftsman&#34;&gt;original interview&lt;/a&gt; on the &lt;a href=&#34;http://www.infoq.com/articles/mancuso-software-craftsman&#34;&gt;InfoQ website&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

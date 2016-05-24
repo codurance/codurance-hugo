@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ubiquitous Language on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/ubiquitous-language/</link>
+    <description>Recent content in Ubiquitous Language on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Mon, 26 Oct 2015 09:35:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/ubiquitous-language/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Talk to the business</title>
+      <link>http://codurance.com/blog/Talk-to-the-business/</link>
+      <pubDate>Mon, 26 Oct 2015 09:35:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/Talk-to-the-business/</guid>
+      <description>&lt;p&gt;Almost a month ago, I did this amazing course at &lt;a href=&#34;https://skillsmatter.com/&#34;&gt;SkillsMatter&lt;/a&gt;: &lt;a href=&#34;https://skillsmatter.com/courses/202-domain-model&#34;&gt;&amp;ldquo;Eric Evans Domain Driven Design Immersion Workshop&amp;rdquo;&lt;/a&gt;. The course was very intensive and provided me with the opportunity to reinforce a lot of concepts I already knew as well as learn a few more.&lt;/p&gt;
+
+&lt;p&gt;One of this concepts was &lt;a href=&#34;http://c2.com/cgi/wiki?UbiquitousLanguage&#34;&gt;Ubiquitous Language&lt;/a&gt;. The first time I heard it from our coach &lt;a href=&#34;https://twitter.com/ziobrando&#34;&gt;Alberto Brandolini&lt;/a&gt;, I must confess I understood &amp;ldquo;Ambiguous Language&amp;rdquo;. The term &amp;ldquo;Ubiquitous&amp;rdquo; it&amp;rsquo;s not a simple one, especially for a non-native English speaker like myself. While I was listening to the coach explaining all of this concepts around the &amp;ldquo;Ubiquitous Language&amp;rdquo;, another one did make its way through: &lt;a href=&#34;https://en.wikipedia.org/wiki/Domain-driven_design#Bounded_context&#34;&gt;&amp;ldquo;Bounded Context&amp;rdquo;&lt;/a&gt;.
+&lt;a href=&#34;http://martinfowler.com/bliki/BoundedContext.html&#34;&gt;Martin Fowler&lt;/a&gt; has a really nice post where he defines it like this:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Bounded Context is a central pattern in Domain-Driven Design. It is the focus of DDD&amp;rsquo;s strategic design section which is all about dealing with large models and teams. DDD deals with large models by dividing them into different Bounded Contexts and being explicit about their interrelationships.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;One thing that Alberto told us was that we should always consider our bounded context when talking to the business expert: in the same company, different concepts may be used for the same term, whether you are talking to a sales expert or an accounting expert. So it&amp;rsquo;s up to us, developers, to define in which context we are currently working.&lt;/p&gt;
+
+&lt;p&gt;The videos that they showed to us during the course were very helpful: I definitely saw myself in previous clients doing the same mistakes and not understanding what was going on. The good thing is that now I know how to address it, and even did it twice in my current client.&lt;/p&gt;
+
+&lt;p&gt;So the next time that you hear a business expert using a different word from the ones that you&amp;rsquo;re using, go and talk to them. Make sure the words you are using are the correct ones, and if there&amp;rsquo;s a new one then you should integrate it into your model. After all, they are the ones who know the business!&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

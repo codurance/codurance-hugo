@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Jira on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/jira/</link>
+    <description>Recent content in Jira on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Mon, 04 Jan 2010 14:28:16 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/jira/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Using JIRA for Agile Project Management (without Green Hopper)</title>
+      <link>http://codurance.com/blog/using-jira-for-agile-project-management-without-green-hopper/</link>
+      <pubDate>Mon, 04 Jan 2010 14:28:16 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/using-jira-for-agile-project-management-without-green-hopper/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;http://www.atlassian.com/software/jira/&#34;&gt;Jira&lt;/a&gt; from Atlassian  is a very popular issue tracking software and can be quite effectively used for Agile Project Management. Jira has a plugin (Green Hopper) that allows for creation of a backlog, iterations and tasks.  However, with help from the free Mylyn plugin for Eclipse I was able to setup a Product Backlog and Iteration Backlogs.&lt;/p&gt;
+
+&lt;p&gt;For the User Stories in the product backlog I created two issue types (Epic &amp;amp; User Story).  Story hierarchies can be represented using Jira Links.&lt;/p&gt;
+
+&lt;p&gt;_Note: Currently Jira connector in Mylyn has an issue with the &amp;ldquo;depends on&amp;rdquo; and &amp;ldquo;is depended on by&amp;rdquo; relationships. It displays them the wrong way around in the Tasklist hierarchy.  You can keep track of the following issues to see if they&amp;rsquo;re fixed: &lt;a href=&#34;https://bugs.eclipse.org/bugs/show_bug.cgi?id=255680&#34;&gt;255680&lt;/a&gt;, &lt;a href=&#34;https://bugs.eclipse.org/bugs/show_bug.cgi?id=223151&#34;&gt;223151.&lt;/a&gt;_&lt;/p&gt;
+
+&lt;p&gt;For Iteration Backlog I created a version for each iteration and assigned the stories to that version/iteration. Each leaf story can then have Jira Sub-tasks to represent the tasks in a particular iteration. The &lt;code&gt;Resolved&lt;/code&gt; state of the story is used to mark it complete and &lt;code&gt;Colsed&lt;/code&gt; state is used to mark it as &amp;ldquo;accepted&amp;rdquo;. You can use Mylyn to see story hierarchies, also I found Mylyn to be a much more intuitive interface when working on Product and Iteration backlogs.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

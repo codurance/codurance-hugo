@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Codurance on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/codurance/</link>
+    <description>Recent content in Codurance on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Fri, 13 May 2016 00:20:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/codurance/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Initiative Circles</title>
+      <link>http://codurance.com/blog/initiative-circles/</link>
+      <pubDate>Fri, 13 May 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/initiative-circles/</guid>
+      <description>&lt;p&gt;We have been trying to encourage decentralised decision making at Codurance. To that effect, everyone within the company understands that they have the power to make any decision they need to make so long as they seek advise from the people that may be impacted. In order to help people make effective decisions, all company information is available to everyone in the company, including financials and salaries. This is all well and good, but in practice people do not simply go and start making informed strategic decisions just because they have the power to do so. For one, they are busy with their day jobs and simply do not have much time to look at the company holistically. Even if they have some wonderful ideas, they may not have the inclination or confidence to kick-off the initiative.&lt;/p&gt;
+
+&lt;p&gt;This has led us to introduce of Initiative Circles. We have a board in &lt;a href=&#34;https://trello.com&#34;&gt;Trello&lt;/a&gt; with the simple &lt;em&gt;Backlog, In Progress, and Complete&lt;/em&gt; workflow. When someone comes up with anything tactical or strategic they can add it as an initiative to the backlog. The only perquisite is that the initiative must have a focused and achievable objective. The initiative can be moved into “In Progress” when 3 or more individuals volunteer to be full-time members of that initiative. The members have full authority, responsibility and accountability to fulfil the objective of that initiative. They assign an aspirational completion date for the initiative before moving it into “In Progress”. The date may change as the initiative progresses. The initiative will be blocked if the members drop below 3. We ask people to try and avoid taking on initiatives that they cannot dedicate time towards, so that blocked initiatives are kept to a minimum.&lt;/p&gt;
+
+&lt;p&gt;A regular update regarding the progress of the initiative is provided to the rest of the company. Any decisions made by an Initiative Circle is communicated to the rest of the company via our usual communication channels. If anyone has strong objections, they will voice those directly with the members of the Initiative Circle. The circle is not expected to satisfy everyone in the company with regards to their decisions. However, all members within the circle must agree to the decisions made by that circle. No decision within the company is written in stone and may be modified by subsequent decisions. So in case people strongly disagree with the outcomes of an initiative, they are welcome to create a new initiative to replace existing policies and practices.&lt;/p&gt;
+
+&lt;p&gt;We have integrated Initiative Circles Trello board with the &lt;a href=&#34;https://slack.com&#34;&gt;Slack&lt;/a&gt; channel so that all updates are posted there automatically. Everyone is subscribed to this channel and can keep abreast of the progress of current Initiative Circles and proposal for new initiatives. If the objective of an initiative or it&amp;rsquo;s completion date is changed then the rest of the company is notified via this channel.&lt;/p&gt;
+
+&lt;p&gt;So far this has proven very successful. This simple process has allowed us to synchronise our efforts to shape both tactical and strategic direction for Codurance. It has also allowed us to seek support from others within the company in a very natural way.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Open Financials</title>
+      <link>http://codurance.com/blog/open-financials/</link>
+      <pubDate>Mon, 22 Feb 2016 14:54:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/open-financials/</guid>
+      <description>
+
+&lt;p&gt;Early this month we took a big step towards full transparency and decided to open the financials to the whole company. Our decision is aligned to the &lt;a href=&#34;https://en.wikipedia.org/wiki/Open-book_management&#34;&gt;open-book management&lt;/a&gt; concept.&lt;/p&gt;
+
+&lt;h2 id=&#34;why-did-we-do-that&#34;&gt;Why did we do that?&lt;/h2&gt;
+
+&lt;p&gt;The short answer: it was the right thing to do. The long answer needs a bit more explanation but first we need to explain the context and who we are as a company. We are a company founded on Software Craftsmanship principles. We are high-skilled software craftsmen who help our clients build quality software following Agile and XP practices. Our craftsmen and apprentices are developers that really care about the quality of their work and put a lot of effort trying to improve their skills. Such professionals care about their careers and need autonomy and purpose in order to perform at the level we all expect. For this type of professionals, working for a company where they can’t see the impact of their work is simply not good enough.&lt;/p&gt;
+
+&lt;h2 id=&#34;advantages-of-opening-the-financials&#34;&gt;Advantages of opening the financials&lt;/h2&gt;
+
+&lt;p&gt;There are many. Once everyone has a clear view of the financial health of the company—risks, buffer (savings we always want to have in the bank), sales pipeline, status of each existing project, profit margin—our discussions around investments, salaries, bonus, etc. becomes much more focused, open, and based on concrete facts. Transparency leads to trust. Individual aspirations become aligned to the company&amp;rsquo;s aspirations and vice-versa. If we do well collectively, we will all do well individually. If we all contribute, we all win.&lt;/p&gt;
+
+&lt;p&gt;Each craftsman and apprentice now has a much better understanding of the impact of their contribution to the company. They can also understand how much investment the company makes: people in between projects, apprentices, conferences, new hires, etc.&lt;/p&gt;
+
+&lt;p&gt;With more information comes more responsibility, helping us understand that we are on the same boat and we can all contribute towards our company.&lt;/p&gt;
+
+&lt;p&gt;We also realised that it is much harder to reach a decision when people don’t have the same amount of information. Giving everyone access to all the financial information is helping us reach agreements faster and find better solutions to our problems.&lt;/p&gt;
+
+&lt;h2 id=&#34;how-did-we-do-it&#34;&gt;How did we do it?&lt;/h2&gt;
+
+&lt;p&gt;Financial numbers are not easy to look at and can be very misleading if you only look at the numbers from a single perspective. Bank balance, cash flow, costs, and revenues, mean nothing in isolation.&lt;/p&gt;
+
+&lt;p&gt;We use an online accounting system that can provide us with some data exports. We built a financial dashboard that consumes the raw data from our accounting system and displays multiple views on that data. The dashboard shows our financial situation and contains things like the buffer, graphs showing the costs and revenues, cash flow, cost breakdown (rent, salaries, travel, etc.), revenue breakdown (projects, clients, etc.), tax paid and to be paid (VAT and corporation tax), money owed, money owing, and a few other things. We will be refining as we go along.&lt;/p&gt;
+
+&lt;p&gt;Our financial dashboard is updated a few times a month and is always available to everyone at Codurance.&lt;/p&gt;
+
+&lt;p&gt;The interesting thing about building our own financial dashboard is that it helped us have a much better understanding and control of our financial situation. It’s also helping us a great deal in our decision making process. More about that later.&lt;/p&gt;
+
+&lt;h2 id=&#34;participation-in-codurance-s-future&#34;&gt;Participation in Codurance’s future&lt;/h2&gt;
+
+&lt;p&gt;As our company grows the challenges become bigger and decisions have a much bigger impact. In addition to the reasons I previously mentioned, we want our craftsmen to help us shape the future of our company. We want to build a company that we all love and belong.&lt;/p&gt;
+
+&lt;p&gt;Until recently, many of the strategic decisions were centralized and now we are opening that up to everyone.&lt;/p&gt;
+
+&lt;h2 id=&#34;decision-making&#34;&gt;Decision making&lt;/h2&gt;
+
+&lt;p&gt;Discussions with a large group of people can be very challenging and unproductive. With that, we decided to create a “craftsmen board”. The two founders, Mash and Sandro, and 3 other craftsmen—elected by all craftsmen and apprentices—compose the board. Every 6 months we will have an election to choose the 3 craftsmen that will be part of the board. The board members are not above the rest of the company. They are only the craftsmen elected to put proposals forward and keep discussions more focused. Some people care more about certain topics than others. It’s up to each person (or group of people) to come up with a proposal and submit it to the board.&lt;/p&gt;
+
+&lt;p&gt;The role of the board is to make decisions and only discusses topics when there is a concrete proposal. The meetings are about making decisions and not about formulating proposals. Any person in the company can submit a proposal: a solution to a problem, an investment opportunity, staff welfare, or the overall direction of the company. The board will discuss the proposal and communicate back the decision to everyone. Proposals can be accepted, rejected, or returned for further refinements. Decisions, and the associated rationale, are communicated to everyone. If the other craftsmen and apprentices don’t agree, then they will need to formulate a new proposal and submit to the board.&lt;/p&gt;
+
+&lt;p&gt;Regardless what the board decides, nothing is written in stone. Any topic can be revised as long as we have a new or refined proposal. This way we can make decisions faster, always moving forward and reviewing our decisions as we have more information and feedback.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-future&#34;&gt;The future&lt;/h2&gt;
+
+&lt;p&gt;We are very happy with the direction Codurance is taking and how all our craftsmen and apprentices are shaping the future of the company we all love. Our craftsmen are increasingly taking bigger responsibilities; in our projects, recruitment, new businesses, and client relationships. With this transparency our craftsmen and apprentices are better equipped to make the right decisions—for themselves individually, and for the company as a whole.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>My first couple of months at Codurance</title>
+      <link>http://codurance.com/blog/my-first-couple-of-months-at-codurance/</link>
+      <pubDate>Sun, 22 Nov 2015 09:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/my-first-couple-of-months-at-codurance/</guid>
+      <description>
+
+&lt;h3 id=&#34;some-background&#34;&gt;Some background&lt;/h3&gt;
+
+&lt;p&gt;Some of you may know me from the various meetups in the city, especially my attendance at a number of &lt;a href=&#34;www.meetup.com/Londonjavacommunity/&#34;&gt;LJC&lt;/a&gt; and &lt;a href=&#34;www.meetup.com/london-software-craftsmanship&#34;&gt;LSCC&lt;/a&gt; meetup events. Attending these events I learnt about various conferences like &lt;strong&gt;Devoxx&lt;/strong&gt;, &lt;strong&gt;SoCraTes&lt;/strong&gt;, &lt;strong&gt;JAX London&lt;/strong&gt;, &lt;strong&gt;Java2Days&lt;/strong&gt;, &lt;strong&gt;OpenFest&lt;/strong&gt;, and I ended up attending and later presenting on various topic including &lt;a href=&#34;https://java.net/projects/adoptopenjdk/pages/AdoptOpenJDK&#34;&gt;Adopt OpenJDK&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;During this time I met a lot of people with various levels of experience and my interest and urge to learn more about the Java/JVM platform, Code Quality, Software Design, XP Practices, Software Craftsmanship, etc&amp;hellip;, were on the rise and saw no end. And whilst attending these events I came across &lt;a href=&#34;https://twitter.com/sandromancuso&#34;&gt;Sandro&lt;/a&gt; and &lt;a href=&#34;https://twitter.com/mashooq&#34;&gt;Mash&lt;/a&gt;, who were in those days hosting &lt;a href=&#34;www.meetup.com/london-software-craftsmanship&#34;&gt;LSCC&lt;/a&gt; events. I went to many of &lt;a href=&#34;www.meetup.com/london-software-craftsmanship&#34;&gt;LSCC&lt;/a&gt; events, especially liked the hands-on sessions (which are still my favourite).&lt;/p&gt;
+
+&lt;p&gt;I also noticed that many things I learnt at such events and conferences wouldn&amp;rsquo;t always be immediately recognised or accepted at the workplace. And moving to another work environment didn&amp;rsquo;t always solve this problem fully. I found that I wasn&amp;rsquo;t learning what I wanted from my peers and the things I learnt from the community I couldn&amp;rsquo;t apply at work. Besides very few were really in tuned with what the community was about. So one fine day I decided to take charge of my career and make a serious decision and take up the Apprenticeship program offered by &lt;a href=&#34;http://codurance.com/&#34;&gt;Codurance&lt;/a&gt; and go through the process.&lt;/p&gt;
+
+&lt;p&gt;I was urged to go this way after being inspired by Sandro&amp;rsquo;s book: &lt;a href=&#34;http://www.amazon.co.uk/books/dp/0134052501&#34;&gt;The Software Craftsman&lt;/a&gt;, attending all the &lt;a href=&#34;http://socratesuk.org/&#34;&gt;SoCraTes UK&lt;/a&gt; conferences, and meeting with developers who valued and took pride of their work namely their craft.&lt;/p&gt;
+
+&lt;h3 id=&#34;where-we-are-just-now&#34;&gt;Where we are just now&lt;/h3&gt;
+
+&lt;p&gt;It&amp;rsquo;s now been nearly two months since I have been working for &lt;a href=&#34;http://codurance.com/&#34;&gt;Codurance&lt;/a&gt;, a formidable force. And so it&amp;rsquo;s also about time that I share my experiences with my fellow mates and the community around me.&lt;/p&gt;
+
+&lt;p&gt;During my first few weeks at &lt;a href=&#34;http://codurance.com/&#34;&gt;Codurance&lt;/a&gt;, I have been busy learning various things that have been chalked out for becoming a craftsman.&lt;/p&gt;
+
+&lt;p&gt;When working on a kata or learning a concept, we paired or did what is known as &amp;lsquo;mob programming&amp;rsquo; along with other apprentices and craftsmen. And most of the time used the &lt;a href=&#34;https://en.wikipedia.org/wiki/Pomodoro_Technique&#34;&gt;pomodoro technique&lt;/a&gt;. Time boxing our work in intervals is something done both in groups and working individually. We would have a lot of discussions and retrospectives after working on a problem or writing some code from scratch.&lt;/p&gt;
+
+&lt;h3 id=&#34;structure-of-my-program&#34;&gt;Structure of my program&lt;/h3&gt;
+
+&lt;p&gt;We used an internal tool based on the concept of &lt;a href=&#34;http://www.impactmapping.org/&#34;&gt;Impact Mapping&lt;/a&gt;. I soon got interested in it when I saw my colleague &lt;a href=&#34;https://twitter.com/Singsalad&#34;&gt;Franzi&lt;/a&gt; (who is now a craftswoman) had used it to plan out her Apprenticeship route. Such a tool helps map out our goals and the tasks we need to perform to achieve it. And this can differ from person-to-person, depending on what they want to work on (driven by the Apprentice).&lt;/p&gt;
+
+&lt;p&gt;My mentor and other craftsmen reviewed them to get an idea of what I wanted to achieve for myself. And then its up to me to apply my own drive and perseverance to achieve the individual stories. My mentor and I meet and talk informally on a regular basis, many times pairing on a kata or a project or on the white board trying to get my head around a concept.&lt;/p&gt;
+
+&lt;h3 id=&#34;days-in-the-life-of-an-apprentice&#34;&gt;Days in the life of an Apprentice&lt;/h3&gt;
+
+&lt;p&gt;I found the working hours quite flexible, remote working is also an option (when you are on the bench or if the client allows, if you are in a project). Our co-founders are understanding and compassionate about our individual situations.&lt;/p&gt;
+
+&lt;p&gt;Meetings are at their minimum, except for a weekly Apprentices meeting (run by an Apprentice and guided by at least one Craftsperson) and a bi-monthly company-wide catchup.&lt;/p&gt;
+
+&lt;p&gt;The Apprentices meetings are full of fun &amp;ndash; we are accompanied by at least one Craftsperson, who disperses their knowledge and experience from a wide variety of topics designed to help us in the journey and fill the gaps in our knowledge and experience.&lt;/p&gt;
+
+&lt;p&gt;A bi-monthly catchup involves sharing of knowledge via lightning talks, discussions and pairing sessions on pet projects over pizzas and beer (and of course veggies and non-alcoholic beverages for the &lt;a href=&#34;https://en.wikipedia.org/wiki/Teetotalism&#34;&gt;teetotalers&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;Katas, code reviews, mob programming and projects make up a learning week - all of these done individually or when pairing with another.&lt;/p&gt;
+
+&lt;h5 id=&#34;katas&#34;&gt;&lt;strong&gt;Katas&lt;/strong&gt;&lt;/h5&gt;
+
+&lt;p&gt;On a daily basis I have worked on different katas or try to solve the same kata in various different ways (using different testing and refactoring approaches). This in turn gave me better insights into designing and refactoring techniques. Trying to solve the same problem in different ways has a positive impact on our problem solving skills especially when writing code. In my case I also learnt how to use the different libraries and methods to write tests. I would like to cite &lt;strong&gt;Samir&lt;/strong&gt;, thanks to you, for the suggesting this approach during the first week of my Apprenticeship.&lt;/p&gt;
+
+&lt;h5 id=&#34;code-reviews&#34;&gt;&lt;strong&gt;Code reviews&lt;/strong&gt;&lt;/h5&gt;
+
+&lt;p&gt;Just last week we did a group code review and time-boxed ourselves, performed a retrospective at the end of each interval and ensured we delivered a good chunk of the feedback before close of play. Such regular code review exercises are helping all of us learn about how to code better as we are not only learning from feedback from the tools we used, but also through exchange of feedback from our peers who were involved in the group code review session.&lt;/p&gt;
+
+&lt;h5 id=&#34;software-design-specification-gathering-communication&#34;&gt;&lt;strong&gt;Software Design, Specification Gathering &amp;amp; Communication&lt;/strong&gt;&lt;/h5&gt;
+
+&lt;p&gt;Recently we had an interesting mob-programming session where we were trying to model and write a game. At the end of the session, we had a retrospective, discussing the things we did well and didn&amp;rsquo;t do well. Each of the apprentices and craftsmen were performing a specific role i.e. Developer, Domain Expert, etc&amp;hellip; We learnt in retrospective, about areas where we could have done better and should focus on. That any test written gives immediate feedback about how well we have understood the domain and if we were taking the right approach. Why a certain approach when starting a project is more advantageous than another approach. What questions to ask and why it is important to ask the right questions to the domain expert or to give the right level of information to another developer and vice-versa. Sandro has described this process in detail in his &lt;a href=&#34;http://codurance.com/2015/11/01/practicing-well-crafted-design/&#34;&gt;blog post&lt;/a&gt; recently.&lt;/p&gt;
+
+&lt;h3 id=&#34;fun-socialising-and-sharing&#34;&gt;Fun, socialising and sharing&lt;/h3&gt;
+
+&lt;p&gt;I found our office environment to be conducive to learning, sharing and collaboration. We even have a pairing rota that we use from time-to-time to record or suggest pairing sessions during the week.&lt;/p&gt;
+
+&lt;p&gt;We share links to events, conferences, tweets, interesting articles, videos, blog posts, etc&amp;hellip; via slack, document discussions and brain dumps via Google doc, huddles during lunch- and tea- breaks to talk about anything we are working on. Thanks to the library of printed and digital books to our disposal, the huge collection of &lt;a href=&#34;http://codurance.com/blog&#34;&gt;blog posts&lt;/a&gt; and &lt;a href=&#34;http://codurance.com/videos/&#34;&gt;videos&lt;/a&gt; on our site.&lt;/p&gt;
+
+&lt;p&gt;The apprentices and some craftsmen have collectively started a social event which of course happens every Friday, sometimes it&amp;rsquo;s dinner at a nearby restaurant, while at other times an indoor movie over snacks and drinks at our office premises.&lt;/p&gt;
+
+&lt;h3 id=&#34;it-is-worthwhile-and-that-s-why-we-are-here&#34;&gt;It is worthwhile and that&amp;rsquo;s why we are here&lt;/h3&gt;
+
+&lt;p&gt;It is a privilege to be able to work alongside very experienced craftsmen from our industry. We are very lucky and thankful to have the opportunity to be guided and mentored by talented and like minded developers.&lt;/p&gt;
+
+&lt;p&gt;This is my first job where the company has a completely flat hierarchy and where we share similar values.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/greatCompanyCulture.jpg&#34;  class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;h3 id=&#34;closing-note&#34;&gt;Closing note&lt;/h3&gt;
+
+&lt;p&gt;Work is fun and learning is enjoyable when we love what we do and are amongst friends with similar goals and aspirations.&lt;/p&gt;
+
+&lt;p&gt;Thank you for taking the time to read this post and I hope it was interesting. Looking forward to write more and share such experiences in future posts.&lt;/p&gt;
+
+&lt;p&gt;Many thanks to &lt;strong&gt;Sandro&lt;/strong&gt;, &lt;strong&gt;Tomaz&lt;/strong&gt;, &lt;strong&gt;Alex&lt;/strong&gt;, &lt;strong&gt;Franzi&lt;/strong&gt; and &lt;strong&gt;David&lt;/strong&gt; for all the feedback provided for this blog post.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Why you should always follow your dreams!</title>
+      <link>http://codurance.com/blog/Why-you-should-always-follow-your-dreams%21/</link>
+      <pubDate>Sat, 01 Aug 2015 14:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/Why-you-should-always-follow-your-dreams%21/</guid>
+      <description>&lt;p&gt;I started at &lt;a href=&#34;http://codurance.com/&#34;&gt;Codurance&lt;/a&gt; a month and a half ago as a C# developer. I was glad to have the opportunity to work in a place where people value your effort to be a better developer.&lt;/p&gt;
+
+&lt;p&gt;I had been away from C# for more than 4 years, but I was happy to return. This was for me a great opportunity to catch up with my main language. But my passion is with iOS. In my own time, I started to apply all the techniques that I&amp;rsquo;ve been learning, especially on &lt;a href=&#34;http://www.ananogal.com/blog/starting-your-tdd-journey/&#34;&gt;honing my TDD skills&lt;/a&gt; and &lt;a href=&#34;http://codurance.com/2015/07/13/How-to-start-doing-TDD-in-iOS/&#34;&gt;applying TDD to iOS&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;So why did I apply for C# and not iOS? Well, I looked for three months for a iOS company that could give me an opportunity. It was really hard. They all wanted senior developers who could get there and get the job done, but I&amp;rsquo;m not at that level in iOS yet. I still have a lot to learn and I needed an opportunity to learn more from experienced developers, exchange thoughts and understand how things work. Working in C#, I&amp;rsquo;ve worked with several clients, I know how to address a problem, and how I can put my expertise to help, but that&amp;rsquo;s not yet true when working on iOS projects. This kind of experience is what I missed from my journey in the world of apps. I&amp;rsquo;m the primary developer of 4 apps, but that wasn&amp;rsquo;t enough. I&amp;rsquo;ve deployed them all to the App Store, despite having to dedicate a whole day to it every time! But I was my own client. They all started as small pet projects that got big enough for me to stay at home for four years and try to make it work. I really loved it, but I missed the exchange  of experience in a team. This is what makes you grow in your profession. The great discussions that a subject can lead to…&lt;/p&gt;
+
+&lt;p&gt;So two weeks ago, &lt;a href=&#34;https://twitter.com/sandromancuso&#34;&gt;Sandro&lt;/a&gt; mentioned that we had an opportunity in iOS. A client was willing to have me as an apprentice, if I could pass the interview. I was thrilled that I could pursue my dream! Given a choice between iOS or C#, I will always choose iOS, but I never thought that Codurance would help me fulfill my dream. I can definitely be more profitable in C# than in iOS, but Codurance choose to give me an opportunity to grow.&lt;/p&gt;
+
+&lt;p&gt;Since my first job, where I stayed for 7 years, I haven&amp;rsquo;t had the same feeling. I still say &amp;ldquo;my company&amp;rdquo; when I&amp;rsquo;m talking about them with friends. Since then I&amp;rsquo;ve worked in several companies not only in Portugal but also in Spain. None of them made me feel a team member or cared about my opinions. My colleagues have made me want to be a better person, not only a better developer.&lt;/p&gt;
+
+&lt;p&gt;Oh! by the way, I&amp;rsquo;ve done the interview and I started yesterday. ;-)&lt;/p&gt;
+
+&lt;p&gt;In the last two weeks, I reviewed everything I learnt about software development and applied it to Objective-C. I&amp;rsquo;ve been learning a lot! Even doing katas has made me investigate and discover all sorts of new concepts and approaches. But that will be the topic for another blog post.&lt;/p&gt;
+
+&lt;p&gt;So if you have a dream and you can&amp;rsquo;t pursue it right away, don&amp;rsquo;t lose the passion for it, and never ever put it in a drawer.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>My first month as an apprentice</title>
+      <link>http://codurance.com/blog/a-month-of-apprenticeship/</link>
+      <pubDate>Wed, 29 Jul 2015 16:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/a-month-of-apprenticeship/</guid>
+      <description>
+
+&lt;p&gt;About a month ago, I started my apprenticeship at Codurance. I have learned a lot already in these few weeks, and I want to share some of it.&lt;/p&gt;
+
+&lt;h2 id=&#34;a-little-background&#34;&gt;A little background&lt;/h2&gt;
+
+&lt;p&gt;As some of you know, I moved from Germany over to London to work for Codurance. I knew the founders and some of the craftsmen from various conferences, mainly &lt;a href=&#34;https://www.socrates-conference.de/&#34;&gt;SoCraTes Germany&lt;/a&gt; and &lt;a href=&#34;http://socratesuk.org/&#34;&gt;SoCraTes UK&lt;/a&gt;.
+Apart from wanting to immerse myself into the vibrant &lt;a href=&#34;http://www.meetup.com/london-software-craftsmanship/&#34;&gt;London Software Craftsmanship Community&lt;/a&gt;, I was looking for an opportunity to learn about better software design.
+I studied computer science at university, where I learned about UML and the theoretics of design patterns. I worked as a developer and consultant for three years in Germany and got some basic training on clean code and XP techniques.&lt;/p&gt;
+
+&lt;p&gt;But going to Software Craftsmanship events, especially the international ones, made me realize there is so much more to learn. I attribute my ignorance to the &lt;a href=&#34;https://en.wikipedia.org/wiki/Dunning%E2%80%93Kruger_effect&#34;&gt;Dunning Kruger&lt;/a&gt; effect. Or the fact that there weren&amp;rsquo;t many people who understood.
+I tried to get some advice from my peers and the answers I heard were:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&amp;ldquo;You just need to spend a few years gaining more experience.&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;This is as far as you can go with learning about good design&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;The training you are looking for doesn&amp;rsquo;t exist, you can train special frameworks and technologies instead&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;Your career options are management or full time process consulting&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Needless to say, given my personality and my goals, this &amp;lsquo;advice&amp;rsquo; didn&amp;rsquo;t satisfy me. Here is what I tried instead:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;I started organizing events to improve by pairing with other motivated coders&lt;/li&gt;
+&lt;li&gt;I booked a one-on-one, advanced design training&lt;/li&gt;
+&lt;li&gt;I used my free time to participate in as many meetups and conferences as I could&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Still, for 40 hours a week, in my comfortable, reasonably agile team, I wasn&amp;rsquo;t improving much. And there weren&amp;rsquo;t enough people senior to me that I could learn from.
+One example is that we were proposing to use the same technology stack for almost every project we started. We used Spring, Hibernate and other frameworks that forced us into a particular design.
+And a lot of the new things I was trying to bring in from outside were rejected, so I couldn&amp;rsquo;t practice them in a &amp;ldquo;real&amp;rdquo; project.&lt;/p&gt;
+
+&lt;p&gt;When I heard &lt;a href=&#34;https://twitter.com/sandromancuso&#34;&gt;Sandro&lt;/a&gt; and &lt;a href=&#34;https://twitter.com/mashooq&#34;&gt;Mash&lt;/a&gt; talk about how important it is to spend your main working time somewhere you can improve, it really hit home. In &lt;a href=&#34;http://www.amazon.co.uk/books/dp/0134052501&#34;&gt;The Software Craftsman&lt;/a&gt;, I read inspiring words about what it meant to take charge of your career.
+I realized I needed to make a bigger change to get where I wanted to be.&lt;/p&gt;
+
+&lt;p&gt;I quit my job (it had three months notice) and applied in London, hoping to get accepted at Codurance. I was intrigued by the opportunity to work with &lt;a href=&#34;http://codurance.com/aboutus/ourteam/&#34;&gt;awesome craftsmen&lt;/a&gt; and to have a few months of focussed learning in my apprenticeship.
+As it turned out, I was a fit and they wanted me to start as early as possible. Organizing the move with no vacation time in between my jobs was a challenge, but I managed.&lt;/p&gt;
+
+&lt;h2 id=&#34;starting-my-apprenticeship&#34;&gt;Starting my apprenticeship&lt;/h2&gt;
+
+&lt;p&gt;Early on I understood that I was the person driving my apprenticeship. Both the company and I benefit from me graduating, but it&amp;rsquo;s my responsibility to get there.
+This is very different from studying at university, where you have a syllabus, exams and credits to collect.&lt;/p&gt;
+
+&lt;p&gt;I started by identifying what Codurance expects from their craftsmen. Some things had already been covered in the application process and in conversations I had with Codurance employees before. There was the &lt;a href=&#34;http://codurance.com/careers/craftsman/&#34;&gt;job description&lt;/a&gt; and a list of values in the Codurance wiki.
+From those, I identified I wanted to focus on improving my design and DevOps skills. Other important aspects are writing and presenting, and getting involved in the Software Craftsmanship Community.
+I made a list of tasks I wanted to do to reach my goals and got encouraging feedback from the founders.&lt;/p&gt;
+
+&lt;h2 id=&#34;mentorship&#34;&gt;Mentorship&lt;/h2&gt;
+
+&lt;p&gt;The next step was to find a mentor to guide me and help me to focus on my goal to graduate. I had a chat with the available craftsmen about how they could help me and what they expected from me.
+And from the ones that offered, I chose &lt;a href=&#34;https://twitter.com/SamirTalwar&#34;&gt;Samir&lt;/a&gt; as my mentor. We meet regularly to pair and discuss my progress. The founders are also providing advice and guidance.&lt;/p&gt;
+
+&lt;h2 id=&#34;first-challenge&#34;&gt;First challenge&lt;/h2&gt;
+
+&lt;p&gt;I was reasonably fast using my Windows laptop, Eclipse IDE and a German keyboard layout. But the first goal was to learn to be efficient using IntelliJ idea shortcuts, a Mac and the UK keyboard layout.
+Why? Because I don&amp;rsquo;t want to waste time between having an idea in my head and writing the code to try it.&lt;/p&gt;
+
+&lt;p&gt;So I practiced the &lt;a href=&#34;https://www.youtube.com/watch?v=iZjgj1S0FCY&#34;&gt;Roman Numerals&lt;/a&gt; kata a few times, to learn some basic navigation skills and other shortcuts.
+Then I moved on to refactoring the &lt;a href=&#34;https://github.com/sandromancuso/trip-service-kata&#34;&gt;Trip Service&lt;/a&gt; kata. Refactoring is one of my favorite coding activities, and it felt very rewarding to speed it up.
+One of the things I found most useful is the &lt;kbd&gt;⇧&lt;/kbd&gt; + &lt;kbd&gt;&amp;#8984;&lt;/kbd&gt; + &lt;kbd&gt;A&lt;/kbd&gt; Shortcut in IntelliJ IDEA. It allows you to search for any action available, be it a setting or a refactoring step. And it shows you the applicable shortcuts.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/findAction.png&#34; alt=&#34;Find Action&#34; title=&#34;Find Action&#34; class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;h2 id=&#34;baby-steps-for-better-design&#34;&gt;Baby steps for better design&lt;/h2&gt;
+
+&lt;p&gt;I continued with our trainings &lt;a href=&#34;http://codurance.com/services/training/crafting-code/&#34;&gt;Crafting Code&lt;/a&gt; and &lt;a href=&#34;http://codurance.com/services/training/crafted-design/&#34;&gt;Crafted Design&lt;/a&gt; and got a better understanding of Dependency inversion, Outside-In TDD and &lt;a href=&#34;http://ustre.am/:49XUG&#34;&gt;Interaction Driven Design&lt;/a&gt;.
+It&amp;rsquo;s one thing to watch videos or read blog posts, but actually implementing and practicing has always been a more sustainable way of learning for me.&lt;/p&gt;
+
+&lt;h2 id=&#34;peer-learning&#34;&gt;Peer learning&lt;/h2&gt;
+
+&lt;p&gt;Every Monday, all Codurance apprentices meet up in the office to learn together. We pair on katas, present lightning talks and have discussions.
+We also started a book club and are currently reading &lt;a href=&#34;http://www.growing-object-oriented-software.com/&#34;&gt;Growing Object-Oriented Software Guided by Tests&lt;/a&gt;. The regular meetups motivate to keep reading.
+Additionally, discussing what each of us understood and took out of the material helps to reinforce the learning and clear up any misunderstandings.&lt;/p&gt;
+
+&lt;p&gt;One of the things we discussed was how the tests help us to look at the unit we are developing from the outside. So when we are writing tests, we should always ask: What are we promising to units interacting with our unit? What can they expect our &amp;lsquo;thing&amp;rsquo; to do?
+Since all of us have different backgrounds, we can share our experiences and support each other. It&amp;rsquo;s great to be part of a group!
+One of the craftsmen will join us on the meetings and provide us with advice and guidance.&lt;/p&gt;
+
+&lt;h2 id=&#34;on-the-shoulders-of-giants&#34;&gt;On the shoulders of giants&lt;/h2&gt;
+
+&lt;p&gt;A lot of good design has already been described in length in various books and blogposts. On the advice of my mentor, I try to focus on reading one book at a time. I also try to read two blog posts a week on topics I&amp;rsquo;m interested in.
+I read blog posts on &lt;a href=&#34;https://pragprog.com/magazines/2010-12/cohesive-software-design&#34;&gt;cohesion&lt;/a&gt;, &lt;a href=&#34;http://martinfowler.com/ieeeSoftware/coupling.pdf&#34;&gt;coupling&lt;/a&gt;, &lt;a href=&#34;http://www.thoughtworks.com/insights/blog/composition-vs-inheritance-how-choose&#34;&gt;composition over inheritance&lt;/a&gt;, the four rules of &lt;a href=&#34;http://martinfowler.com/bliki/BeckDesignRules.html&#34;&gt;simple design&lt;/a&gt; and their &lt;a href=&#34;http://blog.thecodewhisperer.com/2013/12/07/putting-an-age-old-battle-to-rest/&#34;&gt;order&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Another important aspect is sharing my learnings, which is why I intend to regularly write on the &lt;a href=&#34;http://codurance.com/blog/&#34;&gt;Codurance blog&lt;/a&gt;. It&amp;rsquo;s important to timebox reading and writing though, because my learnings usually come from doing :) By advice of my mentor, I try to spend 20% of my time on it.&lt;/p&gt;
+
+&lt;p&gt;I am also sharing by presenting at various conferences. I plan to attend SoCraTes unconferences in  &lt;a href=&#34;https://www.socrates-conference.de/&#34;&gt;Germany&lt;/a&gt;, &lt;a href=&#34;http://socrates-fr.github.io/&#34;&gt;France&lt;/a&gt; and &lt;a href=&#34;http://www.socratesbe.org/&#34;&gt;Belgium&lt;/a&gt;. I am presenting at &lt;a href=&#34;http://swancon.co.uk/&#34;&gt;SWANSEACON&lt;/a&gt; and &lt;a href=&#34;http://www.xpdays.de/2015/&#34;&gt;XP Days Germany&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;working-for-codurance&#34;&gt;Working for Codurance&lt;/h2&gt;
+
+&lt;p&gt;One way I am contributing to Codurance&amp;rsquo;s success is to help out with the recruitment efforts. Be it by reaching out to possible candidates or reviewing code submissions.&lt;/p&gt;
+
+&lt;h2 id=&#34;ideal-conditions&#34;&gt;Ideal conditions&lt;/h2&gt;
+
+&lt;p&gt;Just being around the Codurance office is a blessing. Here are some highlights: Spontaneous discussions about design, pairing with &lt;a href=&#34;https://twitter.com/sandromancuso&#34;&gt;Sandro&lt;/a&gt;, developing the website with &lt;a href=&#34;http://twitter.com/anainogal&#34;&gt;Ana&lt;/a&gt;, learning consultant skills from &lt;a href=&#34;https://twitter.com/mashooq&#34;&gt;Mash&lt;/a&gt;, discussing good design with &lt;a href=&#34;http://twitter.com/lrbpx&#34;&gt;Liam&lt;/a&gt;, organizing meetups with &lt;a href=&#34;http://twitter.com/craftatheart&#34;&gt;Ana&lt;/a&gt;,..&lt;/p&gt;
+
+&lt;p&gt;Biweekly, we also have a catch up with all of Codurance. We use this to keep each other up to date about what we are working on, what our challenges are and what we learned. We have some pizza and some presentations on topics we are interested in.&lt;/p&gt;
+
+&lt;p&gt;Speaking about pizza, there are lots of interesting meetups in London! My favorites so far are the &lt;a href=&#34;http://www.meetup.com/london-software-craftsmanship/&#34;&gt;LSCC hands on&lt;/a&gt; and the &lt;a href=&#34;http://www.meetup.com/Extreme-Programmers-London/&#34;&gt;eXtreme Programmers London&lt;/a&gt;. I am definitely planning on contributing on them! They also feature great discussions afterwards at the pub, which I really enjoyed.
+I also had the honor to facilitate an &lt;a href=&#34;http://www.meetup.com/london-software-craftsmanship/&#34;&gt;LSCC talks&lt;/a&gt; meetup.&lt;/p&gt;
+
+&lt;p&gt;Another beneficial aspect is &lt;a href=&#34;http://codurance.com/2015/07/14/learning-from-our-failures/&#34;&gt;Codurance&amp;rsquo;s culture&lt;/a&gt;. I get feedback and advice and can give feedback myself. My opinion is valued and I am encouraged to be self organized and proactive. I keep my mentor updated on my progress. The founders and the mentor regularly check in on me to solve any problems that could arise.&lt;/p&gt;
+
+&lt;h2 id=&#34;future-plans&#34;&gt;Future plans&lt;/h2&gt;
+
+&lt;p&gt;One important expectation my mentor has is that I always know what to do next. Here are a few things I want to do:
+I&amp;rsquo;ll propose more conference talks and might present or host more LSCC meetings.
+I will also start working on a larger project (a journeyman&amp;rsquo;s piece, so to speak) to practice DevOps, Functional Programming and Domain Driven Design.&lt;/p&gt;
+
+&lt;p&gt;I am excited to see where it leads me!&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Codurance - Looking forward to 2015</title>
+      <link>http://codurance.com/blog/looking-forward-to-2015/</link>
+      <pubDate>Wed, 26 Nov 2014 18:31:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/looking-forward-to-2015/</guid>
+      <description>&lt;p&gt;One year ago Mash and I were thinking how great it would be to be surrounded by great craftsmen, work with good clients, mentor talented apprentices, and a have decent office. We thought to ourselves: “We don’t want a company with employees. We want a company where we have friends. Friends where besides enjoying their company, we also admired their professionalism and knowledge.&amp;rdquo; One year later, we are happy to say we achieved all that. We had a great first year and managed to build a very talented team, which we are hoping to grow even more next year.&lt;/p&gt;
+
+&lt;p&gt;Codurance is going through a new phase. We are refining our services and training offerings and we are also increasing our capacity to work with more clients—from small start-ups to large corporations. We are adjusting our business model in order to be fully aligned with our decision to grow our own craftsmen via an apprenticeship program. We believe that the mix of very senior craftsmen - who are internationally renowned developers with a lot of well earned scars on their backs - combined with the freshness and youth of our apprentices - raring to become fully fledged craftsmen - is what gives the diversity and dynamism we want for Codurance.&lt;/p&gt;
+
+&lt;p&gt;We have also been paying a lot of attention to how we build our team. So far we have been very lucky to have had so many amazing people show interest to work with us. We are also very fortunate to have access to amazing craftsmen that are very active in the London Software Craftsmanship Community (LSCC). We don’t hire developers for specific opportunities, body shopping them straight to clients. We hire craftsman and apprentices when we feel we are in a position to do so, even if we don’t have a client for them to work with. This allows us to always make sure that we are hiring the right people to join our team, never hurrying to hire anyone, and never lowering the bar of our selection process.&lt;/p&gt;
+
+&lt;p&gt;All craftsmen at Codurance share the same principles and values. We all believe in Software Craftsmanship and in what it means to be a software craftsman. But that doesn&amp;rsquo;t make us clones of each other. We all have our own preferences when it comes to tools and technologies, which leads to a lot of cross-learning and interesting debates. Selecting specialists on different technologies to join Codurance was not a coincidence; it was by design. We believe in using the best tools for the job and having specialists in different areas helps us to provide a great service to our clients regardless of the technologies we use.&lt;/p&gt;
+
+&lt;p&gt;We strongly believe that next year will be another great year for us and we can’t wait for it to start. New clients, new projects, new apprentices, new craftsmen, and a bigger office. That is what is in stock for us.&lt;/p&gt;
+
+&lt;p&gt;If you own a business, are a CTO in a start up, or manage an IT department in a larger company, please have a look at our website and get in touch. We would love to hear from you. Just drop as a line at hello@codurance.com and let us know how we can help you.&lt;/p&gt;
+
+&lt;p&gt;If you would like to become a Codurance apprentice, have a look at our careers page and get in touch.&lt;/p&gt;
+
+&lt;p&gt;Looking forward to 2015.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Pairing without Programming</title>
+      <link>http://codurance.com/blog/pairing-without-programming/</link>
+      <pubDate>Wed, 19 Feb 2014 17:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/pairing-without-programming/</guid>
+      <description>&lt;p&gt;Pairing is often associated with programming. There&amp;rsquo;s a Wikipedia article about pair programming, but nothing on pairing in general. And yet, it&amp;rsquo;s a fantastic technique for getting anything done well, especially when neither of you really know exactly how to approach a problem.&lt;/p&gt;
+
+&lt;p&gt;For a week and a half now, I&amp;rsquo;ve been working with &lt;a href=&#34;https://twitter.com/sandromancuso&#34;&gt;Sandro&lt;/a&gt; on the business side of Codurance. From next week, I&amp;rsquo;ll be heading to a client to do some actual programming, but in the mean time, I&amp;rsquo;ve been working on recruiting, promotion, client relations, and I&amp;rsquo;ve also had a little more time to spend on &lt;a href=&#34;http://londonswcraft.com/&#34;&gt;LSCC&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;ve been really enjoying myself, and with good reason. I&amp;rsquo;ve never run a company before, and while I&amp;rsquo;m not really doing that now, I&amp;rsquo;m helping and learning a lot. This is mostly down to pairing. We pair on a lot: we&amp;rsquo;ve written the job specifications together, worked on training material, sent emails to clients and customers, debated our approach to apprenticeships and what&amp;rsquo;s desired of our craftsmen and craftswomen, figured out what we want and need from an office… the list goes on and on. We&amp;rsquo;ve conceded a number of important points to each other that only made sense because we gave ourselves the freedom to think with instantaneous feedback.&lt;/p&gt;
+
+&lt;p&gt;We pursue all these things because they&amp;rsquo;re what&amp;rsquo;s going to put food on the table, and at some point, we need to eat. Discussion begets discussion though, and we&amp;rsquo;ve found ourselves regularly arguing the merits of domain-driven design, schools of TDD, up-front design, architecture, various frameworks and patterns, and pretty much everything else under the sun. (It turns out Sandro and I disagree on &lt;em&gt;a lot&lt;/em&gt;.) These are the discussions I&amp;rsquo;ve missed from working with like-minded software developers; people who care about &lt;em&gt;all&lt;/em&gt; the end-results of their productivity, not just the one that you see on the screen immediately, but how that user interface will look three months from now, how simple it is to add functionality and how much joy or suffering you&amp;rsquo;ll bring the next person who has to work with your output.&lt;/p&gt;
+
+&lt;p&gt;Pairing also allows us to comfortably talk about situations that are generally kept quiet between employers and employees. Creating an environment in which we can talk about anything has allowed us to discuss salaries, working conditions, flexibility in working hours and even our own lifestyles. Sandro&amp;rsquo;s just had a baby and needs to rebuild his life around him; by bringing this to the table as a concern of &lt;em&gt;the company&lt;/em&gt;, not just his personal problem, it encourages everyone else to make their colleagues aware of their own personal situations. I&amp;rsquo;m really hoping this will result in a company which doesn&amp;rsquo;t just &lt;em&gt;say&lt;/em&gt; it cares about its employees, but is designed from the outset to take their needs, desires and aspirations into account. By pairing on the company itself, we can shape it into something we love.&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;m thoroughly enjoying pairing on everything. I&amp;rsquo;ve only been at Codurance a short time, but it feels like I&amp;rsquo;ve come home.&lt;/p&gt;
+
+&lt;p&gt;Oh, and &lt;a href=&#34;http://codurance.com/careers&#34;&gt;we&amp;rsquo;re hiring&lt;/a&gt;. :-D&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Samir Talwar is our first craftsman</title>
+      <link>http://codurance.com/blog/our-first-craftsman/</link>
+      <pubDate>Tue, 21 Jan 2014 15:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/our-first-craftsman/</guid>
+      <description>&lt;p&gt;We are very happy to announce that &lt;a href=&#34;https://twitter.com/samirtalwar&#34;&gt;Samir Talwar&lt;/a&gt; is joining us as our first craftsman. Mash and I first met Samir back in October 2010, when he joined &lt;a href=&#34;http://londonswcraft.com&#34;&gt;LSCC&lt;/a&gt;. Samir became a very active LSCC member, ran many technical sessions, became an LSCC Associate, and is now part of the LSCC organisation team.&lt;/p&gt;
+
+&lt;p&gt;Samir is a true craftsman. He is extremely talented, passionate, is always learning, cares about the quality of his work, cares about doing meaningful work, can code well in many languages, spoke in international conferences, and is very well respected by craftsmen in the UK and across Europe. He is also young and very silly. Yes, that was part of the job description.&lt;/p&gt;
+
+&lt;p&gt;Samir is a great addition to our team. There&amp;rsquo;s not doubt we will have loads of fun working together.&lt;/p&gt;
+
+&lt;p&gt;Welcome on board, Samir.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

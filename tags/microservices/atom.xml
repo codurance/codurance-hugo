@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Microservices on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/microservices/</link>
+    <description>Recent content in Microservices on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Wed, 11 May 2016 00:20:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/microservices/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>AWS Lambda for Beginners</title>
+      <link>http://codurance.com/blog/aws-lambdas/</link>
+      <pubDate>Wed, 11 May 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/aws-lambdas/</guid>
+      <description>
+
+&lt;p&gt;AWS Lambda is a compute service from Amazon. It makes deployment and provisioning very simple and fits very well with microservices based architecture. You can find out more about AWS Lambda &lt;a href=&#34;http://docs.aws.amazon.com/lambda/latest/dg/welcome.html&#34;&gt;here&lt;/a&gt;. Currently supported platforms are JVM, Node JS and Python.&lt;/p&gt;
+
+&lt;p&gt;The programming model for the lambdas consists of &lt;strong&gt;Handler, Context Object, Logging and Exceptions&lt;/strong&gt;. These are described &lt;a href=&#34;http://docs.aws.amazon.com/lambda/latest/dg/programming-model-v2.html&#34;&gt;here&lt;/a&gt;. Lambda must not hold state because they are brought up and down and replicated as needed. Persistent state should be stored in a service that is outside the lifecycle of the lambda such as Amazon DynamoDB, S3 etc.&lt;/p&gt;
+
+&lt;p&gt;First of all follow the instructions &lt;a href=&#34;http://docs.aws.amazon.com/lambda/latest/dg/setup.html&#34;&gt;here&lt;/a&gt; to setup an AWS Account and AWS Command-line Interface and note down your account id.&lt;/p&gt;
+
+&lt;h3 id=&#34;step-1-the-code&#34;&gt;Step 1: The Code&lt;/h3&gt;
+
+&lt;p&gt;The most basic lambda will look like the following in Python:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def lambda_handler(event, context):
+  return &amp;quot;Hello World!&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;or like the following in Java:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;package example;
+
+import com.amazonaws.services.lambda.runtime.Context; 
+
+public class Hello {
+    public String lambdaHandler(String event, Context context) {
+        return &amp;quot;Hello World!&amp;quot;;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You can follow the, somewhat lengthy, instructions &lt;a href=&#34;http://docs.aws.amazon.com/lambda/latest/dg/get-started-create-function.html&#34;&gt;here&lt;/a&gt; to deploy this function … but that’s no fun! Let’s do it devops style ;)&lt;/p&gt;
+
+&lt;p&gt;Paste the above Python code in a file called &lt;code&gt;helloworld.py&lt;/code&gt;. If you want to use the Java version then follow the instructions &lt;a href=&#34;http://docs.aws.amazon.com/lambda/latest/dg/java-create-jar-pkg-maven-no-ide.html&#34;&gt;here&lt;/a&gt; to build your lambda and create a deployment package using Maven.&lt;/p&gt;
+
+&lt;h3 id=&#34;step-2-the-role&#34;&gt;Step 2: The Role&lt;/h3&gt;
+
+&lt;p&gt;Create a &lt;code&gt;trust.json&lt;/code&gt; file . The trust allows our function to assume the &lt;a href=&#34;http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html&#34;&gt;role&lt;/a&gt; of an AWS Lambda.&lt;/p&gt;
+
+&lt;p&gt;In &lt;code&gt;trust.json&lt;/code&gt; we are allowing the function to assume the role of a &lt;code&gt;lambda.amazonaws.com&lt;/code&gt; service, otherwise the infra will not allow our function to run.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
+  &amp;quot;Version&amp;quot;: &amp;quot;2012-10-17&amp;quot;,
+  &amp;quot;Statement&amp;quot;: [{
+    &amp;quot;Sid&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;Effect&amp;quot;: &amp;quot;Allow&amp;quot;,
+    &amp;quot;Principal&amp;quot;: {
+      &amp;quot;Service&amp;quot;: &amp;quot;lambda.amazonaws.com&amp;quot;
+    },
+    &amp;quot;Action&amp;quot;: &amp;quot;sts:AssumeRole&amp;quot;
+  }]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;step-3-the-deployment&#34;&gt;Step 3: The Deployment&lt;/h3&gt;
+
+&lt;p&gt;Create the following script (&lt;code&gt;deploy.sh&lt;/code&gt;). &lt;em&gt;Note: the script assumes that you have the &lt;code&gt;AWS_ACCOUNT_ID&lt;/code&gt; environment variable set.&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;#!/bin/bash
+
+### Create the lambda package
+zip -j helloworld.zip *.py
+
+### Create the role for the lambda to assume
+role=&amp;quot;helloworld_exec_role&amp;quot;
+trust=&amp;quot;trust.json&amp;quot;
+aws iam create-role --role-name $role --assume-role-policy-document file://$trust
+aws iam update-assume-role-policy --role-name $role --policy-document file://$trust
+
+### Create the lambda function
+function_name=&amp;quot;helloworld&amp;quot;
+handler_name=&amp;quot;helloworld.lambda_handler&amp;quot;
+package_file=helloworld.zip
+runtime=python2.7
+aws lambda create-function \
+  --function-name $function_name \
+  --handler $handler_name \
+  --runtime $runtime \
+  --memory 512 \
+  --timeout 60 \
+  --role arn:aws:iam::${AWS_ACCOUNT_ID}:role/$role \
+  --zip-file fileb://$package_file
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;or for Java:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;#!/bin/bash
+
+### Create the lambda package
+mvn package
+
+### Create the role for the lambda to assume
+role=&amp;quot;helloworld_exec_role&amp;quot;
+trust=&amp;quot;trust.json&amp;quot;
+aws iam create-role --role-name $role --assume-role-policy-document file://$trust
+aws iam update-assume-role-policy --role-name $role --policy-document file://$trust
+
+### Create the lambda function
+function_name=&amp;quot;helloworld&amp;quot;
+handler_name=&amp;quot;example.Hello::lambdaHandler&amp;quot;
+package_file=&amp;quot;target/lambda-java-example-1.0-SNAPSHOT.jar&amp;quot;
+runtime=&amp;quot;java8&amp;quot;
+aws lambda create-function \
+  --function-name $function_name \
+  --handler $handler_name \
+  --runtime $runtime \
+  --memory 512 \
+  --timeout 60 \
+  --role arn:aws:iam::${AWS_ACCOUNT_ID}:role/$role \
+  --zip-file fileb://${package_file}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Make the script executable &lt;code&gt;chmod +x deploy.sh&lt;/code&gt; and deploy your lambda &lt;code&gt;./deploy.sh&lt;/code&gt;. You may get the following error: &amp;ldquo;The role defined for the function cannot be assumed by Lambda.&amp;rdquo; This is because the role has not been replicated through in the Amazon infra. Just run the deploy script again. It will complain that the role already exists but this time the lambda creation should pass. In the future we will look at a status check to make sure that the role has been fully created before we deploy the function.&lt;/p&gt;
+
+&lt;h3 id=&#34;step-5-the-execution&#34;&gt;Step 5: The Execution!&lt;/h3&gt;
+
+&lt;p&gt;Invoke your lambda with the below command. You should see the result in the file called &lt;code&gt;output.txt&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;aws lambda invoke --invocation-type RequestResponse --function-name helloworld --payload &#39;[&amp;quot;&amp;quot;]&#39; output.txt
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;step-6-the-cleanup&#34;&gt;Step 6: The Cleanup&lt;/h3&gt;
+
+&lt;p&gt;To delete the lambda function and then the role paste the following in &lt;code&gt;delete.sh&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;#!/bin/bash
+role=&amp;quot;helloworld_exec_role&amp;quot;
+function_name=&amp;quot;helloworld&amp;quot;
+aws lambda delete-function --function-name $function_name
+aws iam delete-role --role-name $role
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then make the script executable &lt;code&gt;chmod +x delete.sh&lt;/code&gt; and execute &lt;code&gt;./delete.sh&lt;/code&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;step-7-relax-you-have-arrived&#34;&gt;Step 7: Relax &amp;hellip; you have arrived ;)&lt;/h3&gt;
+
+&lt;p&gt;&amp;hellip; and wait for the next post on AWS frolics&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Coupling in distributed systems</title>
+      <link>http://codurance.com/blog/coupling-in-distributed-systems/</link>
+      <pubDate>Sun, 07 Feb 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/coupling-in-distributed-systems/</guid>
+      <description>
+
+&lt;p&gt;Coupling and cohesion are key quality indicators. We strive for systems highly cohesive and loosely coupled, but high doesn&amp;rsquo;t mean pure. The same goes with functional programming, we aim for isolating and reducing side effects, but we need them unless we want a useless system. It&amp;rsquo;s good to modularise our systems, so whenever those modules need to talk to each other they&amp;rsquo;ll effectively couple themselves. Our work is to create cohesive modules and minimising coupling as much as possible.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s provide an example. Our system has the following structure:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Different deployables, aka, microservices architecture.&lt;/li&gt;
+&lt;li&gt;Intracommunication through &lt;a href=&#34;http://kafka.apache.org/&#34;&gt;Kafka&lt;/a&gt; (pub-sub messaging). No HTTP involved.&lt;/li&gt;
+&lt;li&gt;1 Producer to N Consumers scenarios.&lt;/li&gt;
+&lt;li&gt;Json for data serialization.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The messages that are published and consumed in this system have a schema and it&amp;rsquo;s our choice making it implicit or explicit and validating that schema at compile or runtime execution. Before analysing the trade-offs of every approach let&amp;rsquo;s say some words about compile vs runtime approaches.&lt;/p&gt;
+
+&lt;h2 id=&#34;proofing-software-correctness-as-soon-as-possible&#34;&gt;Proofing software correctness as soon as possible&lt;/h2&gt;
+
+&lt;p&gt;I&amp;rsquo;ve been a user of statically typed languages most of my career so I&amp;rsquo;m really biased with this topic. I strongly believe in Lean concepts as the importance of minimising waste. At the same time I love the therapeutic ideas behind Agile, TDD or BDD about exposing the truth as soon as possible. Static types, and in the end the compiler, help me to achieve those goals.&lt;/p&gt;
+
+&lt;p&gt;I would prefer spending my time creating tests under the &lt;a href=&#34;https://twitter.com/sarahmei/status/685907333889810432&#34;&gt;motivations&lt;/a&gt; of providing living documentation, easing future refactors or helping me to drive the design, more than helping catching bugs that the type system should take care of. Writing a test that checks the behaviour of a method when receiving null it&amp;rsquo;s a waste of time if we can make it impossible to write a line of code that passes a null.&lt;/p&gt;
+
+&lt;p&gt;Compile world is not perfect though, as it&amp;rsquo;s definitively slower on development and constrains developers (someone could say that less freedom might be a nice to have in this context)&lt;/p&gt;
+
+&lt;h2 id=&#34;runtime-approaches&#34;&gt;Runtime approaches&lt;/h2&gt;
+
+&lt;p&gt;Now that I&amp;rsquo;ve been honest with you about my compile bias I can explain different approaches and trade-offs for the schema validation problem.&lt;/p&gt;
+
+&lt;h3 id=&#34;implicit-schemas&#34;&gt;Implicit schemas&lt;/h3&gt;
+
+&lt;p&gt;First runtime approach is the loosest one: using implicit schemas and trusting in the good will of producers. As nobody is checking the validity of messages before being published into Kafka that means that consumers could blow up.&lt;/p&gt;
+
+&lt;p&gt;First corrective measure is assuring that only the processing of the poisoned message will blow and not the whole consumer. An example of that would be providing a resume supervision strategy on &lt;a href=&#34;http://doc.akka.io/docs/akka-stream-and-http-experimental/2.0.2/scala.html&#34;&gt;Akka Streams&lt;/a&gt; when the message doesn&amp;rsquo;t hold the expected implicit schema.&lt;/p&gt;
+
+&lt;p&gt;Second corrective measure would be not simply swallowing those crashes but being able to communicate them to proper actors (being humans or software). Good practice is to provide dead letter queues for poisoned messages just in case we want to manipulate and retry the processing of those messages at that level.&lt;/p&gt;
+
+&lt;p&gt;Before getting into explicit schemas I would say that those measures are usually not enough but they are a good safety net, as shit happens, and we need to be prepared.&lt;/p&gt;
+
+&lt;h3 id=&#34;explicit-schemas&#34;&gt;Explicit schemas&lt;/h3&gt;
+
+&lt;p&gt;If we want to avoid poisoned messages getting into our topics we could provide a middle-man service to intercept and validate explicit schemas. &lt;a href=&#34;http://docs.confluent.io/1.0/schema-registry/docs/index.html&#34;&gt;Schema registry&lt;/a&gt; is an example of that for Kafka, and its documentation is full of insights about how to implement that in a distributed, highly available and scalable way.&lt;/p&gt;
+
+&lt;p&gt;That&amp;rsquo;s an integration service that could be a single point of failure but, at the same time, it could be valuable to have a centralised repo of schemas when we have a lot of consumers and the complexity of the system would be hard to grasp in de-centralised fashion. That service will be stateless so in order to avoid single point of failures we could make it redundant in a farm of services to allow high availability.&lt;/p&gt;
+
+&lt;h2 id=&#34;compile-approaches&#34;&gt;Compile approaches&lt;/h2&gt;
+
+&lt;p&gt;The last approach would be creating software that makes it impossible to create message that do not hold the expected schema. Assuming &lt;a href=&#34;http://www.scala-lang.org/&#34;&gt;Scala&lt;/a&gt;, we could create a jar that contains &lt;a href=&#34;http://docs.scala-lang.org/tutorials/tour/case-classes.html&#34;&gt;case classes&lt;/a&gt; that are object materialisations of a schema.&lt;/p&gt;
+
+&lt;p&gt;What are the benefits of this approach?&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Fail early. We don&amp;rsquo;t have to wait until testing or production to verify that the messages published by some producer are correct.&lt;/li&gt;
+&lt;li&gt;Centralised knowledge.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;What is the solvable problem?&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Cascade updates. If our microservices live in different repos, then we need to make sure that updates into that common binary are applied into producer and consumers. That&amp;rsquo;s cumbersome and if it&amp;rsquo;s not done could generate unexpected bugs as we introduced a false sense of security with that library. That could be solved using a &lt;a href=&#34;http://danluu.com/monorepo/&#34;&gt;monorepo&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;What is the biggest problem?&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Breaking isolation of deployables. One of the points of microservices is being able to deploy its services independently. If you&amp;rsquo;re forced to redeploy N consumer services every time you upgrade the consumer with a non-backward compatible change of the schema library then you&amp;rsquo;re losing that perk. Being able to do small releases is a big enabler of Continuous Delivery, so it&amp;rsquo;s a remarkable loss.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;You could argue that only non-backward compatible changes forces a redeploy of consumers and that we should design our schemas in a way that predicts and minimises those kind of changes.&lt;/p&gt;
+
+&lt;h2 id=&#34;generalising-coupling-problem&#34;&gt;Generalising coupling problem&lt;/h2&gt;
+
+&lt;p&gt;If we generalise the problem we&amp;rsquo;ll see that there are two kinds of coupling: avoidable and mandatory.&lt;/p&gt;
+
+&lt;p&gt;Avoidable coupling comes when we strive for reducing duplication in our codebase. Let&amp;rsquo;s say that we want to extract some requestId from the header of a HTTP request and put it into some &lt;a href=&#34;http://logback.qos.ch/manual/mdc.html&#34;&gt;MDC&lt;/a&gt; in order to be able to trace logs across different threads or services. That code will hardly vary from service to service so it&amp;rsquo;s a good candidate to be extracted and therefore adding some coupling between services. Before of doing that it&amp;rsquo;s good to think in the following:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Coupling is the enemy of microservices and its effects in the future are not easy visible.&lt;/li&gt;
+&lt;li&gt;Following &lt;a href=&#34;https://www.wikiwand.com/en/Conway&#39;s_law&#34;&gt;Conway&amp;rsquo;s law&lt;/a&gt;, breaking isolation of your services breaks the isolation of your teams, so be sure that your organisation is able to cope with that level of communication and integration.&lt;/li&gt;
+&lt;li&gt;The key measure is the rate change. A library that is going to be constantly updated (as could be your schema library) will be more painful to manage as a common dependency than some fairly static library.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Mandatory coupling comes when some info needs to reside in a third entity as it doesn&amp;rsquo;t make sense to be hold by one of the integration entities or it&amp;rsquo;s not worthy to share and duplicate that info into every single entity.&lt;/p&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Even if I am a strong supporter of compiled languages, I think that sharing code through binaries in a distributed environment deserves a deep analysis of the structure and needs of your system. I hope that this post have provided some insights into this topic.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Premature Microservices</title>
+      <link>http://codurance.com/blog/premature-microservices/</link>
+      <pubDate>Fri, 15 Jan 2016 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/premature-microservices/</guid>
+      <description>
+
+&lt;p&gt;Building your app from the very start as microservices is not a great idea! Their deployment is complex - regardless of how good your microservices infra is. They create boundaries in your application that resist change. Software applications are complex systems and complex systems are grown not designed. In order to grow an efficient system - we must allow it to grow in directions that it needs to. Boundaries designed at the start will stunt that growth at certain axis when direction of growth is at its most unpredictable.&lt;/p&gt;
+
+&lt;p&gt;Also testing the system as a whole is very cumbersome. One can argue that the services should be decoupled enough that testing the application where all the services need to run is kept to a minimum. Sure, but in my experience even that minimal testing is a pain. Pain that should be lessened or altogether avoided for as long as possible.&lt;/p&gt;
+
+&lt;p&gt;So why do we do it? Why are microservices such a compelling idea? The premise of isolating change is extremely attractive. We have all been stung with “the monolith”. We look at the system and see the change hotspots and wonder, “if only I had those hotspots isolated so that I didn’t have to redeploy the whole thing when they change” or “if only I could re-engineer this part without having to worry about the rest” etc. Yes microservices based architecture may help you achieve that (Remember! I said they are a bad idea at the start of a project, not a bad idea altogether.) but by this time you understand the hotspots in the application and your understanding of the domain has matured. My problem is with creating strong boundaries between different aspects of our application. These resist change if the understanding changes and some of the boundaries are no longer valid. It discourages people to question the already drawn boundaries because they are not easy to change.&lt;/p&gt;
+
+&lt;h3 id=&#34;an-idea&#34;&gt;An Idea&lt;/h3&gt;
+
+&lt;p&gt;So can we do microservices without having to draw strong boundaries, at least at the start? Like anything in life it is not so simple. From weak-to-strong -  we can use classes/modules, interfaces/protocols, package/namespaces, sub-projects, libraries and processes to draw these boundaries. The problem with the conventional microservices is that we go straight to the processes level to draw the boundary which is the strongest level at which you can separate the system. However, the weaker the boundary the bigger the chance that you’ll have to do extra work to strengthen that boundary because dependencies will have leaked through. But at the same time weaker boundaries are easier to redefine.&lt;/p&gt;
+
+&lt;p&gt;What if we keep the boundaries in process but make them explicit? For example we segregate the system into components that are only allowed to speak to each other over a well defined interface just like our microservices but they’re all running in the same process. This could be serialised into something specific like JSON or a more abstract interchange format. Code could be divided into top level packages ensuring that there is no direct binary dependency between modules. So that modules are truly passing messages to each other - like good old fashioned Object Oriented Programming. We must ensure that there is no direct dependency between modules e.g. shared code, shared memory or shared database tables. Code can be reused using versioned libraries. This will allow us to keep explicit boundaries between the modules in our codebase that are strong enough that individual modules can be extracted into their own microservices when required but also weak enough that they can be easily changed when needed. Even this level of division my not be ideal at the start and we may start with a single component to the point where a division into at least two parts becomes apparent.&lt;/p&gt;
+
+&lt;h3 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;So the advice, if you haven’t guessed, is that we should start our system with minimal assumptions and restrictions and then sense the system to see where it needs to go. Microservices could be the vision of the destination but we shouldn’t try to second guess the destination or even preplan our journey. We should sense and adapt. Premature abstractions and boundaries will drown out this sense in certain areas resulting in a system that is not as fully evolved as it could’ve been.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Transcending REST and RPC</title>
+      <link>http://codurance.com/blog/Transcending-rest-and-rpc/</link>
+      <pubDate>Thu, 22 Oct 2015 00:20:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/Transcending-rest-and-rpc/</guid>
+      <description>
+
+&lt;p&gt;It seems that a new paradigm is coming. Facebook and Netflix have come up with different implementations for that idea. Some people are calling it &lt;a href=&#34;http://www.infoq.com/presentations/domain-driven-architecture&#34;&gt;Demand-Driven Architecture&lt;/a&gt;, but before I show you some solutions, let&amp;rsquo;s go over some history to understand the problem. I will use the example that Netflix provides, but I think that most of us will find the patterns familiar.&lt;/p&gt;
+
+&lt;p&gt;Just for clarity, let&amp;rsquo;s assume that we have an on-demand streaming service &amp;ndash; quite similar to Netflix :) &amp;ndash; that has three microservices. One contains the genres, another one the titles and the last one contains the ratings that different users give to those titles. As we&amp;rsquo;re in 2015 we&amp;rsquo;ll discard RPC as architectural style and we&amp;rsquo;ll go with a RESTful design. Let&amp;rsquo;s briefly enumerate the characteristics of a RESTful design:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;HTTP verbs have direct correspondence with CRUD verbs. One of the benefits is that clients can understand what is going on the server without digging into the implementation. For instance, we know that PUT is idempotent, so as there will not be any side effect, the client can call to that endpoint several times in a row without any issue.&lt;/li&gt;
+&lt;li&gt;We use extensive HTTP caching. Through headers like Cache-Control or ETag, we leverage one of the most juicy features of HTTP: caching resources.&lt;/li&gt;
+&lt;li&gt;HATEOAS for the win. Every single representation should have links to different representations so the clients can navigate through our backend like a graph.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://www.restapitutorial.com/&#34;&gt;Further reading&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;rest-limitations&#34;&gt;REST limitations&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s imagine that we send a GET to the genres endpoint. The response will include links to other GET requests like titles/1234 or ratings/6789. If we have the title &amp;ldquo;Titanic&amp;rdquo; in different genres (romance, drama and DiCaprioRules) you can see how the client is going to do at least two redundant requests. Apart from that the client is going to reshape the data whenever it comes back since it&amp;rsquo;s likely that the client won&amp;rsquo;t need every single field that those responses include. So, we have two problems with this design:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;High latency as we don&amp;rsquo;t optimize calls.&lt;/li&gt;
+&lt;li&gt;Large message sizes.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;patching-rest-with-rpc&#34;&gt;Patching REST with RPC&lt;/h2&gt;
+
+&lt;p&gt;One way of overcoming these problems is customising our requests with query params. You can say to the server something like &amp;ldquo;&lt;em&gt;give me only a couple of the fields that you expose on that representation&lt;/em&gt;&amp;rdquo;&amp;rdquo; or whatever arbitrary parameter. That means that you&amp;rsquo;ll lose the caching that HTTP offers as now you&amp;rsquo;ll have a ton of possible &lt;em&gt;not-really-resources&lt;/em&gt; to cache.&lt;/p&gt;
+
+&lt;p&gt;Also you can create new abstractions ad-hoc that aggregate that for the client. In fact one of the benefits of CQRS is being able to create different views of your internal entities, so the demands of the client doesn&amp;rsquo;t affect your domain modeling. That has a problem though: there is a big a coupling with the server. Our system has a massive amount of fragmentation as you can stream over Android, iOS, TVs and also, different versions of the same client device. Therefore there are going to be different needs and rhythms and the coordination between backend and clients is going to be really messy.&lt;/p&gt;
+
+&lt;p&gt;Also, CQRS is amazing in the fact that you could decide to model your system around different bounded contexts, i.e, different CQRS deployables. If your client needs a view that aggregate data from two CQRS units, you have the same problem.&lt;/p&gt;
+
+&lt;h2 id=&#34;demand-driven-architecture-to-the-rescue&#34;&gt;Demand driven architecture to the rescue&lt;/h2&gt;
+
+&lt;p&gt;This leads to the point of Demand Driven Architectures. Conceptually the backend is just a single entity and, since it&amp;rsquo;s modeled using REST principles, it&amp;rsquo;s defining what is the shape of the data. However, we&amp;rsquo;re going to have tons of clients with different needs and all of them need to twist themselves in order to get the shape of the data that they want. Would it be great if clients could just send queries to the logical data unit called backend?&lt;/p&gt;
+
+&lt;p&gt;If we think in a relational database the concept is similar. We have different tables (rest endpoints, resources, backend services) and we have a query language that allows us to join and shape the data easily. Some of the optimizations of that query will be done by the platform that runs those queries.&lt;/p&gt;
+
+&lt;h2 id=&#34;falcor-and-json-graph&#34;&gt;Falcor and JSON Graph&lt;/h2&gt;
+
+&lt;p&gt;Netflix has created a tool called &lt;a href=&#34;http://netflix.github.io/falcor&#34;&gt;Falcor&lt;/a&gt; that tries to solve this concrete problem. Clients won&amp;rsquo;t talk with the backend services directly anymore, instead of they will send queries to a Falcor service that will do the routing, aggregations, projections and optimizations. This is an image from Falcor&amp;rsquo;s official documentation.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/falcor-network-diagram.png&#34;  class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;They based that platform on the idea of JSON Graph. Let me explain it briefly. JSON is in essence a tree structure. However, most of our data has relationships so it should be modeled like a graph. Using REST design programmers usually solve that problem through ids, but that makes our life really difficult (think about problems like cache invalidation). As they say:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;JSON Graph is valid JSON and can be parsed by any JSON parser. However JSON Graph introduces new primitive types to JSON to allow JSON to be used to represent graph information in a simple and consistent way.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;They borrow the idea from unix filesystem. That filesystem is a tree, but thanks to symlinks you can emulate the behaviour of a graph. That has massive implications in the way that Falcor optimises calls to backend services. Instead of keeping some values in a denormalised fashion, Falcor keeps references to that normalised value, so, if you ask for a value that has been already retrieved, Falcor will avoid that call. Also That makes cache invalidation much easier.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/falcor-services-diagram.png&#34;  class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;As you can see in the example, we don&amp;rsquo;t store denormalised documents for titles inside of genres, but a reference through a titles map indexed by id.
+I can show you some code that I&amp;rsquo;ve been working on for a proof of concept. Falcor server side is currently only available on Node.js but &lt;a href=&#34;https://twitter.com/falcorjs/status/575657256475189248&#34;&gt;there are plans to porting it into another platforms&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;router.get(&#39;/model.json&#39;, falcorKoa.dataSourceRoute(new FalcorRouter([
+		{
+			route: &amp;quot;teamsById[{integers:teamIds}][&#39;name&#39;, &#39;memberCount&#39;]&amp;quot;,
+			get  : function(pathSet) {
+				const teamIds = pathSet.teamIds;
+				const keys = pathSet[2];
+				return teamsService.getTeams()
+						.then(function(teams) {
+							var results = [];
+							teamIds.forEach(function(teamId) {
+								keys.forEach(function(key) {
+									var team = teams[teamId];
+									results.push({
+										path : [&#39;team&#39;, teamId, key],
+										value: team[key]
+									});
+								});
+							});
+							return results;
+						});
+			}
+		}
+	])));
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The client side would look like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;const model = new falcor.Model({ source: new falcor.HttpDataSource(&#39;/model.json&#39;) });
+model.get(&#39;teamsById[&#39;1234&#39;, &#39;456&#39;].name&#39;);
+model.get(&#39;teamsById[&#39;789&#39;][&#39;name&#39;, &#39;memberCount&#39;]&#39;);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;in-conclusion&#34;&gt;IN CONCLUSION&lt;/h2&gt;
+
+&lt;p&gt;There are no silver bullets in software and nobody is claiming than Falcor or GraphQL are going to solve every single problem with client/server integration. However, if you have an application with a lot of clients and your backend has a complex data model, it might be worth giving this new paradigm a try.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://netflix.github.io/falcor&#34;&gt;Falcor&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://facebook.github.io/react/blog/2015/05/01/graphql-introduction.html&#34;&gt;GraphQL&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.infoq.com/presentations/domain-driven-architecture&#34;&gt;Demand-Driven Architecture&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

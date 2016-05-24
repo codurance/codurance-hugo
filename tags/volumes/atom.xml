@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Volumes on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/volumes/</link>
+    <description>Recent content in Volumes on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Wed, 15 Apr 2015 10:00:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/volumes/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Making Sense of Docker Volumes</title>
+      <link>http://codurance.com/blog/making-sense-of-docker-volumes/</link>
+      <pubDate>Wed, 15 Apr 2015 10:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/making-sense-of-docker-volumes/</guid>
+      <description>
+
+&lt;p&gt;&lt;a href=&#34;http://www.docker.com&#34;&gt;Docker&lt;/a&gt; is a platform that allows users to build, ship, and run distributed applications. Applications are stored inside &lt;strong&gt;docker containers&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;A docker container uses a &lt;strong&gt;Union File System&lt;/strong&gt; which consists of read-only layers and a read / write layer on top.&lt;/p&gt;
+
+&lt;p&gt;Whilst the container is running, it is possible to write information to disk, however, when the container is removed that information does not persist.&lt;/p&gt;
+
+&lt;p&gt;In order to persist information it is necessary to &lt;strong&gt;mount a volume&lt;/strong&gt;. A volume operates outside of the Union File System - any information written to the read/write layer will be copied to the volume.&lt;/p&gt;
+
+&lt;p&gt;The great thing about volumes is that they decouple the life of the data being stored in them from the life of the container that created them. The volume continues to be accessible on the host machine even if the container is removed or no longer running.&lt;/p&gt;
+
+&lt;h2 id=&#34;mounting-a-volume&#34;&gt;Mounting a Volume&lt;/h2&gt;
+
+&lt;p&gt;Volumes can be mounted to container at run time &amp;hellip;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;docker run -d -P --name javaContainer -v /myVol bin/echo &amp;quot;Doing java stuff&amp;quot; &amp;gt; /myVol/java_activity.txt
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&amp;hellip; or from within the docker file.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-console&#34;&gt;FROM java
+RUN mkdir /myvol
+RUN echo &amp;quot;Doing java stuff&amp;quot; &amp;gt; /myvol/java_activity.txt
+VOLUME /myvol
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;But what if you have multiple instances of the application that need to access the same volume? You need to make the most of the sharability that Docker provides.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-data-container-pattern&#34;&gt;The Data Container Pattern&lt;/h2&gt;
+
+&lt;p&gt;Rather than mounting a volume to your application&amp;rsquo;s container, the Data Container Pattern closely follows the single responsibility principle.&lt;/p&gt;
+
+&lt;p&gt;It involves setting up a volume in a separate &lt;strong&gt;data container&lt;/strong&gt;. Your application container then points to the data container to read and write information (using the &lt;strong&gt;volume-from&lt;/strong&gt; command). This is a common practice when working with databases.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-lifecycle-of-a-data-container&#34;&gt;The Lifecycle of a Data Container&lt;/h2&gt;
+
+&lt;p&gt;The data container only runs whilst it is needed and is does next to nothing in terms of work. The application container mounts the volume contained inside the data container, once this is done the data container shuts down.&lt;/p&gt;
+
+&lt;h2 id=&#34;preventing-problems&#34;&gt;Preventing Problems&lt;/h2&gt;
+
+&lt;p&gt;When creating a data container (e.g for storing information from a database application) it&amp;rsquo;s wise to use the same base image in both your application container and data container. This will prevent any file permission issues as the data container will seed the application container with the correct file permissions and brings about greater efficiency as you are reusing the image.&lt;/p&gt;
+
+&lt;h2 id=&#34;further-reading&#34;&gt;Further reading&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.docker.com/userguide/dockervolumes/&#34;&gt;Docker Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://container42.com/2013/12/16/persistent-volumes-with-docker-container-as-volume-pattern/&#34;&gt;Persistent volumes with Docker - Data-only container pattern&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://container-solutions.com/2014/12/understanding-volumes-docker/&#34;&gt;Understanding volumes in Docker&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://container42.com/2014/11/03/docker-indepth-volumes/&#34;&gt;Docker Indepth: Volumes&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;thanks&#34;&gt;Thanks&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;Many thanks to Rob Taylor and Mash Badar for proof-reading this article&lt;/em&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Services on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/services/</link>
+    <description>Recent content in Services on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <atom:link href="http://codurance.com/services/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Software Creation</title>
+      <link>http://codurance.com/services/software-creation/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/services/software-creation/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Training</title>
+      <link>http://codurance.com/services/training/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/services/training/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Crafted Design 4</title>
+      <link>http://codurance.com/services/training/test4/</link>
+      <pubDate>Thu, 19 May 2016 10:18:11 +0100</pubDate>
+      
+      <guid>http://codurance.com/services/training/test4/</guid>
+      <description>&lt;div class=&#34;row margin-bottom-20&#34;&gt;
+&lt;h3 id=&#34;why-attend&#34;&gt;Why attend?&lt;/h3&gt;
+
+&lt;p&gt;&lt;em&gt;Software Craftsmanship&lt;/em&gt; is at the heart of this course. Throughout, you will learn about the Software Craftsmanship attitude to development and how to apply it to your workplace.&lt;/p&gt;
+
+&lt;p&gt;Writing &lt;em&gt;Clean Code&lt;/em&gt; is difficult. Cleaning existing code, even more so. You should attend if you want to:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Write clean code that is easy to understand and maintain&lt;/li&gt;
+&lt;li&gt;Become more proficient in Test-Driven Development (TDD): using tests to design and build your code base&lt;/li&gt;
+&lt;li&gt;Focus your tests and production code according to business requirements using Outside-In TDD (a.k.a. the London School of TDD)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Clean code necessitates good design. In the process of driving your code through tests, you will learn how to:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Understand design principles that lead to clean code&lt;/li&gt;
+&lt;li&gt;Avoid over-engineering and large rewrites by incrementally evolving your design using tests&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Once you have an understanding of the principles at work, we will apply them to Legacy Code to help you gain confidence in improving legacy projects through testing, refactoring and redesigning.&lt;/p&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;div class=&#34;row margin-bottom-20&#34;&gt;
+&lt;h3 id=&#34;content&#34;&gt;Content&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;TDD lifecycle and the Outside-In style of TDD&lt;/li&gt;
+&lt;li&gt;Writing unit tests that express intent, not implementation&lt;/li&gt;
+&lt;li&gt;Using unit tests as a tool to drive good design&lt;/li&gt;
+&lt;li&gt;Expressive code&lt;/li&gt;
+&lt;li&gt;Testing and refactoring Legacy Code&lt;/li&gt;
+&lt;li&gt;Introduction to SOLID Principles and Domain-Driven Design&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The course is fully hands-on and developers will be writing a lot of code.&lt;/p&gt;
+
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;div class=&#34;row margin-bottom-20&#34;&gt;
+&lt;h3 id=&#34;audience&#34;&gt;Audience&lt;/h3&gt;
+
+&lt;p&gt;Software developers that:
+- Are familiar with at least one Object-Oriented language
+- Are able to understand Java or C#
+- Can write and execute unit tests using a framework (such as JUnit, NUnit, etc.)
+- Have a basic understanding of mock objects&lt;/p&gt;
+
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;div class=&#34;row margin-bottom-20&#34;&gt;
+&lt;h3 id=&#34;prerequisites&#34;&gt;Prerequisites&lt;/h3&gt;
+
+&lt;p&gt;Developers must:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Bring their own laptops&lt;/li&gt;
+&lt;li&gt;Have a development environment consisting of:
+
+&lt;ul&gt;
+&lt;li&gt;Their favourite Object-Oriented language&lt;/li&gt;
+&lt;li&gt;A unit test framework&lt;/li&gt;
+&lt;li&gt;A mocking library&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Be able to create projects, build source code and run test cases in their development environment&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In addition, a distributed version-control system such as Git is desirable.&lt;/p&gt;
+
+&lt;/div&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Crafted Design 2</title>
+      <link>http://codurance.com/services/training/test2/</link>
+      <pubDate>Thu, 19 May 2016 10:18:11 +0100</pubDate>
+      
+      <guid>http://codurance.com/services/training/test2/</guid>
+      <description>&lt;div class=&#34;row margin-bottom-20&#34;&gt;
+&lt;h3 id=&#34;why-attend&#34;&gt;Why attend?&lt;/h3&gt;
+
+&lt;p&gt;&lt;em&gt;Software Craftsmanship&lt;/em&gt; is at the heart of this course. Throughout, you will learn about the Software Craftsmanship attitude to development and how to apply it to your workplace.&lt;/p&gt;
+
+&lt;p&gt;Writing &lt;em&gt;Clean Code&lt;/em&gt; is difficult. Cleaning existing code, even more so. You should attend if you want to:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Write clean code that is easy to understand and maintain&lt;/li&gt;
+&lt;li&gt;Become more proficient in Test-Driven Development (TDD): using tests to design and build your code base&lt;/li&gt;
+&lt;li&gt;Focus your tests and production code according to business requirements using Outside-In TDD (a.k.a. the London School of TDD)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Clean code necessitates good design. In the process of driving your code through tests, you will learn how to:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Understand design principles that lead to clean code&lt;/li&gt;
+&lt;li&gt;Avoid over-engineering and large rewrites by incrementally evolving your design using tests&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Once you have an understanding of the principles at work, we will apply them to Legacy Code to help you gain confidence in improving legacy projects through testing, refactoring and redesigning.&lt;/p&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;div class=&#34;row margin-bottom-20&#34;&gt;
+&lt;h3 id=&#34;content&#34;&gt;Content&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;TDD lifecycle and the Outside-In style of TDD&lt;/li&gt;
+&lt;li&gt;Writing unit tests that express intent, not implementation&lt;/li&gt;
+&lt;li&gt;Using unit tests as a tool to drive good design&lt;/li&gt;
+&lt;li&gt;Expressive code&lt;/li&gt;
+&lt;li&gt;Testing and refactoring Legacy Code&lt;/li&gt;
+&lt;li&gt;Introduction to SOLID Principles and Domain-Driven Design&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The course is fully hands-on and developers will be writing a lot of code.&lt;/p&gt;
+
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;div class=&#34;row margin-bottom-20&#34;&gt;
+&lt;h3 id=&#34;audience&#34;&gt;Audience&lt;/h3&gt;
+
+&lt;p&gt;Software developers that:
+- Are familiar with at least one Object-Oriented language
+- Are able to understand Java or C#
+- Can write and execute unit tests using a framework (such as JUnit, NUnit, etc.)
+- Have a basic understanding of mock objects&lt;/p&gt;
+
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;div class=&#34;row margin-bottom-20&#34;&gt;
+&lt;h3 id=&#34;prerequisites&#34;&gt;Prerequisites&lt;/h3&gt;
+
+&lt;p&gt;Developers must:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Bring their own laptops&lt;/li&gt;
+&lt;li&gt;Have a development environment consisting of:
+
+&lt;ul&gt;
+&lt;li&gt;Their favourite Object-Oriented language&lt;/li&gt;
+&lt;li&gt;A unit test framework&lt;/li&gt;
+&lt;li&gt;A mocking library&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Be able to create projects, build source code and run test cases in their development environment&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In addition, a distributed version-control system such as Git is desirable.&lt;/p&gt;
+
+&lt;/div&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Crafted Design 3</title>
+      <link>http://codurance.com/services/training/test1/</link>
+      <pubDate>Thu, 19 May 2016 10:18:11 +0100</pubDate>
+      
+      <guid>http://codurance.com/services/training/test1/</guid>
+      <description>&lt;div class=&#34;row margin-bottom-20&#34;&gt;
+&lt;h3 id=&#34;why-attend&#34;&gt;Why attend?&lt;/h3&gt;
+
+&lt;p&gt;&lt;em&gt;Software Craftsmanship&lt;/em&gt; is at the heart of this course. Throughout, you will learn about the Software Craftsmanship attitude to development and how to apply it to your workplace.&lt;/p&gt;
+
+&lt;p&gt;Writing &lt;em&gt;Clean Code&lt;/em&gt; is difficult. Cleaning existing code, even more so. You should attend if you want to:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Write clean code that is easy to understand and maintain&lt;/li&gt;
+&lt;li&gt;Become more proficient in Test-Driven Development (TDD): using tests to design and build your code base&lt;/li&gt;
+&lt;li&gt;Focus your tests and production code according to business requirements using Outside-In TDD (a.k.a. the London School of TDD)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Clean code necessitates good design. In the process of driving your code through tests, you will learn how to:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Understand design principles that lead to clean code&lt;/li&gt;
+&lt;li&gt;Avoid over-engineering and large rewrites by incrementally evolving your design using tests&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Once you have an understanding of the principles at work, we will apply them to Legacy Code to help you gain confidence in improving legacy projects through testing, refactoring and redesigning.&lt;/p&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;div class=&#34;row margin-bottom-20&#34;&gt;
+&lt;h3 id=&#34;content&#34;&gt;Content&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;TDD lifecycle and the Outside-In style of TDD&lt;/li&gt;
+&lt;li&gt;Writing unit tests that express intent, not implementation&lt;/li&gt;
+&lt;li&gt;Using unit tests as a tool to drive good design&lt;/li&gt;
+&lt;li&gt;Expressive code&lt;/li&gt;
+&lt;li&gt;Testing and refactoring Legacy Code&lt;/li&gt;
+&lt;li&gt;Introduction to SOLID Principles and Domain-Driven Design&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The course is fully hands-on and developers will be writing a lot of code.&lt;/p&gt;
+
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;div class=&#34;row margin-bottom-20&#34;&gt;
+&lt;h3 id=&#34;audience&#34;&gt;Audience&lt;/h3&gt;
+
+&lt;p&gt;Software developers that:
+- Are familiar with at least one Object-Oriented language
+- Are able to understand Java or C#
+- Can write and execute unit tests using a framework (such as JUnit, NUnit, etc.)
+- Have a basic understanding of mock objects&lt;/p&gt;
+
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;div class=&#34;row margin-bottom-20&#34;&gt;
+&lt;h3 id=&#34;prerequisites&#34;&gt;Prerequisites&lt;/h3&gt;
+
+&lt;p&gt;Developers must:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Bring their own laptops&lt;/li&gt;
+&lt;li&gt;Have a development environment consisting of:
+
+&lt;ul&gt;
+&lt;li&gt;Their favourite Object-Oriented language&lt;/li&gt;
+&lt;li&gt;A unit test framework&lt;/li&gt;
+&lt;li&gt;A mocking library&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Be able to create projects, build source code and run test cases in their development environment&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In addition, a distributed version-control system such as Git is desirable.&lt;/p&gt;
+
+&lt;/div&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Crafted Design</title>
+      <link>http://codurance.com/services/training/test/</link>
+      <pubDate>Thu, 19 May 2016 10:18:11 +0100</pubDate>
+      
+      <guid>http://codurance.com/services/training/test/</guid>
+      <description>&lt;div class=&#34;row margin-bottom-20&#34;&gt;
+&lt;h3 id=&#34;why-attend&#34;&gt;Why attend?&lt;/h3&gt;
+
+&lt;p&gt;&lt;em&gt;Software Craftsmanship&lt;/em&gt; is at the heart of this course. Throughout, you will learn about the Software Craftsmanship attitude to development and how to apply it to your workplace.&lt;/p&gt;
+
+&lt;p&gt;Writing &lt;em&gt;Clean Code&lt;/em&gt; is difficult. Cleaning existing code, even more so. You should attend if you want to:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Write clean code that is easy to understand and maintain&lt;/li&gt;
+&lt;li&gt;Become more proficient in Test-Driven Development (TDD): using tests to design and build your code base&lt;/li&gt;
+&lt;li&gt;Focus your tests and production code according to business requirements using Outside-In TDD (a.k.a. the London School of TDD)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Clean code necessitates good design. In the process of driving your code through tests, you will learn how to:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Understand design principles that lead to clean code&lt;/li&gt;
+&lt;li&gt;Avoid over-engineering and large rewrites by incrementally evolving your design using tests&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Once you have an understanding of the principles at work, we will apply them to Legacy Code to help you gain confidence in improving legacy projects through testing, refactoring and redesigning.&lt;/p&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;div class=&#34;row margin-bottom-20&#34;&gt;
+&lt;h3 id=&#34;content&#34;&gt;Content&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;TDD lifecycle and the Outside-In style of TDD&lt;/li&gt;
+&lt;li&gt;Writing unit tests that express intent, not implementation&lt;/li&gt;
+&lt;li&gt;Using unit tests as a tool to drive good design&lt;/li&gt;
+&lt;li&gt;Expressive code&lt;/li&gt;
+&lt;li&gt;Testing and refactoring Legacy Code&lt;/li&gt;
+&lt;li&gt;Introduction to SOLID Principles and Domain-Driven Design&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The course is fully hands-on and developers will be writing a lot of code.&lt;/p&gt;
+
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;div class=&#34;row margin-bottom-20&#34;&gt;
+&lt;h3 id=&#34;audience&#34;&gt;Audience&lt;/h3&gt;
+
+&lt;p&gt;Software developers that:
+- Are familiar with at least one Object-Oriented language
+- Are able to understand Java or C#
+- Can write and execute unit tests using a framework (such as JUnit, NUnit, etc.)
+- Have a basic understanding of mock objects&lt;/p&gt;
+
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;div class=&#34;row margin-bottom-20&#34;&gt;
+&lt;h3 id=&#34;prerequisites&#34;&gt;Prerequisites&lt;/h3&gt;
+
+&lt;p&gt;Developers must:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Bring their own laptops&lt;/li&gt;
+&lt;li&gt;Have a development environment consisting of:
+
+&lt;ul&gt;
+&lt;li&gt;Their favourite Object-Oriented language&lt;/li&gt;
+&lt;li&gt;A unit test framework&lt;/li&gt;
+&lt;li&gt;A mocking library&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Be able to create projects, build source code and run test cases in their development environment&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In addition, a distributed version-control system such as Git is desirable.&lt;/p&gt;
+
+&lt;/div&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

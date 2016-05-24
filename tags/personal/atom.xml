@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Personal on Software Craftsmanship and Agile Development</title>
+    <link>http://codurance.com/tags/personal/</link>
+    <description>Recent content in Personal on Software Craftsmanship and Agile Development</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Mon, 16 Mar 2015 22:49:00 +0000</lastBuildDate>
+    <atom:link href="http://codurance.com/tags/personal/atom/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>How to install Prezto with Zsh for your OS X Terminal</title>
+      <link>http://codurance.com/blog/installing-prezto/</link>
+      <pubDate>Mon, 16 Mar 2015 22:49:00 +0000</pubDate>
+      
+      <guid>http://codurance.com/blog/installing-prezto/</guid>
+      <description>
+
+&lt;p&gt;Once in a while, whether it be by someone I&amp;rsquo;m pairing with or someone who&amp;rsquo;s just peeked over my shoulder, I&amp;rsquo;ll get asked how I &amp;ldquo;got my terminal to look like that&amp;rdquo;. From now on I&amp;rsquo;m just going to direct them to this post as I&amp;rsquo;m going to take a short while to explain how I achieved the colourful canvas I log into every day.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;** &lt;em&gt;Just note that the following does not represent the full capabilities of the tools shown, this is just a little introduction to them describing what I achieved personally. For more information visit the official repository linked at the bottom of the page.&lt;/em&gt; **&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;what-are-shells-zsh-and-prezto&#34;&gt;What are Shells, Zsh and Prezto?&lt;/h2&gt;
+
+&lt;h3 id=&#34;shells&#34;&gt;Shells&lt;/h3&gt;
+
+&lt;p&gt;For the uninitiated, I think it&amp;rsquo;s worth providing a quick explanation of what you&amp;rsquo;ll be tinkering with. If you already have some understanding of unix shells, you can just skip over some of these sections.&lt;/p&gt;
+
+&lt;p&gt;So what is a shell? In short, a shell is an interface that allows a user to communicate with your operating system. They can come in two forms, those being GUIs (Graphical User Interfaces) and CLIs (Command Line Interfaces). Microsoft Windows is a good example of a common GUI, Windows provides a desktop, task bar, start menu as well as a file browser, all of which aid the user in communicating with their operating system. CLIs are not so complex and are limited to a simple command line that takes keyboard inputs from the user to perform various tasks, although this may seem like a more primitive way of doing things, you&amp;rsquo;d be surprised how much more efficiently you can get things done once you&amp;rsquo;re experienced with the command line.&lt;/p&gt;
+
+&lt;h3 id=&#34;bash-and-zsh&#34;&gt;Bash and Zsh&lt;/h3&gt;
+
+&lt;p&gt;Bash and Zsh (Z-shell) are different types of CLI shells. Unix-based systems (that includes Mac OS X) use &lt;a href=&#34;http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29&#34;&gt;Bash&lt;/a&gt; by default. Many of you will have learnt how to navigate your terminal using bash. To tailor our terminal to be more awesome, we&amp;rsquo;re going to be changing our default shell to &lt;a href=&#34;http://en.wikipedia.org/wiki/Z_shell&#34;&gt;Zsh&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;my-terminal-is-fine-why-should-i-use-zsh&#34;&gt;My terminal is fine, why should I use Zsh?&lt;/h3&gt;
+
+&lt;p&gt;Zsh offers a plethora of additional features on top of bash that you may find a little more convenient and easy to navigate, and as a result might save you some time or increase your efficiency a tad. If you&amp;rsquo;re someone who prefers using the default bash shell, that&amp;rsquo;s perfectly fine, you&amp;rsquo;re entitled to your opinion, even if it is wrong.&lt;/p&gt;
+
+&lt;p&gt;Some features of note that I found particularly useful when I first made the switch are:&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&#34;img-responsive&#34; style=&#34;float: right&#34; height=&#34;200px&#34; width=&#34;400px&#34; src=&#34;http://codurance.com/assets/img/custom/blog/installing-prezto/cd-completion.png&#34;&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&amp;lsquo;cd&amp;rsquo; auto-completion&lt;/li&gt;
+&lt;li&gt;&amp;lsquo;cd&amp;rsquo; navigation&lt;/li&gt;
+&lt;li&gt;Syntax highlighting (including file-type distinction)&lt;/li&gt;
+&lt;li&gt;Command history sub-string search&lt;/li&gt;
+&lt;li&gt;Right-hand prompt information&lt;/li&gt;
+&lt;li&gt;Path expansion/replacement&lt;/li&gt;
+&lt;li&gt;Spelling auto-correction&lt;/li&gt;
+&lt;li&gt;Recursive deletion confirmation&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Again, these features aren&amp;rsquo;t necessary by any means, but they certainly help me navigate my terminal more effeciently and maybe they&amp;rsquo;ll do the same for you. If you&amp;rsquo;re still not convinced, some of these features are explained in a bit more detail in the presentation, &lt;a href=&#34;http://www.slideshare.net/jaguardesignstudio/why-zsh-is-cooler-than-your-shell-16194692&#34;&gt;&amp;ldquo;Why Zsh is Cooler than your shell&amp;rdquo;&lt;/a&gt; by Brendan Rapps.&lt;/p&gt;
+
+&lt;h3 id=&#34;so-what-s-prezto&#34;&gt;So what&amp;rsquo;s Prezto?&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/sorin-ionescu/prezto&#34;&gt;Prezto&lt;/a&gt; is a configuration framework for Zsh. It comes supplied with a variety of plugins and themes that can extend and customise your shell. There are other popular frameworks out there, one of which being &lt;a href=&#34;https://github.com/robbyrussell/oh-my-zsh&#34;&gt;Oh My Zsh&lt;/a&gt; which I have found to have more plugins and themes available, but is known to be considerably slower.&lt;/p&gt;
+
+&lt;h2 id=&#34;ok-i-get-it-how-do-i-install-the-thing&#34;&gt;Ok I get it, How do I install the thing?&lt;/h2&gt;
+
+&lt;p&gt;Open up a Terminal and launch zsh.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ zsh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then clone the git repository.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ git clone --recursive https://github.com/sorin-ionescu/prezto.git &amp;quot;${ZDOTDIR:-$HOME}/.zprezto&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Create a Zsh configuration by copying the configuration files provided by the repo.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ setopt EXTENDED_GLOB
+  for rcfile in &amp;quot;${ZDOTDIR:-$HOME}&amp;quot;/.zprezto/runcoms/^README.md(.N); do
+    ln -s &amp;quot;$rcfile&amp;quot; &amp;quot;${ZDOTDIR:-$HOME}/.${rcfile:t}&amp;quot;
+  done
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Lastly, set Zsh as your default shell.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ chsh -s /bin/zsh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To apply all the changes, simply restart your terminal.&lt;/p&gt;
+
+&lt;p&gt;The official repository provides more instructions and troubleshooting &lt;a href=&#34;https://github.com/sorin-ionescu/prezto&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;fiddling-with-dotfiles&#34;&gt;Fiddling with dotfiles.&lt;/h3&gt;
+
+&lt;p&gt;As you are now changing shells, it&amp;rsquo;s important to make sure you&amp;rsquo;re loading the correct information regarding alias&amp;rsquo; and PATH variables on each shell start-up.&lt;/p&gt;
+
+&lt;p&gt;How you organise your own &lt;code&gt;.profile&lt;/code&gt;, &lt;code&gt;.bash_profile&lt;/code&gt;, &lt;code&gt;.profile&lt;/code&gt; and &lt;code&gt;.bashrc&lt;/code&gt; files is your own business. But just note that as you are moving away from &lt;code&gt;bash&lt;/code&gt; and now using &lt;code&gt;zsh&lt;/code&gt;, you must now export your path variables and source the correct files in &lt;code&gt;.zshrc&lt;/code&gt;. If you are inexperienced, a simple way would be to move over any information you have inside the &lt;code&gt;.bashrc&lt;/code&gt; file directly to the &lt;code&gt;.zshrc&lt;/code&gt; file.&lt;/p&gt;
+
+&lt;h3 id=&#34;how-do-i-get-those-colours&#34;&gt;How do I get those colours?&lt;/h3&gt;
+
+&lt;p&gt;The colour theme I use for my terminal is called &lt;a href=&#34;http://ethanschoonover.com/solarized&#34;&gt;Solarized&lt;/a&gt;. Conveniently, the terminal-specific themes can be found &lt;a href=&#34;https://github.com/amiralibazazi/osx-terminal.app-colors-solarized&#34;&gt;here at this repository&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;The colours I&amp;rsquo;ve used are from the file titled &lt;code&gt;Solarized Dark.terminal&lt;/code&gt; from the repository. To install this file open up your Terminal, in the menu bar navigate to &lt;code&gt;Terminal &amp;gt; Preferences&lt;/code&gt; and then use the import feature to load the profile. With the desired profile highlighted, you can then click the &lt;code&gt;Default&lt;/code&gt; button to set it as such.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/installing-prezto/import-terminal-profile.png&#34;  class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;p&gt;From here on every new terminal window you open will have the new profile colours loaded. I encourage you to play around with these colours and themes to whatever suits you.&lt;/p&gt;
+
+&lt;h3 id=&#34;enabling-plugins-modules&#34;&gt;Enabling plugins/modules&lt;/h3&gt;
+
+&lt;p&gt;To view the list of available plugins available for use with Prezto, browse to the &lt;code&gt;modules/&lt;/code&gt; directory within &lt;code&gt;.zprezto/&lt;/code&gt;. The available plugins are listed as sub-directories.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ls ~/.zprezto/modules
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To enable a plugin, open up the &lt;code&gt;.zpreztorc&lt;/code&gt; file in a text-editor.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ vim ~/.zpreztorc
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Under the line which reads &lt;code&gt;zstyle &#39;:prezto:load&#39; pmodule \&lt;/code&gt; there should be a list of already-loaded modules. Simple add any additional ones to the list. Personally, I added the &lt;code&gt;history-substring-search&lt;/code&gt; and the &lt;code&gt;git&lt;/code&gt; modules. My resulting file looks a little like this.&lt;/p&gt;
+
+
+&lt;img src=&#34;http://codurance.com/assets/img/custom/blog/installing-prezto/zpreztorc.png&#34;  class=&#34;img img-responsive style-screengrab&#34;/&gt;
+
+
+&lt;h2 id=&#34;what-s-next&#34;&gt;What&amp;rsquo;s next?&lt;/h2&gt;
+
+&lt;p&gt;This is as far as I&amp;rsquo;ve gotten with installing Zsh with zprezto and am happy with the features enough that I don&amp;rsquo;t need to customise it further. However there is still a lot more you can do with the tools and plugins. For more tips, tricks and troubleshooting with prezto, visit the official repository found at &lt;a href=&#34;https://github.com/sorin-ionescu/prezto&#34;&gt;https://github.com/sorin-ionescu/prezto&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Feel free to send me an email if you have any questions, comments or problems at amir@codurance.com.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
