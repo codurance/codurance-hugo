@@ -1,502 +1,0 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Refactoring on Software Craftsmanship and Agile Development</title>
-    <link>http://codurance.com/tags/refactoring/</link>
-    <description>Recent content in Refactoring on Software Craftsmanship and Agile Development</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en-gb</language>
-    <lastBuildDate>Fri, 06 May 2016 12:10:00 +0000</lastBuildDate>
-    <atom:link href="http://codurance.com/tags/refactoring/atom/index.xml" rel="self" type="application/rss+xml" />
-    
-    <item>
-      <title>Code Smells – Part II</title>
-      <link>http://codurance.com/blog/code-smells%E2%80%93part-two/</link>
-      <pubDate>Fri, 06 May 2016 12:10:00 +0000</pubDate>
-      
-      <guid>http://codurance.com/blog/code-smells%E2%80%93part-two/</guid>
-      <description>
-
-&lt;p&gt;In the last post, &lt;a href=&#34;http://codurance.com/2016/03/17/code-smells-part-I/&#34;&gt;Code Smells - Part I&lt;/a&gt;,  I talked about the bloaters: they are code smells that can be identified as Long Methods, Large Classes, Primitive Obsessions, Long Parameter List and Data Clumps. In this one, I would like to dig into the &lt;strong&gt;Object-Orientation Abusers&lt;/strong&gt; and the &lt;strong&gt;Change Preventers&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;h2 id=&#34;object-orientation-abusers&#34;&gt;Object-Orientation Abusers&lt;/h2&gt;
-
-&lt;p&gt;This type of code smell usually happens when object-oriented principles are incomplete or incorrectly applied.&lt;/p&gt;
-
-&lt;h4 id=&#34;switch-statements&#34;&gt;Switch Statements&lt;/h4&gt;
-
-&lt;p&gt;This case is simple to identify: we have a switch case. But you should consider it a smell too if you find a sequence of ifs. (That&amp;rsquo;s a switch case in disguise.)&lt;/p&gt;
-
-&lt;p&gt;Why are switch statements bad? Because when a new condition is added, you have to find every occurrence of that switch case.&lt;/p&gt;
-
-&lt;p&gt;So while talking to &lt;a href=&#34;https://twitter.com/DHatanian&#34;&gt;David&lt;/a&gt;, he asked me: and what happens if I encapsulate the switch into a method, is it acceptable then? That&amp;rsquo;s really a good question&amp;hellip; If your switch case is only used to &amp;ldquo;take care&amp;rdquo; of one behaviour and that&amp;rsquo;s it, then it might be ok. Remember identifying a code smell doesn&amp;rsquo;t mean that you have to get always rid of it: it&amp;rsquo;s a trade off. If you find your switch statement replicated and each replication has  different behaviour, then you cannot simply isolate the switch statement in a method. You need to find a proper &amp;ldquo;home&amp;rdquo; for it to be in. As a rule of thumb, you should think of polymorphism when you find yourself in this situation. There are two refactoring techniques that we can apply here:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;&lt;em&gt;Replace Type Code with Subclasses&lt;/em&gt;&lt;/strong&gt;
-This technique consists of creating subclasses for each switch case and applying the respective behaviour to these subclasses.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;em&gt;Replace Type Code With Strategy&lt;/em&gt;&lt;/strong&gt;
-Similar to the above one, in this case, you should make use of one of the patterns: &lt;a href=&#34;https://en.wikipedia.org/wiki/State_pattern&#34;&gt;State&lt;/a&gt; or &lt;a href=&#34;https://en.wikipedia.org/wiki/Strategy_pattern&#34;&gt;Strategy&lt;/a&gt;.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;So when to use one or the other? If the &lt;strong&gt;&lt;em&gt;Type Code&lt;/em&gt;&lt;/strong&gt; does not change the behaviour of a class you can use the &lt;strong&gt;&lt;em&gt;Subclasses&lt;/em&gt;&lt;/strong&gt; technique. Separating each behaviour into its appropriate subclass will enforce the &lt;a href=&#34;https://en.wikipedia.org/wiki/Single_responsibility_principle&#34;&gt;Single Responsibility Principle&lt;/a&gt; and make the code more readable in general. If you need to add another case, you just add a new class to your code without having to modify any other code. So you apply the &lt;a href=&#34;https://en.wikipedia.org/wiki/Open/closed_principle&#34;&gt;Open/Closed Principle&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;You should use the Strategy approach when the &lt;strong&gt;&lt;em&gt;Type Code&lt;/em&gt;&lt;/strong&gt; affects the behaviour of your classes. If you&amp;rsquo;re changing the state of the class, fields and many other actions then you should use the &lt;a href=&#34;https://en.wikipedia.org/wiki/State_pattern&#34;&gt;State Pattern&lt;/a&gt;. If it only affects how you select a behaviour of the class then the &lt;a href=&#34;https://en.wikipedia.org/wiki/Strategy_pattern&#34;&gt;Strategy Pattern&lt;/a&gt; is a better choice.&lt;/p&gt;
-
-&lt;p&gt;Hmm&amp;hellip; It&amp;rsquo;s a little confusing, no? So let&amp;rsquo;s try with an example.&lt;/p&gt;
-
-&lt;p&gt;You have an enumeration EmployeeType:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public enum EmployeeType 
-{ 		
-	Worker, 		
-	Supervisor, 		
-	Manager 	
-} 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;And a class Employee:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Employee 
-{     
-	private float salary;     
-	private float bonusPercentage;     
-	private EmployeeType employeeType;      
-
-	public Employee(float salary, float bonusPercentage, EmployeeType employeeType)     
-	{         
-		this.salary = salary;         
-		this.bonusPercentage = bonusPercentage;         
-		this.employeeType = employeeType;     
-	}      
-
-	public float CalculateSalary()      
-	{         
-		switch (employeeType)          
-		{             
-			case EmployeeType.Worker:                 
-				return salary;              
-			case EmployeeType.Supervisor:                 
-				return salary + (bonusPercentage * 0.5F);             
-			case EmployeeType.Manager:                 
-				return salary + (bonusPercentage * 0.7F);         
-		}
-
-        return 0.0F;     
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;It all looks ok. But what happen if you need to calculate the year bonus? You will add another method like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public float CalculateYearBonus()  
-{     
-	switch (employeeType)      
-	{         
-		case EmployeeType.Worker:             
-			return 0;          
-		case EmployeeType.Supervisor:             
-			return salary + salary * 0.7F;         
-		case EmployeeType.Manager:             
-			return salary + salary * 1.0F;	     
-	}
-
-	return 0.0F;
-} 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;See the repetition of the switch? So let&amp;rsquo;s try first the subclass approach: Here is the superclass:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;abstract public class Employee  
-{ 
-
-	  protected float salary;     
-	protected float bonusPercentage;      
-
-	public Employee(float salary, float bonusPercentage)     
-	{         
-		this.salary = salary;         
-		this.bonusPercentage = bonusPercentage;     
-	}      
-
-	abstract public float CalculateSalary();
-
-	  virtual public float CalculateYearBonus()      
-	{ 
-	    return 0.0F;     
-	}
- }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;And here we have the subclasses:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Worker: Employee  
-{ 
-
-	public Worker(float salary, float bonusPercentage)   
-		: base(salary, bonusPercentage)  
-	{}    
-
-	 override public float CalculateSalary()      
-	 {         
-	 	return salary;      
-	 }
- }
-
-public class Supervisor : Employee 
-{     
-
-	public Supervisor(float salary, float bonusPercentage) 
-	        : base(salary, bonusPercentage)     
-	{}      
-
-	override public float CalculateSalary()      
-	{         
-		return salary + (bonusPercentage * 0.5F);     
-	}      
-
-	public override float CalculateYearBonus()     
-	{         
-		return salary + salary * 0.7F;     
-	}
- }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;With the Strategy approach we would create an interface for calculating the remuneration:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface IRemunerationCalculator  	
-{ 		
-	float CalculateSalary(float salary); 		
-	float CalculateYearBonus(float salary); 	
-} 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;With the interface in place, we can now pass to the employee any class that conforms to that protocol and calculate the correct salary/bonus.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Employee
-{     
-	private float salary;     
-	private IRemunerationCalculator remunerationCalculator;      
-
-	public Employee(float salary, IRemunerationCalculator remunerationCalculator)     
-	{
-        this.salary = salary;         
-        this.remunerationCalculator = remunerationCalculator;     
-    }      
-
-    public float CalculateSalary()     
-    {         
-    	return remunerationCalculator.CalculateSalary(salary);     
-    } 			     
-
-    public float CalculateYearBonus()      
-    {         
-    	return remunerationCalculator.CalculateYearBonus(salary);     
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;temporary-field&#34;&gt;Temporary Field&lt;/h4&gt;
-
-&lt;p&gt;This case occurs when we are calculating a big algorithm that needs several input variables. Creating these fields in the class has no value most of the time because they are just used for this specific calculation. And this can be dangerous too because you have to be sure you reinitialize them before you start the next computation.&lt;/p&gt;
-
-&lt;p&gt;Here the best refactoring technique is to use &lt;strong&gt;&lt;em&gt;Replace Method with Method Object&lt;/em&gt;&lt;/strong&gt;, which will extract the method into a separate class. Then you can split the method into several methods within the same class.&lt;/p&gt;
-
-&lt;h4 id=&#34;refused-bequest&#34;&gt;Refused Bequest&lt;/h4&gt;
-
-&lt;p&gt;This code smell is a little tricky to detect because this happens when a subclass doesn&amp;rsquo;t use all the behaviours of its parent class. So it&amp;rsquo;s as if the subclass &amp;ldquo;refuses&amp;rdquo; some behaviours (&amp;ldquo;bequest&amp;rdquo;) of its parent class.&lt;/p&gt;
-
-&lt;p&gt;In this case, if it makes no sense to continue to use inheritance, the best refactoring technique is to change to &lt;strong&gt;&lt;em&gt;Delegation&lt;/em&gt;&lt;/strong&gt;: we can get rid of the inheritance by creating a field of the parent&amp;rsquo;s classes type in our subclass. This way every time you need the methods from the parent class you just delegate them to this new object.&lt;/p&gt;
-
-&lt;p&gt;When the inheritance is the correct thing to do, then move all unnecessary fields and methods from the subclass. Extract all methods and fields from the subclass and parent class and put them in a new class. Make this new class the SuperClass, from whom the subclass and parent class should inherit. This technique is called &lt;strong&gt;&lt;em&gt;Extract Superclass&lt;/em&gt;&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;h4 id=&#34;alternative-classes-with-different-interfaces&#34;&gt;Alternative Classes with Different Interfaces&lt;/h4&gt;
-
-&lt;p&gt;Hmm, this case makes me think of &amp;ldquo;lack of communication&amp;rdquo; between members of the same team because this happens when we have two classes that do the same thing but have different names for their methods.
-Start by &lt;strong&gt;&lt;em&gt;Renaming Methods&lt;/em&gt;&lt;/strong&gt; or &lt;strong&gt;&lt;em&gt;Moving Method&lt;/em&gt;&lt;/strong&gt;, so you can have both classes implementing the same interface. In some cases, only part of the behaviour is duplicated in both classes. If so, try &lt;strong&gt;&lt;em&gt;Extract Superclass&lt;/em&gt;&lt;/strong&gt; and make the original classes the subclasses.&lt;/p&gt;
-
-&lt;h2 id=&#34;change-preventers&#34;&gt;Change Preventers&lt;/h2&gt;
-
-&lt;p&gt;Oh boy! This kind of code smells are the ones you really want to avoid. These are the ones that when you make a change in one place, you have to go basically throughout your code-base making changes in other places too. So it&amp;rsquo;s a nightmare that all of us want to avoid!&lt;/p&gt;
-
-&lt;h4 id=&#34;divergent-change&#34;&gt;Divergent Change&lt;/h4&gt;
-
-&lt;p&gt;This is the case when you find yourself changing the same class for several different reasons. This means that you are violating the [Single Responsibility Principle](&lt;a href=&#34;https://en.wikipedia.org/wiki/SOLID_(object-oriented_design&#34;&gt;https://en.wikipedia.org/wiki/SOLID_(object-oriented_design&lt;/a&gt;) (which has to do with separation of concerns).&lt;/p&gt;
-
-&lt;p&gt;The refactoring technique applied here is &lt;strong&gt;&lt;em&gt;Extract Class&lt;/em&gt;&lt;/strong&gt; since you want to extract the different behaviours into different classes.&lt;/p&gt;
-
-&lt;h4 id=&#34;shotgun-surgery&#34;&gt;Shotgun Surgery&lt;/h4&gt;
-
-&lt;p&gt;This means that when you make a small change in a class, you have to go and change several classes at the same time.&lt;/p&gt;
-
-&lt;p&gt;Even though it seems the same as the &lt;strong&gt;&lt;em&gt;Divergent Change&lt;/em&gt;&lt;/strong&gt; smell, in reality, they are opposite of each other: &lt;strong&gt;&lt;em&gt;Divergent Change&lt;/em&gt;&lt;/strong&gt; is when many changes are made to a single class. &lt;strong&gt;&lt;em&gt;Shotgun Surgery&lt;/em&gt;&lt;/strong&gt; refers to when a single change is made to multiple classes simultaneously.&lt;/p&gt;
-
-&lt;p&gt;Here the refactoring technique to apply is &lt;strong&gt;&lt;em&gt;Move Method&lt;/em&gt;&lt;/strong&gt; and/or &lt;strong&gt;&lt;em&gt;Move Field&lt;/em&gt;&lt;/strong&gt;. This will permit you to move the duplicated methods or fields to a common class. If that class doesn&amp;rsquo;t exist, create a new one. In the case where the original class stays almost empty, maybe you should think if this class is redundant, and if so, get rid of it by using &lt;strong&gt;&lt;em&gt;Inline Class&lt;/em&gt;&lt;/strong&gt;: move the remaining methods/fields to one of the new classes created. This all depends on whether the original class still has any responsibilities.&lt;/p&gt;
-
-&lt;h4 id=&#34;parallel-inheritance-hierarchies&#34;&gt;Parallel Inheritance Hierarchies&lt;/h4&gt;
-
-&lt;p&gt;This case is when you find yourself creating a new subclass for class B because you add a subclass to class A.&lt;/p&gt;
-
-&lt;p&gt;Here you can: first, make one of the hierarchy refer to instances of another hierarchy. After this first step you can then use &lt;strong&gt;&lt;em&gt;Move Method&lt;/em&gt;&lt;/strong&gt; and &lt;strong&gt;&lt;em&gt;Move Field&lt;/em&gt;&lt;/strong&gt; to remove the hierarchy in the referred class. You can apply here the &lt;a href=&#34;https://en.wikipedia.org/wiki/Visitor_pattern&#34;&gt;Visitor pattern&lt;/a&gt; too.&lt;/p&gt;
-
-&lt;h3 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h3&gt;
-
-&lt;p&gt;In the case of &lt;strong&gt;&lt;em&gt;Object-Orientation Abusers&lt;/em&gt;&lt;/strong&gt; and &lt;strong&gt;&lt;em&gt;Change Preventers&lt;/em&gt;&lt;/strong&gt;, I think that they are simpler to avoid if you know how to apply a good design to your code. And that comes with a lot of practice.&lt;/p&gt;
-
-&lt;p&gt;Today I&amp;rsquo;ve talked about a few refactoring techniques, but there are a lot more. You can find a good reference to all of then in &lt;a href=&#34;http://refactoring.com/catalog/&#34;&gt;Refactoring.com&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;And as I said in the &lt;a href=&#34;http://codurance.com/2016/03/17/code-smells-part-I/&#34;&gt;first part of this series&lt;/a&gt;, code smells can&amp;rsquo;t always be removed. Study each case and decide: remember there is always a trade off.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Code Smells – Part I</title>
-      <link>http://codurance.com/blog/code-smells-part-one/</link>
-      <pubDate>Thu, 17 Mar 2016 12:10:00 +0000</pubDate>
-      
-      <guid>http://codurance.com/blog/code-smells-part-one/</guid>
-      <description>
-
-&lt;p&gt;Last weekend I was at &lt;a href=&#34;https://twitter.com/hashtag/socracan16&#34;&gt;SoCraTes Canaries&lt;/a&gt; and I gave my first talk ever about code smells. Oh boy! How nervous was I! But now that has passed, I was wondering what I should do with all information I gathered. And then I thought, maybe it&amp;rsquo;s a good idea to put it all in a nice blog post.&lt;/p&gt;
-
-&lt;h2 id=&#34;so-what-are-code-smells&#34;&gt;So what are code smells?&lt;/h2&gt;
-
-&lt;p&gt;As &lt;a href=&#34;http://martinfowler.com/&#34;&gt;Martin Fowler&lt;/a&gt; said in his book &lt;a href=&#34;http://martinfowler.com/books/refactoring.html&#34;&gt;&amp;ldquo;Refactoring: Improving the Design of Existing Code&amp;rdquo;&lt;/a&gt;,&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;&lt;strong&gt;A code smell is a surface indication that usually corresponds to a deeper problem in the system.&lt;/strong&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;I like to think that a code smell is something that makes your developer instinct cry out to you, and you just know that something is wrong. This doesn’t mean you have to make changes in your code: there are occasions where these code smells are ok, but I think it’s important for us to detect them and know exactly why they are there.&lt;/p&gt;
-
-&lt;p&gt;There are five categories of code smells:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Bloaters&lt;/li&gt;
-&lt;li&gt;Object-Orientation Abusers&lt;/li&gt;
-&lt;li&gt;Change Preventers&lt;/li&gt;
-&lt;li&gt;Dispensables&lt;/li&gt;
-&lt;li&gt;Couplers&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Today I&amp;rsquo;m going to talk about Bloaters. I&amp;rsquo;ll leave the other categories for a future post.&lt;/p&gt;
-
-&lt;h2 id=&#34;bloaters&#34;&gt;Bloaters&lt;/h2&gt;
-
-&lt;p&gt;Bloaters can be big methods or classes, primitive obsessions, data clumps, or long parameter lists.&lt;/p&gt;
-
-&lt;h4 id=&#34;long-parameter-list-data-clumps&#34;&gt;Long Parameter List/Data Clumps&lt;/h4&gt;
-
-&lt;p&gt;The Long Parameter List is when you have a method that has more than 3 parameters. Sometimes we see that when we receive an object, and instead of passing it all we pass some of its data. In this case, the best policy is to pass the whole object. Data Clumps are a bit different: they are, in general, primitive values that start to &amp;ldquo;get together&amp;rdquo;. A good example of this is a startDate and endDate&amp;hellip; Maybe it&amp;rsquo;s worth creating a DateRange.&lt;/p&gt;
-
-&lt;h4 id=&#34;primitive-obsession&#34;&gt;Primitive Obsession&lt;/h4&gt;
-
-&lt;p&gt;This case is when we use primitives instead of value types for simple tasks. Sometimes the use of primitives is justifiable, but when you start to have behaviour attached to this primitives, then it&amp;rsquo;s time to stop and think that maybe a value type is in order. A simple example is a currency: we tend to put it in a float or double, instead of encapsulating it in a value type.&lt;/p&gt;
-
-&lt;h4 id=&#34;long-method-large-class&#34;&gt;Long Method / Large Class&lt;/h4&gt;
-
-&lt;p&gt;This kind of code smell happens when you have a big method. But when do you know that a method has become too big? Well, I have the rule that with more than five lines, you should, at least, look at it again. But, as &lt;a href=&#34;https://twitter.com/sandromancuso&#34;&gt;Sandro&lt;/a&gt; told me before, the right number of lines is just enough lines so a method only does one thing (and so it conforms to the 1st principle of &lt;a href=&#34;https://en.wikipedia.org/wiki/SOLID_(object-oriented_design)&#34;&gt;SOLID&lt;/a&gt; the &lt;a href=&#34;https://en.wikipedia.org/wiki/Single_responsibility_principle&#34;&gt;Single responsibility principle&lt;/a&gt;).&lt;/p&gt;
-
-&lt;p&gt;To do this blog I started to look at my old code when I hadn&amp;rsquo;t woken up yet to craftsmanship: if it was working that was good enough for me. Here&amp;rsquo;s the code in Objective-C:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;- (void) postToServer
-{
-    PostSerializer* postSerializer = [[PostSerializer alloc] init];
-    NSString *post = [postSerializer serializePostWithTitle:self.txtTitle.text description:self.txtDescription.text author:self.txtUser.text game:self.game];
-
-    NSMutableDictionary *postParams = [NSMutableDictionary dictionary];
-	  [postParams setObject:txtTitle.text forKey:@&amp;quot;title&amp;quot;];
-	  [postParams setObject:post forKey:@&amp;quot;data&amp;quot;];
-	  [postParams setObject:txtUser.text forKey:@&amp;quot;username&amp;quot;];
-    [postParams setObject:txtPassword.text forKey:@&amp;quot;password&amp;quot;];
-
-	  NSArray *args = [NSArray arrayWithObjects:[NSNumber numberWithInt:0], postParams, nil];
-
-#ifdef DEBUG_LOG
-    XMLRPCRequest *request = [[XMLRPCRequest alloc] initWithURL:
-                              [NSURL URLWithString:@&amp;quot;http://localhost:8888/letsbasket/xmlrpc.php&amp;quot;]];
-    DLog(@&amp;quot;Debug&amp;quot;);
-#else
-    XMLRPCRequest *request = [[XMLRPCRequest alloc] initWithURL:[NSURL URLWithString:[UtilsHelper localizeString:@&amp;quot;UrlXmlRPCKey&amp;quot;]]];
-    DLog(@&amp;quot;Producao&amp;quot;);
-#endif
-
-	  [request setMethod:@&amp;quot;letsBasket.AddPost&amp;quot; withParameters:args];
-
-    NSError *error = nil;
-	  XMLRPCResponse* result = [XMLRPCConnection sendSynchronousXMLRPCRequest:request error:&amp;amp;error];
-
-    UIApplication *app = [UIApplication sharedApplication];
-    app.networkActivityIndicatorVisible = NO;
-
-    [self dismissWaitingAlert];
-
-    if(error != nil || [[result body] rangeOfString:@&amp;quot;&amp;lt;name&amp;gt;error&amp;lt;/name&amp;gt;&amp;quot;].location != NSNotFound)
-    {
-        int location_start = [[result body] rangeOfString:@&amp;quot;&amp;lt;string&amp;gt;&amp;quot;].location + 8;
-        int location_end = [[result body] rangeOfString:@&amp;quot;&amp;lt;/string&amp;gt;&amp;quot;].location;
-
-        NSString *message = [[[result body] substringWithRange:NSMakeRange(location_start, location_end- location_start)] unescapedString];
-        NSString* title = [UtilsHelper localizeString:@&amp;quot;PublishVC_ErrorRetreivingAlertTitle_key&amp;quot;];
-        [self showAlertWithErrorMessage:message Title:title];
-	      return;
-	  }
-
-    [self processPublishResult:result];
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Wow! This is a really big method. And it is inside a ViewController class, so this should definitely be extracted into a service class, so we have a correct separation of concerns. But for the sake of the brevity, let&amp;rsquo;s focus on how can we refactor this big method.
-The refactoring technique to apply here is &lt;strong&gt;Extract Method&lt;/strong&gt;: you can aggregate code together and extract to a new method. So let&amp;rsquo;s see what we can come up with:&lt;/p&gt;
-
-&lt;p&gt;We can start with grouping the code that refers to serializing a post:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;- (NSString *)serializePost
-{
-    PostSerializer* postSerializer = [[PostSerializer alloc] init];
-    NSString *post = [postSerializer serializePostWithTitle:self.txtTitle.text description:self.txtDescription.text author:self.txtUser.text game:self.game];
-    return post;
-}
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Then we can do it for the parameters of the request:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;- (NSArray *)createPostParams:(NSString *)post
-{
-    NSMutableDictionary *postParams = [NSMutableDictionary dictionary];
-    [postParams setObject:txtTitle.text forKey:@&amp;quot;title&amp;quot;];
-    [postParams setObject:post forKey:@&amp;quot;data&amp;quot;];
-    [postParams setObject:txtUser.text forKey:@&amp;quot;username&amp;quot;];
-    [postParams setObject:txtPassword.text forKey:@&amp;quot;password&amp;quot;];
-
-    NSArray *args = [NSArray arrayWithObjects:[NSNumber numberWithInt:0], postParams, nil];
-    return args;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;With all this in place we are now ready to create a XMLRPCRequest:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;- (XMLRPCRequest *)createXMLRPCRequestWithArgs:(NSArray*)args {
-
-    XMLRPCRequest *request;
-
-#ifdef DEBUG_LOG
-   request = [[XMLRPCRequest alloc] initWithURL:
-                              [NSURL URLWithString:@&amp;quot;http://localhost:8888/letsbasket/xmlrpc.php&amp;quot;]];
-    DLog(@&amp;quot;Debug&amp;quot;);
-#else
-    request = [[XMLRPCRequest alloc] initWithURL:[NSURL URLWithString:[UtilsHelper localizeString:@&amp;quot;UrlXmlRPCKey&amp;quot;]]];
-    DLog(@&amp;quot;Producao&amp;quot;);
-#endif
-
-    [request setMethod:@&amp;quot;letsBasket.AddPost&amp;quot; withParameters:args];
-
-    return request;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We can also extract a method with some display updates:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;- (void)updateDisplay
-{
-    UIApplication *app = [UIApplication sharedApplication];
-    app.networkActivityIndicatorVisible = NO;
-
-    [self dismissWaitingAlert];
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;And last but not least we can extract the preparation for displaying the error message:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;- (void)showError:(NSString*)bodyResult {
-
-    int location_start = [bodyResult rangeOfString:@&amp;quot;&amp;lt;string&amp;gt;&amp;quot;].location + 8;
-    int location_end = [bodyResult rangeOfString:@&amp;quot;&amp;lt;/string&amp;gt;&amp;quot;].location;
-
-    NSString *message = [[bodyResult substringWithRange:NSMakeRange(location_start, location_end- location_start)] unescapedString];
-    NSString* title = [UtilsHelper localizeString:@&amp;quot;PublishVC_ErrorRetreivingAlertTitle_key&amp;quot;];
-    [self showAlertWithErrorMessage:message Title:title];
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;With all these extractions our method now looks pretty neat:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;- (void) postToServer
-{
-    NSString *post = [self serializePost];
-    NSArray *args = [self createPostParams:post];
-    XMLRPCRequest *request = [self createXMLRPCRequestWithArgs: args];
-    NSError *error = nil;
-
-	  XMLRPCResponse* result = [XMLRPCConnection sendSynchronousXMLRPCRequest:request error:&amp;amp;error];
-
-    [self updateDisplay];
-
-    if(error != nil || [[result body] rangeOfString:@&amp;quot;&amp;lt;name&amp;gt;error&amp;lt;/name&amp;gt;&amp;quot;].location != NSNotFound)
-    {
-        [self showError:[result body]];
-		    return;
-	  }
-
-    [self processPublishResult:result];
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Hmm&amp;hellip; we can do this even better! Let&amp;rsquo;s take a look at the method &lt;code&gt;createXMLRCPRequest&lt;/code&gt; and see if we can call the others from there. In this case, it makes sense to have all together.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;- (XMLRPCRequest *)createXMLRPCRequest {
-
-    NSString *post = [self serializePost];
-    NSArray *args = [self createPostParams:post];
-
-    XMLRPCRequest *request;
-
-#ifdef DEBUG_LOG
-   request = [[XMLRPCRequest alloc] initWithURL:
-                              [NSURL URLWithString:@&amp;quot;http://localhost:8888/letsbasket/xmlrpc.php&amp;quot;]];
-    DLog(@&amp;quot;Debug&amp;quot;);
-#else
-    request = [[XMLRPCRequest alloc] initWithURL:[NSURL URLWithString:[UtilsHelper localizeString:@&amp;quot;UrlXmlRPCKey&amp;quot;]]];
-    DLog(@&amp;quot;Producao&amp;quot;);
-#endif
-
-    [request setMethod:@&amp;quot;letsBasket.AddPost&amp;quot; withParameters:args];
-
-    return request;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;And our original method now looks like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-objectivec&#34;&gt;- (void) postToServer
-{
-    XMLRPCRequest *request = [self createXMLRPCRequest];
-    NSError *error = nil;
-
-    XMLRPCResponse* result = [XMLRPCConnection sendSynchronousXMLRPCRequest:request error:&amp;amp;error];
-
-    [self updateDisplay];
-
-    if(error != nil || [[result body] rangeOfString:@&amp;quot;&amp;lt;name&amp;gt;error&amp;lt;/name&amp;gt;&amp;quot;].location != NSNotFound)
-    {
-        [self showError:[result body]];
-        return;
-    }
-
-    [self processPublishResult:result];
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Well, here you go: a method with more than 5 lines and I think that&amp;rsquo;s ok. :)
-As we can see it&amp;rsquo;s really easy to let a method grow. But it&amp;rsquo;s really easy to refactor and have a cleaner code too.&lt;/p&gt;
-
-&lt;h4 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h4&gt;
-
-&lt;p&gt;In general, bloaters are viewed as code that, over time, &amp;ldquo;gets out of hand&amp;rdquo;.&lt;/p&gt;
-
-&lt;p&gt;Remember, code smells sometimes can&amp;rsquo;t be removed, but it&amp;rsquo;s good to know that they are there and you know &lt;strong&gt;why&lt;/strong&gt; they are there.&lt;/p&gt;
-</description>
-    </item>
-    
-  </channel>
-</rss>

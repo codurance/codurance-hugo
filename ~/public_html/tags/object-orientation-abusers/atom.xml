@@ -1,252 +1,0 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Object Orientation Abusers on Software Craftsmanship and Agile Development</title>
-    <link>http://codurance.com/tags/object-orientation-abusers/</link>
-    <description>Recent content in Object Orientation Abusers on Software Craftsmanship and Agile Development</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en-gb</language>
-    <lastBuildDate>Fri, 06 May 2016 12:10:00 +0000</lastBuildDate>
-    <atom:link href="http://codurance.com/tags/object-orientation-abusers/atom/index.xml" rel="self" type="application/rss+xml" />
-    
-    <item>
-      <title>Code Smells – Part II</title>
-      <link>http://codurance.com/blog/code-smells%E2%80%93part-two/</link>
-      <pubDate>Fri, 06 May 2016 12:10:00 +0000</pubDate>
-      
-      <guid>http://codurance.com/blog/code-smells%E2%80%93part-two/</guid>
-      <description>
-
-&lt;p&gt;In the last post, &lt;a href=&#34;http://codurance.com/2016/03/17/code-smells-part-I/&#34;&gt;Code Smells - Part I&lt;/a&gt;,  I talked about the bloaters: they are code smells that can be identified as Long Methods, Large Classes, Primitive Obsessions, Long Parameter List and Data Clumps. In this one, I would like to dig into the &lt;strong&gt;Object-Orientation Abusers&lt;/strong&gt; and the &lt;strong&gt;Change Preventers&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;h2 id=&#34;object-orientation-abusers&#34;&gt;Object-Orientation Abusers&lt;/h2&gt;
-
-&lt;p&gt;This type of code smell usually happens when object-oriented principles are incomplete or incorrectly applied.&lt;/p&gt;
-
-&lt;h4 id=&#34;switch-statements&#34;&gt;Switch Statements&lt;/h4&gt;
-
-&lt;p&gt;This case is simple to identify: we have a switch case. But you should consider it a smell too if you find a sequence of ifs. (That&amp;rsquo;s a switch case in disguise.)&lt;/p&gt;
-
-&lt;p&gt;Why are switch statements bad? Because when a new condition is added, you have to find every occurrence of that switch case.&lt;/p&gt;
-
-&lt;p&gt;So while talking to &lt;a href=&#34;https://twitter.com/DHatanian&#34;&gt;David&lt;/a&gt;, he asked me: and what happens if I encapsulate the switch into a method, is it acceptable then? That&amp;rsquo;s really a good question&amp;hellip; If your switch case is only used to &amp;ldquo;take care&amp;rdquo; of one behaviour and that&amp;rsquo;s it, then it might be ok. Remember identifying a code smell doesn&amp;rsquo;t mean that you have to get always rid of it: it&amp;rsquo;s a trade off. If you find your switch statement replicated and each replication has  different behaviour, then you cannot simply isolate the switch statement in a method. You need to find a proper &amp;ldquo;home&amp;rdquo; for it to be in. As a rule of thumb, you should think of polymorphism when you find yourself in this situation. There are two refactoring techniques that we can apply here:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;&lt;em&gt;Replace Type Code with Subclasses&lt;/em&gt;&lt;/strong&gt;
-This technique consists of creating subclasses for each switch case and applying the respective behaviour to these subclasses.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;em&gt;Replace Type Code With Strategy&lt;/em&gt;&lt;/strong&gt;
-Similar to the above one, in this case, you should make use of one of the patterns: &lt;a href=&#34;https://en.wikipedia.org/wiki/State_pattern&#34;&gt;State&lt;/a&gt; or &lt;a href=&#34;https://en.wikipedia.org/wiki/Strategy_pattern&#34;&gt;Strategy&lt;/a&gt;.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;So when to use one or the other? If the &lt;strong&gt;&lt;em&gt;Type Code&lt;/em&gt;&lt;/strong&gt; does not change the behaviour of a class you can use the &lt;strong&gt;&lt;em&gt;Subclasses&lt;/em&gt;&lt;/strong&gt; technique. Separating each behaviour into its appropriate subclass will enforce the &lt;a href=&#34;https://en.wikipedia.org/wiki/Single_responsibility_principle&#34;&gt;Single Responsibility Principle&lt;/a&gt; and make the code more readable in general. If you need to add another case, you just add a new class to your code without having to modify any other code. So you apply the &lt;a href=&#34;https://en.wikipedia.org/wiki/Open/closed_principle&#34;&gt;Open/Closed Principle&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;You should use the Strategy approach when the &lt;strong&gt;&lt;em&gt;Type Code&lt;/em&gt;&lt;/strong&gt; affects the behaviour of your classes. If you&amp;rsquo;re changing the state of the class, fields and many other actions then you should use the &lt;a href=&#34;https://en.wikipedia.org/wiki/State_pattern&#34;&gt;State Pattern&lt;/a&gt;. If it only affects how you select a behaviour of the class then the &lt;a href=&#34;https://en.wikipedia.org/wiki/Strategy_pattern&#34;&gt;Strategy Pattern&lt;/a&gt; is a better choice.&lt;/p&gt;
-
-&lt;p&gt;Hmm&amp;hellip; It&amp;rsquo;s a little confusing, no? So let&amp;rsquo;s try with an example.&lt;/p&gt;
-
-&lt;p&gt;You have an enumeration EmployeeType:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public enum EmployeeType 
-{ 		
-	Worker, 		
-	Supervisor, 		
-	Manager 	
-} 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;And a class Employee:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Employee 
-{     
-	private float salary;     
-	private float bonusPercentage;     
-	private EmployeeType employeeType;      
-
-	public Employee(float salary, float bonusPercentage, EmployeeType employeeType)     
-	{         
-		this.salary = salary;         
-		this.bonusPercentage = bonusPercentage;         
-		this.employeeType = employeeType;     
-	}      
-
-	public float CalculateSalary()      
-	{         
-		switch (employeeType)          
-		{             
-			case EmployeeType.Worker:                 
-				return salary;              
-			case EmployeeType.Supervisor:                 
-				return salary + (bonusPercentage * 0.5F);             
-			case EmployeeType.Manager:                 
-				return salary + (bonusPercentage * 0.7F);         
-		}
-
-        return 0.0F;     
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;It all looks ok. But what happen if you need to calculate the year bonus? You will add another method like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public float CalculateYearBonus()  
-{     
-	switch (employeeType)      
-	{         
-		case EmployeeType.Worker:             
-			return 0;          
-		case EmployeeType.Supervisor:             
-			return salary + salary * 0.7F;         
-		case EmployeeType.Manager:             
-			return salary + salary * 1.0F;	     
-	}
-
-	return 0.0F;
-} 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;See the repetition of the switch? So let&amp;rsquo;s try first the subclass approach: Here is the superclass:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;abstract public class Employee  
-{ 
-
-	  protected float salary;     
-	protected float bonusPercentage;      
-
-	public Employee(float salary, float bonusPercentage)     
-	{         
-		this.salary = salary;         
-		this.bonusPercentage = bonusPercentage;     
-	}      
-
-	abstract public float CalculateSalary();
-
-	  virtual public float CalculateYearBonus()      
-	{ 
-	    return 0.0F;     
-	}
- }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;And here we have the subclasses:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Worker: Employee  
-{ 
-
-	public Worker(float salary, float bonusPercentage)   
-		: base(salary, bonusPercentage)  
-	{}    
-
-	 override public float CalculateSalary()      
-	 {         
-	 	return salary;      
-	 }
- }
-
-public class Supervisor : Employee 
-{     
-
-	public Supervisor(float salary, float bonusPercentage) 
-	        : base(salary, bonusPercentage)     
-	{}      
-
-	override public float CalculateSalary()      
-	{         
-		return salary + (bonusPercentage * 0.5F);     
-	}      
-
-	public override float CalculateYearBonus()     
-	{         
-		return salary + salary * 0.7F;     
-	}
- }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;With the Strategy approach we would create an interface for calculating the remuneration:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface IRemunerationCalculator  	
-{ 		
-	float CalculateSalary(float salary); 		
-	float CalculateYearBonus(float salary); 	
-} 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;With the interface in place, we can now pass to the employee any class that conforms to that protocol and calculate the correct salary/bonus.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Employee
-{     
-	private float salary;     
-	private IRemunerationCalculator remunerationCalculator;      
-
-	public Employee(float salary, IRemunerationCalculator remunerationCalculator)     
-	{
-        this.salary = salary;         
-        this.remunerationCalculator = remunerationCalculator;     
-    }      
-
-    public float CalculateSalary()     
-    {         
-    	return remunerationCalculator.CalculateSalary(salary);     
-    } 			     
-
-    public float CalculateYearBonus()      
-    {         
-    	return remunerationCalculator.CalculateYearBonus(salary);     
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;temporary-field&#34;&gt;Temporary Field&lt;/h4&gt;
-
-&lt;p&gt;This case occurs when we are calculating a big algorithm that needs several input variables. Creating these fields in the class has no value most of the time because they are just used for this specific calculation. And this can be dangerous too because you have to be sure you reinitialize them before you start the next computation.&lt;/p&gt;
-
-&lt;p&gt;Here the best refactoring technique is to use &lt;strong&gt;&lt;em&gt;Replace Method with Method Object&lt;/em&gt;&lt;/strong&gt;, which will extract the method into a separate class. Then you can split the method into several methods within the same class.&lt;/p&gt;
-
-&lt;h4 id=&#34;refused-bequest&#34;&gt;Refused Bequest&lt;/h4&gt;
-
-&lt;p&gt;This code smell is a little tricky to detect because this happens when a subclass doesn&amp;rsquo;t use all the behaviours of its parent class. So it&amp;rsquo;s as if the subclass &amp;ldquo;refuses&amp;rdquo; some behaviours (&amp;ldquo;bequest&amp;rdquo;) of its parent class.&lt;/p&gt;
-
-&lt;p&gt;In this case, if it makes no sense to continue to use inheritance, the best refactoring technique is to change to &lt;strong&gt;&lt;em&gt;Delegation&lt;/em&gt;&lt;/strong&gt;: we can get rid of the inheritance by creating a field of the parent&amp;rsquo;s classes type in our subclass. This way every time you need the methods from the parent class you just delegate them to this new object.&lt;/p&gt;
-
-&lt;p&gt;When the inheritance is the correct thing to do, then move all unnecessary fields and methods from the subclass. Extract all methods and fields from the subclass and parent class and put them in a new class. Make this new class the SuperClass, from whom the subclass and parent class should inherit. This technique is called &lt;strong&gt;&lt;em&gt;Extract Superclass&lt;/em&gt;&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;h4 id=&#34;alternative-classes-with-different-interfaces&#34;&gt;Alternative Classes with Different Interfaces&lt;/h4&gt;
-
-&lt;p&gt;Hmm, this case makes me think of &amp;ldquo;lack of communication&amp;rdquo; between members of the same team because this happens when we have two classes that do the same thing but have different names for their methods.
-Start by &lt;strong&gt;&lt;em&gt;Renaming Methods&lt;/em&gt;&lt;/strong&gt; or &lt;strong&gt;&lt;em&gt;Moving Method&lt;/em&gt;&lt;/strong&gt;, so you can have both classes implementing the same interface. In some cases, only part of the behaviour is duplicated in both classes. If so, try &lt;strong&gt;&lt;em&gt;Extract Superclass&lt;/em&gt;&lt;/strong&gt; and make the original classes the subclasses.&lt;/p&gt;
-
-&lt;h2 id=&#34;change-preventers&#34;&gt;Change Preventers&lt;/h2&gt;
-
-&lt;p&gt;Oh boy! This kind of code smells are the ones you really want to avoid. These are the ones that when you make a change in one place, you have to go basically throughout your code-base making changes in other places too. So it&amp;rsquo;s a nightmare that all of us want to avoid!&lt;/p&gt;
-
-&lt;h4 id=&#34;divergent-change&#34;&gt;Divergent Change&lt;/h4&gt;
-
-&lt;p&gt;This is the case when you find yourself changing the same class for several different reasons. This means that you are violating the [Single Responsibility Principle](&lt;a href=&#34;https://en.wikipedia.org/wiki/SOLID_(object-oriented_design&#34;&gt;https://en.wikipedia.org/wiki/SOLID_(object-oriented_design&lt;/a&gt;) (which has to do with separation of concerns).&lt;/p&gt;
-
-&lt;p&gt;The refactoring technique applied here is &lt;strong&gt;&lt;em&gt;Extract Class&lt;/em&gt;&lt;/strong&gt; since you want to extract the different behaviours into different classes.&lt;/p&gt;
-
-&lt;h4 id=&#34;shotgun-surgery&#34;&gt;Shotgun Surgery&lt;/h4&gt;
-
-&lt;p&gt;This means that when you make a small change in a class, you have to go and change several classes at the same time.&lt;/p&gt;
-
-&lt;p&gt;Even though it seems the same as the &lt;strong&gt;&lt;em&gt;Divergent Change&lt;/em&gt;&lt;/strong&gt; smell, in reality, they are opposite of each other: &lt;strong&gt;&lt;em&gt;Divergent Change&lt;/em&gt;&lt;/strong&gt; is when many changes are made to a single class. &lt;strong&gt;&lt;em&gt;Shotgun Surgery&lt;/em&gt;&lt;/strong&gt; refers to when a single change is made to multiple classes simultaneously.&lt;/p&gt;
-
-&lt;p&gt;Here the refactoring technique to apply is &lt;strong&gt;&lt;em&gt;Move Method&lt;/em&gt;&lt;/strong&gt; and/or &lt;strong&gt;&lt;em&gt;Move Field&lt;/em&gt;&lt;/strong&gt;. This will permit you to move the duplicated methods or fields to a common class. If that class doesn&amp;rsquo;t exist, create a new one. In the case where the original class stays almost empty, maybe you should think if this class is redundant, and if so, get rid of it by using &lt;strong&gt;&lt;em&gt;Inline Class&lt;/em&gt;&lt;/strong&gt;: move the remaining methods/fields to one of the new classes created. This all depends on whether the original class still has any responsibilities.&lt;/p&gt;
-
-&lt;h4 id=&#34;parallel-inheritance-hierarchies&#34;&gt;Parallel Inheritance Hierarchies&lt;/h4&gt;
-
-&lt;p&gt;This case is when you find yourself creating a new subclass for class B because you add a subclass to class A.&lt;/p&gt;
-
-&lt;p&gt;Here you can: first, make one of the hierarchy refer to instances of another hierarchy. After this first step you can then use &lt;strong&gt;&lt;em&gt;Move Method&lt;/em&gt;&lt;/strong&gt; and &lt;strong&gt;&lt;em&gt;Move Field&lt;/em&gt;&lt;/strong&gt; to remove the hierarchy in the referred class. You can apply here the &lt;a href=&#34;https://en.wikipedia.org/wiki/Visitor_pattern&#34;&gt;Visitor pattern&lt;/a&gt; too.&lt;/p&gt;
-
-&lt;h3 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h3&gt;
-
-&lt;p&gt;In the case of &lt;strong&gt;&lt;em&gt;Object-Orientation Abusers&lt;/em&gt;&lt;/strong&gt; and &lt;strong&gt;&lt;em&gt;Change Preventers&lt;/em&gt;&lt;/strong&gt;, I think that they are simpler to avoid if you know how to apply a good design to your code. And that comes with a lot of practice.&lt;/p&gt;
-
-&lt;p&gt;Today I&amp;rsquo;ve talked about a few refactoring techniques, but there are a lot more. You can find a good reference to all of then in &lt;a href=&#34;http://refactoring.com/catalog/&#34;&gt;Refactoring.com&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;And as I said in the &lt;a href=&#34;http://codurance.com/2016/03/17/code-smells-part-I/&#34;&gt;first part of this series&lt;/a&gt;, code smells can&amp;rsquo;t always be removed. Study each case and decide: remember there is always a trade off.&lt;/p&gt;
-</description>
-    </item>
-    
-  </channel>
-</rss>
