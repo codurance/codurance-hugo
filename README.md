@@ -4,11 +4,7 @@
 
 ## What do you have to install? 
 
-Almost Nothing ;)
-
-1. [Download](https://github.com/spf13/hugo/releases) Hugo.
-
-2. [Install](https://gohugo.io/overview/installing/) Hugo. 
+Nothing
 
 ## What do you have to do to run the site locally?
 
@@ -16,4 +12,18 @@ Almost Nothing ;)
  
 **Just run:**
 
-```hugo server --theme=codurance --buildDrafts --verbose --verboseLog```
+on Mac OS/X:
+
+```./bin/hugo server --buildDrafts --verbose --verboseLog --watch```
+
+on Windows:
+
+```[TODO]```
+
+on Linux:
+
+```[TODO]```
+
+**and enjoy our website in a web browser:*
+ 
+```http://localhost:1313/```
