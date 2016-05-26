@@ -12,17 +12,19 @@ Nothing
  
 **Just run:**
 
-on Mac OS/X:
+#### on Mac OS/X:
 
 ```./bin/hugo server --buildDrafts --verbose --verboseLog --watch```
 
-on Windows:
+#### on Windows:
 
-```[TODO]```
+```./bin/hugo_windows_amd64.exe server --buildDrafts --verbose --verboseLog --watch```
 
-on Linux:
+**If your Windows OS is 32-bit version you can use *hugo_windows_386.exe* instead of *hugo_windows_amd64.exe***
 
-```[TODO]```
+#### on Linux:
+
+```./bin/hugo_linux_amd64 server --buildDrafts --verbose --verboseLog --watch```
 
 **and enjoy our website in a web browser:*
  
